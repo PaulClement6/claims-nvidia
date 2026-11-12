@@ -4,6 +4,7 @@ version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi",
+    "httpx2>=2.16.0",
     "pypdf>=7.0.1",
     "python-multipart>=0.0.33",
     "uvicorn[standard]",
@@ -14,7 +15,6 @@ dev = [
     "pytest",
     "ruff",
     "mypy",
-    "httpx2>=2.16.0",
     "reportlab>=5.1.0",
     "pillow>=13.0.0",
 ]
@@ -27,3 +27,5 @@ select = ["E", "F", "I", "UP", "B"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+markers = ["live: calls the real model with NVIDIA_KEY; run with -m live"]
+addopts = "-m 'not live'"

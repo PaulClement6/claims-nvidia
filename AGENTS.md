@@ -21,7 +21,7 @@ Target: a working demo on real-looking mock claim files at the Q1 2027 event.
 
 ## Status
 
-2026-11-12: M0 to M2 are built (issues #2 to #11): the full claim flow works in `local` mode, and the three mock claim files give `straight_through`, `handler_review` and `investigation`. Next for the base: M3 (LLM agent, OpenShell sandbox, deploy on the VM). The intern owns M4: the document reading pipeline behind the `Reader` contract (`README.md`).
+2026-11-12: M0 to M2 are built (issues #2 to #11): the full claim flow works in `local` mode, and the three mock claim files give `straight_through`, `handler_review` and `investigation`. M3 has started: the LLM agent runs in `nim` mode (issue #12, `docs/EVALUATION.md`). Next for the base: the OpenShell sandbox and the deploy on the VM. The intern owns M4: the document reading pipeline behind the `Reader` contract (`README.md`).
 
 ## Commands (target, same as NemoForge)
 
@@ -31,6 +31,8 @@ Backend in `backend/` (Python, FastAPI, uv). Frontend in `frontend/` (React, Vit
 - Types: `cd backend && uv run mypy .` and `cd frontend && npm run typecheck`
 - Lint: `cd backend && uv run ruff check . ../scripts` and `cd frontend && npm run lint`
 - Mock documents: `cd backend && uv run python ../scripts/generate_mock_documents.py`
+- Run: `cd backend && uv run uvicorn app.main:app --env-file ../.env` (loads `.env`: `CLAIMS_MODE`, `NVIDIA_KEY`, the model settings) and `cd frontend && npm run dev`
+- Live tests (the real model, needs `NVIDIA_KEY` in `.env`, skipped in CI): `cd backend && uv run pytest -m live`. Measure: `cd backend && uv run python ../scripts/measure_agent.py` (`docs/EVALUATION.md`)
 - Run tests and types before you say a task is done.
 
 ## Non-negotiables
@@ -60,7 +62,8 @@ Each rule must point to a test that checks it. The ticket that first touches a r
 - Work in vertical slices: each change touches every layer it needs and is testable end to end.
 - `local` mode must always work with no GPU and no sandbox. CI runs in `local` mode.
 - Do only what the current issue asks. List other problems at the end of your report.
-- Never push to `main`. Never merge pull requests. The human merges.
+- Never push to `main`: `main` takes pull requests only, and the CI check `checks` must be green.
+- The coordinating agent merges a pull request of the base when CI is green and there is no conflict (Paul, 2026-11-12). Other agents and the intern do not merge: Paul or the coordinating agent does.
 - Check the NVIDIA docs before you write code against a NVIDIA API. The stack changes every month. `docs/READING-LIST.md` has the links.
 
 ## How to talk to me

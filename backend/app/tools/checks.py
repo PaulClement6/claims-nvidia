@@ -38,5 +38,19 @@ def register(gateway: Gateway, uploads: Path) -> None:
         return add(claim, check_consistency(claim, workflow))
 
     # like run_checks: the agent gets nothing back, the event keeps the signals
-    gateway.register("check_tampering", tampering, visible=())
-    gateway.register("check_consistency", consistency, visible=())
+    gateway.register(
+        "check_tampering",
+        tampering,
+        visible=(),
+        description=(
+            "Check step 2 of 3. Run it when the customer is done, after run_checks."
+        ),
+    )
+    gateway.register(
+        "check_consistency",
+        consistency,
+        visible=(),
+        description=(
+            "Check step 3 of 3. Run it when the customer is done, after run_checks."
+        ),
+    )

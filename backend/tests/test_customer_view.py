@@ -1,5 +1,6 @@
 """Non-negotiable 2: the customer never sees a score, a flag or the word "fraud"."""
 
+import re
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
@@ -12,6 +13,7 @@ from app.models import Claim, FraudReport, Outcome
 from app.views import CustomerView, customer_view
 from tests import test_health_api, test_property_api
 from tests.builders import signal, travel_claim
+from tests.fake_chat import use_fake_model
 
 VALIDATED = "Your claim is validated. You will receive a confirmation by e-mail."
 REVIEW = "A claims specialist will review your case and contact you."
@@ -70,8 +72,13 @@ def test_no_message_before_the_result() -> None:
     assert view.message is None and view.status == "open"
 
 
-@pytest.fixture
-def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
+@pytest.fixture(params=["local", "nim"])
+def client(
+    request: pytest.FixtureRequest, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> Iterator[TestClient]:
+    """Both agents: the scripted one, and the LLM agent with a fake model."""
+    if request.param == "nim":
+        use_fake_model(monkeypatch)
     monkeypatch.setenv("CLAIMS_DB", str(tmp_path / "claims.db"))
     monkeypatch.setenv("CLAIMS_UPLOADS", str(tmp_path / "uploads"))
     with TestClient(create_app()) as c:
@@ -110,7 +117,9 @@ def test_the_customer_endpoints_of_claim_file_3_hold_nothing_of_the_report(
     low = body.lower()
     for text in secrets:
         assert text not in body
-    for word in ("fraud", "score", "130", "signal", "finding", "evidence", "tamper",
+    # the score is a whole number: "130" inside a time stamp or an id is not a leak
+    assert not re.search(r"\b130\b", body)
+    for word in ("fraud", "score", "signal", "finding", "evidence", "tamper",
                  "investigation", "handler_review", "straight_through",
                  "r003", "r004", "r005", "t001", "t002", "t003", "c001",
                  "not_checked", "next_steps", "edited", "jonas"):  # fmt: skip

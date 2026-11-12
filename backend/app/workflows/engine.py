@@ -24,6 +24,9 @@ class Workflow:
     causes: tuple[tuple[str, str], ...] = ()
     default_cause: str = "other"
 
+    def all_causes(self) -> list[str]:
+        return [c for c, _ in self.causes] + [self.default_cause]
+
     def cause_of(self, story: str) -> str:
         for cause, pattern in self.causes:
             if re.search(pattern, story, re.I):

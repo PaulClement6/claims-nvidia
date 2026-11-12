@@ -71,9 +71,23 @@ def register(gateway: Gateway) -> None:
 
     # The agent gets nothing from the checks, and only the customer text from the
     # routing. The event keeps the full result for the pipeline panel.
-    gateway.register("run_checks", run_checks, visible=())
     gateway.register(
-        "assess_and_route", assess_and_route, visible=("customer_message",)
+        "run_checks",
+        run_checks,
+        visible=(),
+        description=(
+            "Check step 1 of 3. Run it only when the customer says they are done "
+            "and have no more documents."
+        ),
+    )
+    gateway.register(
+        "assess_and_route",
+        assess_and_route,
+        visible=("customer_message",),
+        description=(
+            "The last step. Call it after run_checks, check_tampering and "
+            "check_consistency. Returns the message for the customer."
+        ),
     )
     gateway.register(
         "write_fraud_report",
