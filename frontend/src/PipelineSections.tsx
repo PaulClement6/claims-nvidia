@@ -34,30 +34,32 @@ export function FraudReportSection({ report }: { report: FraudReport }) {
         <span className="pill pill-bad">{`${report.outcome} · score ${report.score}`}</span>
       </p>
       <p className="report-summary">{report.summary}</p>
-      <table>
-        <thead>
-          <tr>
-            <th>Code</th>
-            <th>What the system saw</th>
-            <th>Where</th>
-            <th>Expected</th>
-          </tr>
-        </thead>
-        <tbody>
-          {report.findings.map((f) => (
-            <tr key={f.code}>
-              <td className="mono">{f.code}</td>
-              <td>{f.saw}</td>
-              <td className="muted">
-                {f.where.map((w) => (
-                  <div key={w}>{w}</div>
-                ))}
-              </td>
-              <td className="muted">{f.expected}</td>
+      <div className="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>What the system saw</th>
+              <th>Where</th>
+              <th>Expected</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {report.findings.map((f) => (
+              <tr key={f.code}>
+                <td className="mono">{f.code}</td>
+                <td>{f.saw}</td>
+                <td className="muted">
+                  {f.where.map((w) => (
+                    <div key={w}>{w}</div>
+                  ))}
+                </td>
+                <td className="muted">{f.expected}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <h4>Not checked</h4>
       <ul>
         {report.not_checked.map((t) => (
@@ -107,34 +109,36 @@ export function ChecksSection({ claim, ran }: { claim: PipelineClaim; ran: boole
       {claim.signals.length === 0 ? (
         <p className="muted">No signal.</p>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Code</th>
-              <th>Title</th>
-              <th>Severity</th>
-              <th>Points</th>
-              <th>Evidence</th>
-            </tr>
-          </thead>
-          <tbody>
-            {claim.signals.map((s) => (
-              <tr key={s.code}>
-                <td className="mono">{s.code}</td>
-                <td>{s.title}</td>
-                <td>
-                  <span className={`pill ${SEVERITY_PILL[s.severity] ?? 'pill-idle'}`}>{s.severity}</span>
-                </td>
-                <td className="mono">{s.points}</td>
-                <td className="muted">
-                  {s.evidence.length === 0
-                    ? s.detail
-                    : s.evidence.map((e) => <div key={`${e.document_id}-${e.page}`}>{`${docName(claim.documents, e.document_id)} · page ${e.page}`}</div>)}
-                </td>
+        <div className="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Title</th>
+                <th>Severity</th>
+                <th>Points</th>
+                <th>Evidence</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {claim.signals.map((s) => (
+                <tr key={s.code}>
+                  <td className="mono">{s.code}</td>
+                  <td>{s.title}</td>
+                  <td>
+                    <span className={`pill ${SEVERITY_PILL[s.severity] ?? 'pill-idle'}`}>{s.severity}</span>
+                  </td>
+                  <td className="mono">{s.points}</td>
+                  <td className="muted">
+                    {s.evidence.length === 0
+                      ? s.detail
+                      : s.evidence.map((e) => <div key={`${e.document_id}-${e.page}`}>{`${docName(claim.documents, e.document_id)} · page ${e.page}`}</div>)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   )
@@ -160,24 +164,26 @@ export function ExtractedSection({ docs, claimId }: { docs: Doc[]; claimId: stri
           {d.fields.length === 0 ? (
             <p className="muted">No field read.</p>
           ) : (
-            <table>
-              <thead>
-                <tr>
-                  <th>Field</th>
-                  <th>Value</th>
-                  <th>Source</th>
-                </tr>
-              </thead>
-              <tbody>
-                {d.fields.map((f) => (
-                  <tr key={f.name}>
-                    <td>{f.name}</td>
-                    <td className="mono">{String(f.value)}</td>
-                    <td className="muted">{f.source.snippet ? `page ${f.source.page} · “${f.source.snippet}”` : `page ${f.source.page} · box ${f.source.box?.join(', ') ?? ''}`}</td>
+            <div className="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                    <th>Source</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {d.fields.map((f) => (
+                    <tr key={f.name}>
+                      <td>{f.name}</td>
+                      <td className="mono">{String(f.value)}</td>
+                      <td className="muted">{f.source.snippet ? `page ${f.source.page} · “${f.source.snippet}”` : `page ${f.source.page} · box ${f.source.box?.join(', ') ?? ''}`}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       ))}

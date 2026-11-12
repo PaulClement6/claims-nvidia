@@ -376,14 +376,25 @@ td {
 }
 .events summary {
   display: flex;
+  flex-wrap: wrap; /* a long model name goes to its own line, the row never grows wider than the panel */
   align-items: center;
-  gap: 10px;
+  gap: 4px 10px;
   padding: 10px 0;
   cursor: pointer;
 }
 .event-title {
-  flex: 1;
+  flex: 1 1 10em;
   min-width: 0;
+  overflow-wrap: anywhere;
+}
+.events summary .mono {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* a table may scroll inside its own box: the panel never scrolls sideways */
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
 }
 .events pre {
   margin: 0 0 10px;
