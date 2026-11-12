@@ -165,3 +165,38 @@ test('the Done button is on only in the documents step and sends "done"', async 
   expect(await screen.findByText('done')).toHaveClass('bubble-customer')
   await vi.waitFor(() => expect(screen.getByRole('button', { name: 'Done' })).toBeDisabled())
 })
+
+test('an agent bubble with three dots shows while a request runs, and goes when the answer arrives or fails', async () => {
+  let release: () => void = () => {}
+  let gate = new Promise<void>((r) => (release = r))
+  let fail = false
+  const base = withChat()
+  vi.stubGlobal(
+    'fetch',
+    vi.fn((url: string, init?: RequestInit) =>
+      init?.method === 'POST' ? gate.then(() => (fail ? Promise.reject(new Error('down')) : Response.json([]))) : base(url, init),
+    ),
+  )
+  render(<CustomerPanel claimId="CL-1" onClaim={() => {}} />)
+  const input = await screen.findByRole('textbox', { name: 'Message' })
+  expect(screen.queryByText('The agent is typing')).not.toBeInTheDocument()
+
+  fireEvent.change(input, { target: { value: 'I was ill' } })
+  fireEvent.submit(input.closest('form')!)
+  const typing = (await screen.findByText('The agent is typing')).closest('p')!
+  expect(typing).toHaveClass('bubble', 'bubble-agent', 'typing')
+  expect(typing.querySelectorAll('.typing-dots i')).toHaveLength(3)
+  expect(typing.querySelector('.typing-still')).toHaveTextContent('…') // shown instead of the dots when motion is off
+  expect(screen.getByRole('log').lastElementChild).toBe(typing) // after the last message
+  release()
+  await vi.waitFor(() => expect(screen.queryByText('The agent is typing')).not.toBeInTheDocument())
+
+  fail = true
+  gate = new Promise<void>((r) => (release = r))
+  fireEvent.change(input, { target: { value: 'again' } })
+  fireEvent.submit(input.closest('form')!)
+  expect(await screen.findByText('The agent is typing')).toBeInTheDocument()
+  release()
+  expect(await screen.findByText('The message was not sent.')).toBeInTheDocument()
+  expect(screen.queryByText('The agent is typing')).not.toBeInTheDocument()
+})

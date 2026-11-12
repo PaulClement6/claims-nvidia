@@ -521,3 +521,131 @@ td {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* Sandbox section of the pipeline panel (issue #15). */
+
+.sandbox-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0;
+}
+.reach {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 14px;
+  margin: 0;
+}
+.reach dt {
+  color: var(--text-2);
+}
+.reach dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.tool-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.tool-pill {
+  padding: 2px 8px;
+  font-size: 11px;
+}
+.tool-pill::before {
+  display: none;
+}
+.probe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.probe-list li {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 2px 10px;
+}
+.probe-list .muted {
+  grid-column: 2;
+  overflow-wrap: anywhere;
+}
+/* the denied table: long paths wrap, so the panel does not scroll sideways */
+.sandbox table {
+  table-layout: fixed;
+}
+.sandbox th:first-child {
+  width: 6.5em;
+}
+.sandbox th,
+.sandbox td {
+  padding: 8px 8px;
+  overflow-wrap: anywhere;
+}
+.sidebar-foot .model-name {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.sandbox h4 {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.sandbox > p {
+  margin: 0;
+}
+
+/* The agent is typing: three dots, or a still "…" for people who ask for less motion. */
+
+.typing {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.45em;
+}
+.typing-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+.typing-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-2);
+  animation: typing-dot 1.2s infinite ease-in-out;
+}
+.typing-dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing-dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.typing-still {
+  display: none;
+  color: var(--text-2);
+}
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .typing-dots {
+    display: none;
+  }
+  .typing-still {
+    display: inline;
+  }
+}

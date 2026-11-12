@@ -306,3 +306,42 @@ test('shows no graph strip without a claim', () => {
   render(<PipelinePanel claimId={null} />)
   expect(screen.queryByRole('list', { name: 'Agent graph' })).not.toBeInTheDocument()
 })
+
+test('shows the events of a turn in the order of their time, not of their arrival', () => {
+  render(<PipelinePanel claimId="CL-1" />)
+  const source = FakeEventSource.all[0]
+  // the tool events arrive first; the node and model events of the sandbox come in a batch after
+  // them, with the time they happened (a whole second and a part of a second: not string order)
+  source.emit(event(1, { title: 'Tool call', time: '2026-11-12T10:00:01.5Z' }))
+  source.emit(event(2, { actor: 'workflow', title: 'Node: intake', time: '2026-11-12T10:00:01Z' }))
+  source.emit(event(3, { actor: 'agent', title: 'Model writes', time: '2026-11-12T10:00:02.250000Z' }))
+  source.emit(event(4, { actor: 'sandbox', stage: 'turn', title: 'Sandbox turn', time: '2026-11-12T10:00:02.5Z' }))
+  expect(screen.getAllByRole('group').length).toBe(4)
+  const titles = ['Node: intake', 'Tool call', 'Model writes', 'Sandbox turn'].map((t) => screen.getByText(t))
+  titles.forEach((el, i) => i > 0 && expect(titles[i - 1].compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy())
+  // equal times keep the order they arrived in
+  source.emit(event(5, { title: 'Same time A', time: '2026-11-12T10:00:09Z' }))
+  source.emit(event(6, { title: 'Same time B', time: '2026-11-12T10:00:09Z' }))
+  const ab = screen.getByText('Same time A').compareDocumentPosition(screen.getByText('Same time B'))
+  expect(ab & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+})
+
+test('sandbox events have their own pill colours among the others', () => {
+  render(<PipelinePanel claimId="CL-1" />)
+  const source = FakeEventSource.all[0]
+  const sb = (n: number, stage: string, extra = {}) => event(n, { actor: 'sandbox', stage, title: `Sandbox ${stage} ${n}`, ...extra })
+  source.emit(sb(1, 'created'))
+  source.emit(sb(2, 'denied', { outputs: { reason: 'x' } }))
+  source.emit(sb(3, 'probe', { outputs: { denied: true } }))
+  source.emit(sb(4, 'probe', { outputs: { denied: false } }))
+  source.emit(sb(5, 'failed'))
+  source.emit(event(6, { actor: 'agent', title: 'Agent', stage: 'llm' }))
+  const pill = (title: string) => screen.getByText(title).closest('summary')!.querySelector('.pill')!
+  expect(pill('Sandbox created 1')).toHaveClass('pill-idle')
+  expect(pill('Sandbox denied 2')).toHaveClass('pill-warn')
+  expect(pill('Sandbox probe 3')).toHaveClass('pill-ok')
+  expect(pill('Sandbox probe 4')).toHaveClass('pill-bad')
+  expect(pill('Sandbox failed 5')).toHaveClass('pill-bad')
+  expect(pill('Agent')).toHaveClass('pill-idle')
+  expect(pill('Sandbox created 1').textContent).toBe('sandbox')
+})
