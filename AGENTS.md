@@ -62,7 +62,8 @@ Each rule must point to a test that checks it. The ticket that first touches a r
 - Work in vertical slices: each change touches every layer it needs and is testable end to end.
 - `local` mode must always work with no GPU and no sandbox. CI runs in `local` mode.
 - Do only what the current issue asks. List other problems at the end of your report.
-- Never push to `main`. Never merge pull requests. The human merges.
+- Never push to `main`: `main` takes pull requests only, and the CI check `checks` must be green.
+- The coordinating agent merges a pull request of the base when CI is green and there is no conflict (Paul, 2026-11-12). Other agents and the intern do not merge: Paul or the coordinating agent does.
 - Check the NVIDIA docs before you write code against a NVIDIA API. The stack changes every month. `docs/READING-LIST.md` has the links.
 
 ## How to talk to me

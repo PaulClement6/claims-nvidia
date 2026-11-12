@@ -3,14 +3,27 @@ services:
     build: ./backend
     environment:
       CLAIMS_DATA: /data
+      CLAIMS_DB: /var/claims/claims.db
+      CLAIMS_UPLOADS: /var/claims/uploads
     volumes:
       - ./data:/data:ro
+      - claims-state:/var/claims # database and uploads survive a restart
     ports:
       - "${BACKEND_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/health')"]
+      interval: 3s
+      retries: 20
 
   frontend:
     build: ./frontend
     environment:
       BACKEND_URL: http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
     ports:
       - "${FRONTEND_PORT:-5173}:5173"
+
+volumes:
+  claims-state:

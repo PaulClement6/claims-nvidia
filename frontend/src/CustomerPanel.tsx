@@ -7,7 +7,7 @@ type Policy = { number: string; line_of_business: string }
 // the customer endpoint: claim id, policy, status and the result text, nothing else
 type View = { claim_id: string; policy_number: string | null; status: string; message: string | null }
 
-export default function CustomerPanel({ claimId, onClaim }: { claimId: string | null; onClaim: (id: string) => void }) {
+export default function CustomerPanel({ claimId, onClaim }: { claimId: string | null; onClaim: (id: string | null) => void }) {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [policies, setPolicies] = useState<Policy[]>([])
   const [filter, setFilter] = useState('')
@@ -49,6 +49,12 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
       })
       .catch(() => setError('The policy was not set.'))
 
+  const newClaim = () => {
+    setClaim(null)
+    setPolicies([])
+    onClaim(null) // no data is deleted: the old claim stays in the store
+  }
+
   const q = filter.trim().toLowerCase()
   const shown = policies.filter((p) => `${p.number} ${p.line_of_business}`.toLowerCase().includes(q))
 
@@ -56,6 +62,11 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
     <section className="card panel panel-customer" aria-label="Customer">
       <p className="notice">Demo. Do not upload a real document.</p>
       <h2>Customer</h2>
+      {claimId && (
+        <button type="button" onClick={newClaim}>
+          New claim
+        </button>
+      )}
       {error && <p className="pill pill-bad">{error}</p>}
       {!claimId ? (
         <div className="stack">

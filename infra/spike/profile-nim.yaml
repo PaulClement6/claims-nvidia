@@ -1,0 +1,32 @@
+# Provider profile of the spike (issue #13): the NVIDIA hosted endpoint, direct (no Guardrails proxy).
+# Import it, then `openshell provider create --type claims-spike-nim --credential NVIDIA_API_KEY`.
+# The sandbox sees a placeholder in NVIDIA_API_KEY. The supervisor swaps in the real key
+# on the Authorization bearer toward integrate.api.nvidia.com only.
+id: claims-spike-nim
+display_name: Claims spike NVIDIA NIM
+description: OpenAI-compatible hosted NVIDIA endpoint, called directly
+category: inference
+inference_capable: true
+credentials:
+  - name: api_key
+    description: NVIDIA API key, injected at egress
+    env_vars: [NVIDIA_API_KEY]
+    required: true
+    auth_style: bearer
+    header_name: authorization
+discovery:
+  credentials: [api_key]
+endpoints:
+  - host: integrate.api.nvidia.com
+    port: 443
+    protocol: rest
+    enforcement: enforce
+    rules:
+      - allow:
+          method: POST
+          path: /v1/chat/completions
+binaries:
+  - /usr/local/bin/python3.12
+  - /usr/local/bin/python3
+  - /usr/local/bin/python
+  - /usr/bin/curl

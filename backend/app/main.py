@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 from pypdf import PdfReader
 
 from app.agent import Agent, get_agent
+from app.demo import router as demo_router
 from app.docintel.reader import get_reader
 from app.models import Claim, Customer, Document, Message, Policy
 from app.store import Store
@@ -239,6 +240,7 @@ def create_app() -> FastAPI:
             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
         )
 
+    app.include_router(demo_router)
     return app
 
 
