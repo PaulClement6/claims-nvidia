@@ -756,6 +756,76 @@ def test_a_failure_in_the_checks_is_the_fallback_and_the_next_turn_resumes(
     assert rig.claim()["outcome"] == "straight_through"
 
 
+def test_a_code_node_that_fails_twice_in_a_row_hands_the_claim_to_a_person(
+    rig: Rig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.agent.handover import HANDOVER
+    from app.agent.phrases import check_message
+
+    assert check_message(HANDOVER, "fake-model") is None  # the output filter
+    prepare_for_done(rig)
+    gateway = rig.client.app.state.gateway  # type: ignore[attr-defined]
+    real = gateway._tools["check_consistency"]
+
+    def down(**kw: Any) -> Any:
+        raise RuntimeError("the reader is down")
+
+    monkeypatch.setitem(
+        gateway._tools,
+        "check_consistency",
+        type(real)(
+            down,
+            real.model,
+            real.visible,
+            real.title,
+            real.description,
+            real.parameters,
+        ),
+    )
+    assert rig.say("done") == FALLBACK  # first failure: the usual fallback
+    assert rig.claim()["status"] == "open"
+    assert rig.say("hello?") == HANDOVER  # second one in a row: said once
+    c = rig.claim()
+    assert c["status"] == "in_review" and c["outcome"] is None
+    [failed] = [e for e in rig.events() if e.stage == "failed"]
+    assert (failed.actor, failed.outputs["outcome"]) == ("workflow", None)
+    assert "no outcome set" in failed.outputs["why"]
+    calls_before = len(tool_events(rig))
+    assert rig.say("anyone there?") == CLOSED  # not the fallback, not the handover
+    assert len(tool_events(rig)) == calls_before  # and no tool call
+    view = rig.client.get(f"/claims/{rig.cid}/customer").json()
+    assert view["status"] == "in_review" and view["message"] is None
+
+
+def test_two_failures_in_different_code_nodes_are_not_a_handover(
+    rig: Rig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    prepare_for_done(rig)
+    gateway = rig.client.app.state.gateway  # type: ignore[attr-defined]
+    for tool in ("check_consistency", "assess_and_route"):
+        real = gateway._tools[tool]
+        count = [0]
+
+        def flaky(real: Any = real, count: list[int] = count, **kw: Any) -> Any:
+            count[0] += 1
+            if count[0] == 1:
+                raise RuntimeError("down")
+            return real.fn(**kw)
+
+        monkeypatch.setitem(
+            gateway._tools,
+            tool,
+            type(real)(
+                flaky, real.model, real.visible, real.title, real.description,
+                real.parameters,
+            ),
+        )  # fmt: skip
+    assert rig.say("done") == FALLBACK  # checks fails once, then passes
+    assert rig.say("again") == FALLBACK  # route fails once: another node
+    assert rig.claim()["status"] == "open"
+    assert rig.say("once more") == VALIDATED
+
+
 def test_the_step_survives_a_restart_of_the_backend(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
