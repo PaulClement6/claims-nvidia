@@ -63,3 +63,26 @@ test('shows the claim line and the placeholder once the claim has a policy', asy
   expect(await screen.findByText('Claim CL-1 · TRV-2026-0417 · travel')).toBeInTheDocument()
   expect(screen.getByText('The chat comes next.')).toBeInTheDocument()
 })
+
+test('uploads a file to the claim once a policy is picked', async () => {
+  const fetchMock = vi.fn((url: string, init?: RequestInit) =>
+    Promise.resolve(
+      init?.method === 'POST'
+        ? Response.json({ id: 'D-1' }, { status: 201 })
+        : url === '/claims/CL-1'
+          ? Response.json(claim({ number: 'TRV-2026-0417' }, 'travel'))
+          : Response.json([]),
+    ),
+  )
+  vi.stubGlobal('fetch', fetchMock)
+  render(<CustomerPanel claimId="CL-1" onClaim={() => {}} />)
+
+  const input = await screen.findByLabelText(/Upload a document/)
+  const file = new File(['%PDF-'], 'booking.pdf', { type: 'application/pdf' })
+  fireEvent.change(input, { target: { files: [file] } })
+
+  await vi.waitFor(() => expect(fetchMock.mock.calls.some(([, i]) => i?.method === 'POST')).toBe(true))
+  const post = fetchMock.mock.calls.find(([, i]) => i?.method === 'POST')!
+  expect(post[0]).toBe('/claims/CL-1/documents')
+  expect((post[1]!.body as FormData).get('file')).toBe(file)
+})

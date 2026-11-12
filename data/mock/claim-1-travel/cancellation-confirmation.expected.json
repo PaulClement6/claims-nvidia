@@ -1,0 +1,40 @@
+{
+  "document_type": "cancellation_confirmation",
+  "fields": [
+    {
+      "name": "booking_reference",
+      "value": "WPR-482913",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "WPR-482913"
+    },
+    {
+      "name": "cancellation_date",
+      "value": "2026-08-04",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-08-04"
+    },
+    {
+      "name": "refund_received",
+      "value": 340.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "340.00"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Trip price paid",
+      "amount": 1840.0
+    },
+    {
+      "description": "Cancellation fees (terms, art. 7)",
+      "amount": -1500.0
+    },
+    {
+      "description": "Refund to your card",
+      "amount": 340.0
+    }
+  ]
+}

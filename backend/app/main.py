@@ -1,15 +1,26 @@
+import os
+import uuid
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from io import BytesIO
+from pathlib import Path
 
-from fastapi import FastAPI, Header, HTTPException, Query, Request
+from fastapi import FastAPI, Header, HTTPException, Query, Request, UploadFile
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+from pypdf import PdfReader
 
-from app.models import Claim, Customer, Policy
+from app.docintel.reader import get_reader
+from app.models import Claim, Customer, Document, Extraction, Policy
 from app.store import Store
 from app.stream import event_stream
+from app.tools import documents as documents_tool
 from app.tools import policies as policies_tool
 from app.tools.gateway import Gateway
+
+MAX_UPLOAD = 10 * 1024 * 1024
+# magic bytes -> extension; the client file name and content type are never trusted
+MAGIC = {b"%PDF-": ".pdf", b"\x89PNG\r\n\x1a\n": ".png", b"\xff\xd8\xff": ".jpg"}
 
 
 class NewClaim(BaseModel):
@@ -25,6 +36,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     store = Store()  # reads CLAIMS_DB at startup
     gateway = Gateway(store)
     policies_tool.register(gateway)
+    reader = get_reader()  # unknown CLAIMS_READER stops the startup
+    uploads = Path(os.environ.get("CLAIMS_UPLOADS", "uploads"))
+    documents_tool.register(gateway, reader, uploads)
+    app.state.uploads = uploads
     app.state.store = store
     app.state.gateway = gateway
     yield
@@ -78,6 +93,44 @@ def create_app() -> FastAPI:
         if claim is None:
             raise HTTPException(404, "policy not found for this customer")
         return claim
+
+    @app.post("/claims/{claim_id}/documents", status_code=201)
+    def upload_document(claim_id: str, request: Request, file: UploadFile) -> Document:
+        claim_or_404(request, claim_id)
+        data = file.file.read(MAX_UPLOAD + 1)
+        if len(data) > MAX_UPLOAD:
+            raise HTTPException(413, "file larger than 10 MB")
+        ext = next((e for m, e in MAGIC.items() if data.startswith(m)), None)
+        if ext is None:
+            raise HTTPException(415, "only PDF, PNG and JPEG files are accepted")
+        pages = 1
+        if ext == ".pdf":
+            try:
+                pages = max(1, len(PdfReader(BytesIO(data)).pages))
+            except Exception:
+                raise HTTPException(415, "the PDF cannot be read") from None
+        doc_id = f"D-{uuid.uuid4().hex[:8]}"
+        doc = Document(
+            id=doc_id,
+            file=f"{claim_id}/{doc_id}{ext}",
+            pages=pages,
+            file_metadata={"original_name": (file.filename or "")[:200]},
+        )
+        path: Path = request.app.state.uploads / doc.file
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+        store(request).save_document(claim_id, doc)
+        gateway: Gateway = request.app.state.gateway
+        doc.document_type = gateway.call(
+            claim_id, "classify_document", {"document_id": doc.id}
+        )["document_type"]
+        out = Extraction.model_validate(
+            gateway.call(claim_id, "extract_document", {"document_id": doc.id})
+        )
+        doc.document_type = out.document_type.value
+        doc.fields, doc.line_items = out.fields, out.line_items
+        store(request).save_document(claim_id, doc)
+        return doc
 
     @app.get("/claims/{claim_id}/events")
     def events(

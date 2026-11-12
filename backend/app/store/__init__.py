@@ -13,6 +13,7 @@ from app.models import (
     Claim,
     ClaimType,
     Customer,
+    Document,
     LineOfBusiness,
     PipelineEvent,
     Policy,
@@ -102,6 +103,26 @@ class Store:
             return None
         claim.policy = policy
         claim.type = CLAIM_TYPE[policy.line_of_business]
+        self._save_claim(claim)
+        return claim
+
+    def find_document(self, document_id: str) -> tuple[Claim, Document] | None:
+        # ponytail: scans all claims, add a documents table if the demo grows
+        rows = self.db.execute("SELECT data FROM claims").fetchall()
+        for (data,) in rows:
+            claim = Claim.model_validate_json(data)
+            for doc in claim.documents:
+                if doc.id == document_id:
+                    return claim, doc
+        return None
+
+    def save_document(self, claim_id: str, document: Document) -> Claim | None:
+        """Adds the document, or replaces the one with the same id."""
+        claim = self.get_claim(claim_id)
+        if claim is None:
+            return None
+        docs = [document if d.id == document.id else d for d in claim.documents]
+        claim.documents = docs if document in docs else [*docs, document]
         self._save_claim(claim)
         return claim
 

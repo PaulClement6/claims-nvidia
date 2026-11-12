@@ -86,3 +86,27 @@ test('closes the stream when the claim changes or the panel goes away', () => {
   unmount()
   expect(FakeEventSource.all[1].closed).toBe(true)
 })
+
+test('reloads the claim on an extract_document event and shows fields with their sources', async () => {
+  const doc = {
+    id: 'D-1',
+    file: 'CL-1/D-1.pdf',
+    document_type: 'booking_confirmation',
+    file_metadata: { original_name: 'booking.pdf' },
+    fields: [{ name: 'trip_price', value: 1840, source: { document_id: 'D-1', page: 1, snippet: 'CHF 1,840.00' } }],
+  }
+  const fetchMock = vi.fn(() => Promise.resolve(Response.json({ documents: [doc] })))
+  vi.stubGlobal('fetch', fetchMock)
+  render(<PipelinePanel claimId="CL-1" />)
+
+  FakeEventSource.all[0].emit(event(1, { stage: 'classify_document' }))
+  expect(fetchMock).not.toHaveBeenCalled()
+  FakeEventSource.all[0].emit(event(2, { stage: 'extract_document' }))
+
+  expect(await screen.findByText('booking.pdf')).toBeInTheDocument()
+  expect(fetchMock).toHaveBeenCalledWith('/claims/CL-1')
+  expect(screen.getByText('booking_confirmation')).toBeInTheDocument()
+  expect(screen.getByText('trip_price')).toBeInTheDocument()
+  expect(screen.getByText('1840')).toBeInTheDocument()
+  expect(screen.getByText('page 1 · “CHF 1,840.00”')).toBeInTheDocument()
+})

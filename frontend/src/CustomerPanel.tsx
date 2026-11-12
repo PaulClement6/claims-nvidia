@@ -47,6 +47,24 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
       })
       .catch(() => setError('The policy was not set.'))
 
+  // plain upload, one file at a time; the pipeline panel shows the result
+  const upload = (file: File | undefined) => {
+    if (!file) return
+    const body = new FormData()
+    body.append('file', file)
+    send(`/claims/${claimId}/documents`, { method: 'POST', body })
+      .then(() => setError(''))
+      .catch((e: Error) =>
+        setError(
+          e.message === '415'
+            ? 'Only PDF, PNG or JPEG files.'
+            : e.message === '413'
+              ? 'The file is larger than 10 MB.'
+              : 'The upload failed.',
+        ),
+      )
+  }
+
   const q = filter.trim().toLowerCase()
   const shown = policies.filter((p) => `${p.number} ${p.line_of_business}`.toLowerCase().includes(q))
 
@@ -67,6 +85,17 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
       ) : claim?.policy ? (
         <>
           <p className="mono">{`Claim ${claim.id} · ${claim.policy.number} · ${claim.type}`}</p>
+          <label className="stack">
+            Upload a document (PDF, PNG or JPEG)
+            <input
+              type="file"
+              accept="application/pdf,image/png,image/jpeg"
+              onChange={(e) => {
+                upload(e.target.files?.[0])
+                e.target.value = ''
+              }}
+            />
+          </label>
           <p className="muted">The chat comes next.</p>
         </>
       ) : claim ? (

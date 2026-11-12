@@ -56,6 +56,20 @@ class ExtractedField(BaseModel):
     source: Source
 
 
+class DocumentType(StrEnum):
+    booking_confirmation = "booking_confirmation"
+    cancellation_confirmation = "cancellation_confirmation"
+    medical_certificate = "medical_certificate"
+    repair_invoice = "repair_invoice"
+    repair_quote = "repair_quote"
+    damage_photo = "damage_photo"
+    police_report = "police_report"
+    medical_invoice = "medical_invoice"
+    medical_report = "medical_report"
+    receipt = "receipt"
+    unknown = "unknown"
+
+
 class Document(BaseModel):
     id: str
     file: str
@@ -64,6 +78,14 @@ class Document(BaseModel):
     fields: list[ExtractedField] = []
     line_items: list[dict[str, Any]] = []
     file_metadata: dict[str, Any] = {}
+
+
+class Extraction(BaseModel):
+    """What a Reader returns for one document (the contract of extract_document)."""
+
+    document_type: DocumentType
+    fields: list[ExtractedField] = []
+    line_items: list[dict[str, Any]] = []
 
 
 class Signal(BaseModel):

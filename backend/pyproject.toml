@@ -4,6 +4,8 @@ version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi",
+    "pypdf>=7.0.1",
+    "python-multipart>=0.0.33",
     "uvicorn[standard]",
 ]
 
@@ -13,6 +15,7 @@ dev = [
     "ruff",
     "mypy",
     "httpx2>=2.16.0",
+    "reportlab>=5.1.0",
 ]
 
 [tool.mypy]

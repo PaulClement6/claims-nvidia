@@ -1,0 +1,53 @@
+{
+  "document_type": "booking_confirmation",
+  "fields": [
+    {
+      "name": "booking_reference",
+      "value": "WPR-482913",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "WPR-482913"
+    },
+    {
+      "name": "departure_date",
+      "value": "2026-08-10",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-08-10"
+    },
+    {
+      "name": "trip_price",
+      "value": 1840.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 1,840.00"
+    },
+    {
+      "name": "traveller_name",
+      "value": "Anna Keller",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Anna Keller"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Return flights Zurich - Lisbon",
+      "quantity": 2,
+      "unit_price": 420.0,
+      "amount": 840.0
+    },
+    {
+      "description": "Hotel Miradouro, double room, 7 nights",
+      "quantity": 1,
+      "unit_price": 900.0,
+      "amount": 900.0
+    },
+    {
+      "description": "Airport transfers and city card",
+      "quantity": 1,
+      "unit_price": 100.0,
+      "amount": 100.0
+    }
+  ]
+}
