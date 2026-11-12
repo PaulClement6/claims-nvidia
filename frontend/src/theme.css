@@ -337,3 +337,25 @@ td {
     height: calc(100vh - 48px);
   }
 }
+
+/* Customer panel */
+
+.notice {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-weight: 500;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 12px;
+}
+.stack button {
+  text-align: left;
+}

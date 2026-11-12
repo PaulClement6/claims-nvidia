@@ -5,7 +5,7 @@ import App from './App'
 afterEach(() => vi.unstubAllGlobals())
 
 test('shows the brand, the two panels and the backend health', async () => {
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ status: 'ok' })))
+  vi.stubGlobal('fetch', vi.fn((url: string) => Promise.resolve(Response.json(url === '/health' ? { status: 'ok' } : []))))
   render(<App />)
   expect(screen.getByText('Claims')).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'Customer' })).toBeInTheDocument()
@@ -14,7 +14,7 @@ test('shows the brand, the two panels and the backend health', async () => {
 })
 
 test('the theme button switches and stores the theme', async () => {
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ status: 'ok' })))
+  vi.stubGlobal('fetch', vi.fn((url: string) => Promise.resolve(Response.json(url === '/health' ? { status: 'ok' } : []))))
   document.documentElement.dataset.theme = 'dark'
   render(<App />)
   screen.getByRole('button', { name: 'Light theme' }).click()

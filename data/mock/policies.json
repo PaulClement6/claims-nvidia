@@ -1,0 +1,15 @@
+{
+  "customers": [
+    {"id": "C-1001", "name": "Anna Keller"},
+    {"id": "C-1002", "name": "Marco Bianchi"},
+    {"id": "C-1003", "name": "Lukas Meier"}
+  ],
+  "policies": [
+    {"number": "TRV-2026-0417", "customer_id": "C-1001", "line_of_business": "Travel", "start": "2026-01-01", "end": "2026-12-31", "coverage_limit": 5000},
+    {"number": "HH-2025-1182", "customer_id": "C-1001", "line_of_business": "Household", "start": "2025-03-01", "end": "2027-02-28", "coverage_limit": 20000},
+    {"number": "HH-2024-0933", "customer_id": "C-1002", "line_of_business": "Household", "start": "2024-06-01", "end": "2027-05-31", "coverage_limit": 15000},
+    {"number": "TRV-2026-0721", "customer_id": "C-1002", "line_of_business": "Travel", "start": "2026-02-01", "end": "2027-01-31", "coverage_limit": 5000},
+    {"number": "ACC-2026-2210", "customer_id": "C-1003", "line_of_business": "Accident", "start": "2026-10-20", "end": "2027-10-19", "coverage_limit": 4500},
+    {"number": "HH-2026-0102", "customer_id": "C-1003", "line_of_business": "Household", "start": "2026-01-15", "end": "2027-01-14", "coverage_limit": 10000}
+  ]
+}
