@@ -90,7 +90,7 @@ Checks, score, routing and the UI read only the output of this contract. They do
 | `nim` | The LangGraph graph, in the backend process. Model: `ChatOpenAI` on the hosted NVIDIA endpoint. | Fixture reader or Omni reader (hosted endpoint) | None | Work on the agent and on extraction quality. |
 | `sandbox` | The same graph, in OpenShell. The tools are MCP tools. | Same as `nim` | Enforced | The demo, on the Brev VM. |
 
-The three modes share the tool gateway, the schemas, the rules and the UI. Only the agent and the model clients change. `sandbox` mode runs the same `build_graph`: the spike of issue #13 proved the graph, the model key swap and the MCP tools in OpenShell. The ticket for the MCP gateway (#14) connects them. `local` mode imports no LangChain and no LangGraph: the packages load only in `nim` mode. `local` mode must give the right outcome for the three mock claim files.
+The three modes share the tool gateway, the schemas, the rules and the UI. Only the agent and the model clients change. `sandbox` mode runs the same `build_graph`: the spike of issue #13 proved the graph, the model key swap and the MCP tools in OpenShell. Issue #14 built it (section 7). `local` mode imports no LangChain and no LangGraph: the packages load only in `nim` mode. `local` mode must give the right outcome for the three mock claim files.
 
 ## 4. Data model (Pydantic)
 
@@ -113,11 +113,26 @@ A workflow is declarative data plus rules: required documents, the claim schema,
 
 ## 7. Sandbox
 
-Same pattern as NemoForge: OpenShell with a deny-by-default policy. The policy allows the tool gateway and the model provider, and nothing else. No folder of the host except a scratch folder. OpenShell injects credentials outside the sandbox. The pipeline panel shows the policy and the denials.
+Same pattern as NemoForge: OpenShell with a deny-by-default policy. The policy allows the tool gateway and the model provider, and nothing else. No folder of the host except a scratch folder. OpenShell injects the model key outside the sandbox. The pipeline panel will show the policy and the denials (issue #15).
 
-The sandbox is part of the base and runs on the Brev VM (decision D25). The agent is the LangGraph graph of section 1a (decision D36, which replaces Hermes). The spike of issue #13 ran it in OpenShell: the backend sends each turn with `openshell sandbox exec`, the model call goes through the provider key swap, and the tools are MCP tools. NeMo Guardrails comes after the first demo.
+`CLAIMS_MODE=sandbox` (issue #14, decisions D44 to D49) runs the graph of section 1a in one OpenShell sandbox per claim. OpenShell 0.1.5 with Colima. Nothing in the sandbox is trusted: the backend decides what the customer reads.
 
-NemoForge runs OpenShell 0.1.5 with provider profiles (`inference.local` was removed in 0.1.x). Start from that setup, then test OpenShell 0.1.8: its gateway refuses to start without authentication, and static credentials go only in the `Authorization` header. Reuse its spike notes: `../nemoforge-plateforme/docs/DECISIONS.md` and `docs/LESSONS.md`.
+```
+ Backend (127.0.0.1:BACKEND_PORT)                    OpenShell sandbox `claims-<claim id>`
+   SandboxAgent ── sandbox exec, JSON on stdin ───►    python -m app.agent.sandbox_turn
+     create (1st turn) · turn · delete (close, reset)    the graph (same graph.py as nim mode)
+   MCP server  /mcp/<token>  ◄── MCP over HTTP ────     call_tool = MCP client, MCP_URL
+     guarded_call → gateway.call → one tool event        model ──► provider claims-nim ──► NIM
+```
+
+- **One setup, once**: `infra/sandbox/setup.sh` builds the image `claims-agent:1` (Python slim, non-root, the pinned packages, the graph files of `backend/app`, no `curl`), imports the profile `claims-nim` and creates the provider `claims-nim` with the key from `NVIDIA_KEY` (in the environment of that one command). All names start with `claims-`. The backend stops at startup, naming this script, when `openshell`, the gateway, the provider or the image is missing.
+- **MCP server** (`app/tools/mcp_server.py`): the tools of the gateway that the graph uses, on `/mcp/<token>`. The token fixes the claim. Every call goes through `guarded_call` and `gateway.call`, so rule 1 holds and one tool event is written per call. These tool events are the trusted ones.
+- **Policy** (`infra/sandbox/policy.yaml`, made for each sandbox by `render_policy`): one network policy, the MCP endpoint of this claim (`host.openshell.internal`, the backend port, the path with the token), methods `initialize`, `notifications/initialized`, `tools/list`, and `tools/call` for the tools of `GRAPH_TOOLS`. The model goes through the provider profile (`POST /v1/chat/completions` on `integrate.api.nvidia.com`). Landlock `hard_requirement`; `/sandbox` writable; the rest read-only. Another host, another path of the backend, the MCP path of another claim, another tool and `GET /v1/models` are denied (`pytest -m sandbox` checks each).
+- **A turn**: `openshell sandbox exec` with `{"text", "document_id"}` on stdin. The process runs the graph (SQLite checkpoint in `/sandbox/state`, thread id = claim id) and prints one JSON line: the reply and the node and model events. The backend stores the events as display-only (`"source": "sandbox"`), filters the reply, and, when the claim has an outcome, sends its own `customer_message` word for word.
+- **Events**: `sandbox` actor: `created` (seconds, policy file, shortened path, how to read the denials), `turn` (seconds), `deleted`, `failed` (the reason). Time per turn: `docs/EVALUATION.md`.
+- **What #15 needs**: the policy file of each sandbox is in `CLAIMS_SANDBOX_DIR` (default `.dev-data/sandboxes/<name>.policy.yaml`, mode 0600, it holds the token; its path is in the `created` event). The denials are `openshell logs <name> --source sandbox`, the lines with `DENIED` (the `created` event holds the command). Those OpenShell lines show the whole path, so the token: cut it before the panel shows a line.
+
+NemoForge runs OpenShell 0.1.5 with provider profiles (`inference.local` was removed in 0.1.x). This setup stays on 0.1.5. Later, test OpenShell 0.1.8: its gateway refuses to start without authentication, and static credentials go only in the `Authorization` header (table in `docs/DECISIONS.md`, spike section). NeMo Guardrails comes after the first demo. NemoForge notes: `../nemoforge-plateforme/docs/DECISIONS.md` and `docs/LESSONS.md`.
 
 ## 8. Stack
 
@@ -132,8 +147,8 @@ NemoForge runs OpenShell 0.1.5 with provider profiles (`inference.local` was rem
 ```
 backend/app/
   api/          claims, documents, events, views
-  agent/        graph (LangGraph, no store import), graph_agent (backend runner), scripted agent, phrases (shared words and rules), sandbox launcher
-  tools/        tool gateway, one module per tool, guard (rule 1 of the routing)
+  agent/        graph (LangGraph, no store import), graph_agent (backend runner), scripted agent, phrases (shared words and rules), model, sandbox (runner), sandbox_turn (the turn process in the image), sandbox_image (image build context)
+  tools/        tool gateway, one module per tool, guard (rule 1 of the routing), mcp_server
   docintel/     reader contract, fixture reader (base); Omni reader, evaluation (intern)
   workflows/    engine, property.py, health.py, travel.py
   checks/       rules, tampering, consistency
@@ -142,7 +157,7 @@ backend/app/
 backend/tests/
 frontend/src/   CustomerPanel, PipelinePanel
 data/mock/      customers, policies, claim files, expected results
-infra/          compose, sandbox policy, Brev setup
+infra/sandbox/  Dockerfile, policy template, provider profile, setup.sh (Brev setup later)
 scripts/        mock document generator, evaluation
 docs/
 ```

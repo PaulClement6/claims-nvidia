@@ -20,6 +20,7 @@ from app.models import (
     Outcome,
     PipelineEvent,
     Policy,
+    SandboxRecord,
 )
 
 # CLAIMS_DATA overrides it (the Docker image does not hold the repository).
@@ -58,6 +59,8 @@ class Store:
             CREATE TABLE IF NOT EXISTS messages (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 claim_id TEXT NOT NULL, data TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS sandboxes (
+                claim_id TEXT PRIMARY KEY, data TEXT NOT NULL);
             """
         )
         if not self.db.execute("SELECT 1 FROM customers").fetchone():
@@ -241,11 +244,31 @@ class Store:
             ).fetchall()
         return [PipelineEvent.model_validate_json(r[0]) for r in rows]
 
+    def save_sandbox(self, record: SandboxRecord) -> None:
+        with self.lock, self.db:
+            self.db.execute(
+                "INSERT OR REPLACE INTO sandboxes VALUES (?, ?)",
+                (record.claim_id, record.model_dump_json()),
+            )
+
+    def get_sandbox(self, claim_id: str) -> SandboxRecord | None:
+        with self.lock:
+            row = self.db.execute(
+                "SELECT data FROM sandboxes WHERE claim_id = ?", (claim_id,)
+            ).fetchone()
+        return SandboxRecord.model_validate_json(row[0]) if row else None
+
+    def sandboxes(self) -> list[SandboxRecord]:
+        with self.lock:
+            rows = self.db.execute("SELECT data FROM sandboxes").fetchall()
+        return [SandboxRecord.model_validate_json(r[0]) for r in rows]
+
     def reset(self) -> dict[str, int]:
-        """Deletes claims, messages and events; keeps customers and policies."""
+        """Deletes claims, messages, events and sandbox records; keeps customers and
+        policies."""
         counts = {}
         with self.lock, self.db:
-            for table in ("claims", "messages", "events"):
+            for table in ("claims", "messages", "events", "sandboxes"):
                 counts[table] = self.db.execute(f"DELETE FROM {table}").rowcount
         return counts
 

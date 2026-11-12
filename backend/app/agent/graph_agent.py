@@ -17,48 +17,14 @@ from pathlib import Path
 from typing import Any
 
 from langchain_core.runnables import RunnableConfig
-from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.sqlite import SqliteSaver
-from pydantic import SecretStr
 
 from app.agent.graph import CallTool, Model, build_graph, turn_input
+from app.agent.model import make_model
 from app.agent.phrases import FALLBACK
 from app.tools.gateway import Gateway
-from app.tools.guard import blocker
-
-MAX_TOKENS = 2000  # room for the reasoning tokens of a reasoning model
-TIMEOUT = 60.0  # seconds, per model call
-RETRIES = 2  # the OpenAI client retries a 429, a 5xx and a timeout
-
-
-class Refused(Exception):
-    """The trusted code refused a tool call (rule 1)."""
-
-
-def make_model() -> Model:
-    """The chat model, from the environment. The key goes in the client only: not
-    in a repr, not in an error text. It stops the startup when a setting is missing."""
-    env = os.environ
-    if not env.get("NVIDIA_KEY"):
-        raise RuntimeError("CLAIMS_MODE=nim needs NVIDIA_KEY (see .env.example)")
-    for name in ("AGENT_BASE_URL", "AGENT_MODEL"):
-        if not env.get(name):
-            raise RuntimeError(f"CLAIMS_MODE=nim needs {name} (see .env.example)")
-    thinking = env.get("AGENT_THINKING", "")
-    if thinking not in ("", "on", "off"):
-        raise RuntimeError("AGENT_THINKING must be on, off or empty")
-    extra: dict[str, Any] = {}
-    if thinking:  # NVIDIA model cards: chat_template_kwargs.enable_thinking
-        extra["chat_template_kwargs"] = {"enable_thinking": thinking == "on"}
-    return ChatOpenAI(
-        model=env["AGENT_MODEL"],
-        base_url=env["AGENT_BASE_URL"],
-        api_key=SecretStr(env["NVIDIA_KEY"]),
-        max_completion_tokens=MAX_TOKENS,
-        timeout=TIMEOUT,
-        max_retries=RETRIES,
-        extra_body=extra or None,
-    )
+from app.tools.guard import Refused as Refused  # re-export: tests import it here
+from app.tools.guard import guarded_call
 
 
 class GraphAgent:
@@ -89,14 +55,7 @@ class GraphAgent:
         """`call_tool` of the graph: the gateway, for this claim."""
 
         def call_tool(name: str, inputs: dict[str, Any]) -> dict[str, Any]:
-            if name == "assess_and_route" and (why := blocker(self.gateway, claim_id)):
-                self.gateway.store.append_event(
-                    claim_id, "agent", "refused", f"Refused {name}: {why}"[:80],
-                    {"tool": name}, {"error": why},
-                )  # fmt: skip
-                raise Refused(why)
-            # the claim id is ours: whatever the inputs say is replaced
-            return self.gateway.call(claim_id, name, {**inputs, "claim_id": claim_id})
+            return guarded_call(self.gateway, claim_id, name, inputs)
 
         return call_tool
 

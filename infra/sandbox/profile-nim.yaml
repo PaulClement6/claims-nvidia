@@ -1,9 +1,11 @@
-# Provider profile of the spike (issue #13): the NVIDIA hosted endpoint, direct (no Guardrails proxy).
-# Import it, then `openshell provider create --type claims-spike-nim --credential NVIDIA_API_KEY`.
-# The sandbox sees a placeholder in NVIDIA_API_KEY. The supervisor swaps in the real key
-# on the Authorization bearer toward integrate.api.nvidia.com only.
-id: claims-spike-nim
-display_name: Claims spike NVIDIA NIM
+# Provider profile of the claim sandboxes (issue #14): the NVIDIA hosted endpoint,
+# called directly. Imported by infra/sandbox/setup.sh, then the provider `claims-nim`
+# is created from it with the key from NVIDIA_KEY (in the environment of that one
+# command, never an argument).
+# The sandbox sees a placeholder in NVIDIA_API_KEY. The supervisor swaps in the real
+# key on the Authorization bearer toward integrate.api.nvidia.com only.
+id: claims-nim
+display_name: Claims NVIDIA NIM
 description: OpenAI-compatible hosted NVIDIA endpoint, called directly
 category: inference
 inference_capable: true
@@ -29,4 +31,3 @@ binaries:
   - /usr/local/bin/python3.12
   - /usr/local/bin/python3
   - /usr/local/bin/python
-  - /usr/bin/curl

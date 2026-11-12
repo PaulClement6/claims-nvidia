@@ -132,6 +132,18 @@ class PipelineEvent(BaseModel):
     duration: float | None = None  # seconds
 
 
+class SandboxRecord(BaseModel):
+    """The OpenShell sandbox of a claim (`CLAIMS_MODE=sandbox`). The token itself is
+    never stored: only its SHA-256, which is enough to check a request."""
+
+    claim_id: str
+    name: str
+    token_sha256: str
+    policy_file: str
+    created: datetime
+    closed: bool = False
+
+
 class Claim(BaseModel):
     id: str
     customer: Customer

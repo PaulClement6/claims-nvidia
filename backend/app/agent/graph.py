@@ -76,6 +76,23 @@ NODE_TOOLS = {
         "customer_is_done",
     ),
 }
+# What the code nodes call, with the `agent_state` argument that the model never sees.
+CODE_TOOLS = (
+    "get_claim_summary",
+    "update_claim",
+    "classify_document",
+    "extract_document",
+    *CHECKS,
+    "assess_and_route",
+)
+# Every gateway tool the graph calls, by the model or by code. The sandbox policy
+# allows these and no others; a test runs the graph and checks the list is right.
+GRAPH_TOOLS = tuple(
+    sorted(
+        ({*CODE_TOOLS, *(t for tools in NODE_TOOLS.values() for t in tools)})
+        - {"customer_is_done"}  # a flag in the graph state, not a gateway tool
+    )
+)
 CUSTOMER_IS_DONE = {
     "type": "function",
     "function": {

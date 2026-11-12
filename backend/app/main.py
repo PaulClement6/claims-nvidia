@@ -1,15 +1,17 @@
+import logging
 import os
 import threading
 import uuid
 from collections.abc import AsyncIterator, Iterator
-from contextlib import asynccontextmanager, contextmanager
+from contextlib import AsyncExitStack, asynccontextmanager, contextmanager
 from io import BytesIO
 from pathlib import Path
 
 from fastapi import FastAPI, Header, HTTPException, Query, Request, UploadFile
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, PlainTextResponse, StreamingResponse
 from pydantic import BaseModel, Field
 from pypdf import PdfReader
+from starlette.types import Receive, Scope, Send
 
 from app.agent import Agent, get_agent
 from app.demo import router as demo_router
@@ -44,6 +46,16 @@ class ClaimPolicy(BaseModel):
     policy_number: str
 
 
+async def mcp_endpoint(scope: Scope, receive: Receive, send: Send) -> None:
+    """`/mcp/<token>`: the tool gateway for the sandbox of a claim. It exists in
+    `sandbox` mode only; in the other modes every path under it is a 404."""
+    server = scope["app"].state.mcp
+    if server is None:
+        await PlainTextResponse("not found", 404)(scope, receive, send)
+    else:
+        await server(scope, receive, send)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     store = Store()  # reads CLAIMS_DB at startup
@@ -56,12 +68,21 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     checks_tool.register(gateway, uploads)
     requirements_tool.register(gateway)
     routing_tool.register(gateway)
-    app.state.agent = get_agent(gateway)  # CLAIMS_MODE: local or nim
+    app.state.agent = get_agent(gateway)  # CLAIMS_MODE: local, nim or sandbox
     app.state.uploads = uploads
     app.state.store = store
     app.state.gateway = gateway
     app.state.locks = {}
-    yield
+    app.state.mcp = None
+    async with AsyncExitStack() as stack:
+        if os.environ.get("CLAIMS_MODE") == "sandbox":
+            from app.tools.mcp_server import McpServer, RedactToken
+
+            # the path of a sandbox request holds its token: not in the access log
+            logging.getLogger("uvicorn.access").addFilter(RedactToken())
+            app.state.mcp = McpServer(gateway)
+            await stack.enter_async_context(app.state.mcp.run())
+        yield
 
 
 def create_app() -> FastAPI:
@@ -241,6 +262,7 @@ def create_app() -> FastAPI:
         )
 
     app.include_router(demo_router)
+    app.mount("/mcp", mcp_endpoint)
     return app
 
 
