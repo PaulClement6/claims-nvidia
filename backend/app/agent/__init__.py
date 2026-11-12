@@ -30,4 +30,8 @@ def get_agent(gateway: "Gateway") -> Agent:
         from app.agent.graph_agent import GraphAgent
 
         return GraphAgent.from_env(gateway)  # no key stops the startup
-    raise ValueError(f"unknown CLAIMS_MODE {mode!r} (known: local, nim)")
+    if mode == "sandbox":
+        from app.agent.sandbox import SandboxAgent
+
+        return SandboxAgent.from_env(gateway)  # no OpenShell, gateway or image stops it
+    raise ValueError(f"unknown CLAIMS_MODE {mode!r} (known: local, nim, sandbox)")

@@ -154,9 +154,7 @@ def test_the_mode_switch(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Non
     monkeypatch.setenv("CLAIMS_MODE", "nope")
     with pytest.raises(ValueError, match="unknown CLAIMS_MODE 'nope'"):
         get_agent(gateway)  # type: ignore[arg-type]
-    monkeypatch.setenv("CLAIMS_MODE", "sandbox")
-    with pytest.raises(ValueError, match="unknown CLAIMS_MODE"):
-        get_agent(gateway)  # type: ignore[arg-type]
+    # `sandbox` is a mode now: its tests are in test_sandbox_agent.py
 
 
 def test_nim_mode_without_a_key_stops_the_startup(

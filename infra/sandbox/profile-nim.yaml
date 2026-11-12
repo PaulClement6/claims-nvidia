@@ -1,0 +1,33 @@
+# Provider profile of the claim sandboxes (issue #14): the NVIDIA hosted endpoint,
+# called directly. Imported by infra/sandbox/setup.sh, then the provider `claims-nim`
+# is created from it with the key from NVIDIA_KEY (in the environment of that one
+# command, never an argument).
+# The sandbox sees a placeholder in NVIDIA_API_KEY. The supervisor swaps in the real
+# key on the Authorization bearer toward integrate.api.nvidia.com only.
+id: claims-nim
+display_name: Claims NVIDIA NIM
+description: OpenAI-compatible hosted NVIDIA endpoint, called directly
+category: inference
+inference_capable: true
+credentials:
+  - name: api_key
+    description: NVIDIA API key, injected at egress
+    env_vars: [NVIDIA_API_KEY]
+    required: true
+    auth_style: bearer
+    header_name: authorization
+discovery:
+  credentials: [api_key]
+endpoints:
+  - host: integrate.api.nvidia.com
+    port: 443
+    protocol: rest
+    enforcement: enforce
+    rules:
+      - allow:
+          method: POST
+          path: /v1/chat/completions
+binaries:
+  - /usr/local/bin/python3.12
+  - /usr/local/bin/python3
+  - /usr/local/bin/python

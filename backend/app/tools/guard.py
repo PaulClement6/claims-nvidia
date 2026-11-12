@@ -12,6 +12,25 @@ from app.tools.gateway import Gateway
 CHECKS = ("run_checks", "check_tampering", "check_consistency")
 
 
+class Refused(Exception):
+    """The trusted code refused a tool call (rule 1)."""
+
+
+def guarded_call(
+    gateway: Gateway, claim_id: str, name: str, inputs: dict[str, Any]
+) -> dict[str, Any]:
+    """A tool call of an agent that is not trusted: the backend graph agent and the
+    MCP server of the sandbox both come through here. The claim is ours, whatever
+    the inputs say, and `assess_and_route` waits for rule 1."""
+    if name == "assess_and_route" and (why := blocker(gateway, claim_id)):
+        gateway.store.append_event(
+            claim_id, "agent", "refused", f"Refused {name}: {why}"[:80],
+            {"tool": name}, {"error": why},
+        )  # fmt: skip
+        raise Refused(why)
+    return gateway.call(claim_id, name, {**inputs, "claim_id": claim_id})
+
+
 def blocker(gateway: Gateway, claim_id: str) -> str | None:
     """Rule 1: why `assess_and_route` may not run yet, or None. The story must be
     saved, every document read, and the three checks run after the last change of
