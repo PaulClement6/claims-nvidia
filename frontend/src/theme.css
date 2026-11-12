@@ -441,10 +441,12 @@ td {
 }
 .chat-form {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
+/* the message box takes its own row: four buttons left it 20px wide */
 .chat-form > input:not([type='file']) {
-  flex: 1;
+  flex: 1 1 100%;
   min-width: 0;
 }
 .chat-upload {
