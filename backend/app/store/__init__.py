@@ -3,12 +3,23 @@
 import json
 import os
 import sqlite3
+import threading
 import uuid
+from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any, Literal
 
-from app.models import Claim, ClaimType, Customer, LineOfBusiness, Policy
+from app.models import (
+    Claim,
+    ClaimType,
+    Customer,
+    LineOfBusiness,
+    PipelineEvent,
+    Policy,
+)
 
-SEED = Path(__file__).resolve().parents[3] / "data" / "mock" / "policies.json"
+# CLAIMS_DATA overrides it (the Docker image does not hold the repository).
+DATA = Path(__file__).resolve().parents[3] / "data"
 CLAIM_TYPE: dict[LineOfBusiness, ClaimType] = {
     "Travel": "travel",
     "Household": "property",
@@ -21,6 +32,9 @@ class Store:
         path = path or os.environ.get("CLAIMS_DB", ".dev-data/claims.db")
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(path, check_same_thread=False)
+        # One connection for all threads: every write, and the sequence
+        # allocation, runs under this lock.
+        self.lock = threading.Lock()
         self.db.executescript(
             """
             CREATE TABLE IF NOT EXISTS customers (
@@ -29,14 +43,18 @@ class Store:
                 number TEXT PRIMARY KEY, customer_id TEXT NOT NULL, data TEXT NOT NULL);
             CREATE TABLE IF NOT EXISTS claims (
                 id TEXT PRIMARY KEY, data TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS events (
+                claim_id TEXT NOT NULL, sequence INTEGER NOT NULL, data TEXT NOT NULL,
+                PRIMARY KEY (claim_id, sequence));
             """
         )
         if not self.db.execute("SELECT 1 FROM customers").fetchone():
             self._seed()
 
     def _seed(self) -> None:
-        seed = json.loads(SEED.read_text())
-        with self.db:
+        data = Path(os.environ.get("CLAIMS_DATA") or DATA)
+        seed = json.loads((data / "mock" / "policies.json").read_text())
+        with self.lock, self.db:
             for c in map(Customer.model_validate, seed["customers"]):
                 self.db.execute(
                     "INSERT INTO customers VALUES (?, ?)", (c.id, c.model_dump_json())
@@ -58,30 +76,82 @@ class Store:
         )
         return [Policy.model_validate_json(r[0]) for r in rows]
 
-    def create_claim(self, customer_id: str, policy_number: str) -> Claim | None:
-        """Returns None when the policy is not one of this customer."""
+    def create_claim(self, customer_id: str) -> Claim | None:
+        """An open claim with no policy yet. None when the customer is unknown."""
         customer = next((c for c in self.get_customers() if c.id == customer_id), None)
+        if customer is None:
+            return None
+        claim = Claim(id=f"CL-{uuid.uuid4().hex[:8]}", customer=customer)
+        self._save_claim(claim)
+        return claim
+
+    def set_claim_policy(self, claim_id: str, policy_number: str) -> Claim | None:
+        """None when the claim is unknown or the policy is not this customer's."""
+        claim = self.get_claim(claim_id)
+        if claim is None:
+            return None
         policy = next(
             (
                 p
-                for p in self.get_customer_policies(customer_id)
+                for p in self.get_customer_policies(claim.customer.id)
                 if p.number == policy_number
             ),
             None,
         )
-        if customer is None or policy is None:
+        if policy is None:
             return None
-        claim = Claim(
-            id=f"CL-{uuid.uuid4().hex[:8]}",
-            customer=customer,
-            policy=policy,
-            type=CLAIM_TYPE[policy.line_of_business],
-        )
-        with self.db:
-            self.db.execute(
-                "INSERT INTO claims VALUES (?, ?)", (claim.id, claim.model_dump_json())
-            )
+        claim.policy = policy
+        claim.type = CLAIM_TYPE[policy.line_of_business]
+        self._save_claim(claim)
         return claim
+
+    def _save_claim(self, claim: Claim) -> None:
+        with self.lock, self.db:
+            self.db.execute(
+                "INSERT OR REPLACE INTO claims VALUES (?, ?)",
+                (claim.id, claim.model_dump_json()),
+            )
+
+    def append_event(
+        self,
+        claim_id: str,
+        actor: Literal["agent", "tool", "workflow", "sandbox"],
+        stage: str,
+        title: str,
+        inputs: dict[str, Any] | None = None,
+        outputs: dict[str, Any] | None = None,
+        model: str | None = None,
+        duration: float | None = None,
+    ) -> PipelineEvent:
+        with self.lock, self.db:
+            (sequence,) = self.db.execute(
+                "SELECT COALESCE(MAX(sequence), 0) + 1 FROM events WHERE claim_id = ?",
+                (claim_id,),
+            ).fetchone()
+            event = PipelineEvent(
+                sequence=sequence,
+                time=datetime.now(UTC),
+                actor=actor,
+                stage=stage,
+                title=title,
+                inputs=inputs or {},
+                outputs=outputs or {},
+                model=model,
+                duration=duration,
+            )
+            self.db.execute(
+                "INSERT INTO events VALUES (?, ?, ?)",
+                (claim_id, sequence, event.model_dump_json()),
+            )
+        return event
+
+    def events_since(self, claim_id: str, sequence: int) -> list[PipelineEvent]:
+        rows = self.db.execute(
+            "SELECT data FROM events WHERE claim_id = ? AND sequence > ? "
+            "ORDER BY sequence",
+            (claim_id, sequence),
+        ).fetchall()
+        return [PipelineEvent.model_validate_json(r[0]) for r in rows]
 
     def get_claim(self, claim_id: str) -> Claim | None:
         row = self.db.execute(
