@@ -8,7 +8,7 @@ never as an argument. One process is one turn: the conversation is kept by the S
 checkpointer in the scratch folder (thread id = claim id). The last line of stdout is
 one JSON line:
 
-    {"reply": "...", "events": [{"actor", "stage", "title", ...}], "seconds": 4.2}
+    {"reply": "...", "events": [{"actor", "stage", "title", "at", ...}], "seconds": 4.2}
 
 The backend treats it as data. `events` are the node and model events of the graph,
 shown in the pipeline panel and nothing more.
@@ -126,6 +126,9 @@ def run_turn(
                 "outputs": outputs or {},
                 "model": model,
                 "duration": duration,
+                # when it happened (epoch seconds): the backend shows the events of a
+                # turn in the order of this time
+                "at": round(time.time(), 3),
             }
         )
 

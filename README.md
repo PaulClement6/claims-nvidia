@@ -26,7 +26,7 @@ The system never rejects a claim. A claim has three possible outcomes:
 2. Start the backend on the loopback, with the model settings of `.env`:
    `cd backend && CLAIMS_MODE=sandbox BACKEND_PORT=8000 uv run uvicorn app.main:app --host 127.0.0.1 --port 8000`
    (`BACKEND_PORT` must be the port of uvicorn: the sandbox reaches the backend as `host.openshell.internal:<port>`.)
-3. Start the frontend as in `local` mode. The pipeline panel shows the `sandbox` events: created, each turn with its seconds, deleted.
+3. Start the frontend as in `local` mode. The sidebar shows the mode. The pipeline panel has a Sandbox section: the policy of the claim, the requests the sandbox denied, and a button "Run confinement test". It also shows the `sandbox` events: created, each turn with its seconds, deleted.
 
 If a piece is missing, the backend stops at startup and names `infra/sandbox/setup.sh`. The demo reset deletes the sandboxes of this app. The tests that need OpenShell: `cd backend && uv run pytest -m sandbox` (the three claim files with the real model, and the confinement checks).
 

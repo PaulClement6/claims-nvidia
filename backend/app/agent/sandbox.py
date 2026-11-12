@@ -25,6 +25,10 @@ token (`app.tools.mcp_server`). The policy of the sandbox is made from
 of each sandbox is in `CLAIMS_SANDBOX_DIR` (mode 0600: it holds the token) and its
 path is in the `created` event. Denied requests: `openshell logs <sandbox> --source
 sandbox`, the lines with `DENIED` (the same command is in the event).
+
+For the pipeline panel (issue #15): after each turn the backend reads the denial lines
+of the sandbox log and stores each new one as a `denied` event (token cut), and
+`probe` runs a fixed confinement test in the sandbox (`app.agent.sandbox_panel`).
 """
 
 import hashlib
@@ -41,6 +45,15 @@ from typing import Any, Protocol
 
 from app.agent.graph import GRAPH_TOOLS
 from app.agent.phrases import CLOSED, FALLBACK, check_message
+from app.agent.sandbox_panel import (
+    PROBE,
+    PROBE_COMMAND,
+    PROBE_EXEC_TIMEOUT,
+    Denial,
+    clean,
+    judge,
+    parse_denial,
+)
 from app.models import SandboxRecord
 from app.tools.gateway import Gateway
 from app.tools.mcp_server import PATH, hash_token
@@ -55,6 +68,7 @@ TURN = ["python", "-m", "app.agent.sandbox_turn"]
 CREATE_TIMEOUT = 90.0  # seconds: create, then wait for the first exec
 DELETE_TIMEOUT = 30.0
 QUICK_TIMEOUT = 20.0  # status, get, provider get, docker inspect
+LOG_LINES = 500  # read from the sandbox log after a turn
 MAX_EVENTS = 300  # per turn, from the sandbox
 MAX_EVENT_CHARS = 20_000
 SANDBOX_ACTORS = ("workflow", "agent")  # what the sandbox may report, display only
@@ -66,6 +80,10 @@ class ShellError(Exception):
 
 class ShellTimeout(ShellError):
     pass
+
+
+class SandboxNotRunning(ShellError):
+    """The claim has no sandbox that runs: it is closed, or it is gone."""
 
 
 class Shell(Protocol):
@@ -81,6 +99,7 @@ class Shell(Protocol):
     ) -> None: ...
     def exec(self, name: str, argv: list[str], stdin: str, timeout: float) -> str: ...
     def delete(self, name: str) -> None: ...
+    def log_lines(self, name: str) -> list[str]: ...
 
 
 class OpenShell:
@@ -186,6 +205,14 @@ class OpenShell:
     def delete(self, name: str) -> None:
         self._checked(["sandbox", "delete", name], DELETE_TIMEOUT)
 
+    def log_lines(self, name: str) -> list[str]:
+        """The last lines of the sandbox log (the supervisor, not the gateway). The
+        log reaches the gateway a few tenths of a second after the event."""
+        out = self._checked(
+            ["logs", name, "--source", "sandbox", "-n", str(LOG_LINES)], QUICK_TIMEOUT
+        )
+        return out.splitlines()
+
 
 def sandbox_name(claim_id: str) -> str:
     """At most 19 characters, always with the prefix."""
@@ -226,6 +253,7 @@ class SandboxAgent:
         state_dir: Path,
         image: str,
         turn_timeout: float = 150.0,
+        denial_wait: float = 3.0,
     ) -> None:
         self.gateway = gateway
         self.shell = shell
@@ -235,6 +263,7 @@ class SandboxAgent:
         self.state_dir = state_dir
         self.image = image
         self.turn_timeout = turn_timeout
+        self.denial_wait = denial_wait  # seconds the probe waits for the log
 
     @classmethod
     def from_env(cls, gateway: Gateway) -> "SandboxAgent":
@@ -376,7 +405,9 @@ class SandboxAgent:
         try:
             if record is None or record.closed or not self.shell.exists(record.name):
                 record = self._create(claim_id)
-            data, seconds = self._turn(claim_id, record, text, document_id)
+            data, seconds, started, ended = self._turn(
+                claim_id, record, text, document_id
+            )
         except ShellError as e:
             self._event(
                 claim_id, "failed", "Sandbox turn failed", {}, {"reason": str(e)}
@@ -391,13 +422,14 @@ class SandboxAgent:
                     self._close(claim_id, record, "the claim is closed")
                 return [text]
             return [FALLBACK]
-        self._keep_events(claim_id, data.get("events"))
+        self._keep_events(claim_id, data, started, ended)
         self._event(
             claim_id, "turn", f"Sandbox turn ({seconds:.1f} s)",
             {"sandbox": record.name},
             {"seconds": round(seconds, 2)}, seconds,
         )  # fmt: skip
         reply, closed = self._reply(claim_id, data.get("reply"))
+        self.collect_denials(claim_id, record)  # before a close: the log goes with it
         if closed:
             self._close(claim_id, record, "the claim is closed")
         return [reply]
@@ -408,14 +440,16 @@ class SandboxAgent:
         record: SandboxRecord,
         text: str | None,
         document_id: str | None,
-    ) -> tuple[dict[str, Any], float]:
+    ) -> tuple[dict[str, Any], float, datetime, datetime]:
         # the customer text goes on stdin, never on a command line
         stdin = json.dumps({"text": text, "document_id": document_id})
+        started = datetime.now(UTC)
         start = time.perf_counter()
         out = self.shell.exec(
             record.name, [*TURN, "--thread", claim_id], stdin, self.turn_timeout
         )
         seconds = time.perf_counter() - start
+        ended = datetime.now(UTC)
         lines = [line for line in out.splitlines() if line.strip()]
         try:
             data = json.loads(lines[-1])
@@ -423,11 +457,15 @@ class SandboxAgent:
             raise ShellError("the turn printed no JSON line") from None
         if not isinstance(data, dict):
             raise ShellError("the turn printed no JSON object")
-        return data, seconds
+        return data, seconds, started, ended
 
-    def _keep_events(self, claim_id: str, events: Any) -> None:
+    def _keep_events(
+        self, claim_id: str, data: dict[str, Any], started: datetime, ended: datetime
+    ) -> None:
         """The node and model events of the sandbox: display only. Only `workflow` and
-        `agent` events, each marked with its source, and capped in number and size."""
+        `agent` events, each marked with its source, and capped in number and size.
+        The display time of an event is when it happened, placed by `display_time`."""
+        events = data.get("events")
         if not isinstance(events, list):
             return
         for e in events[:MAX_EVENTS]:
@@ -444,6 +482,7 @@ class SandboxAgent:
                     dict(e.get("outputs") or {}),
                     str(e["model"]) if e.get("model") else None,
                     float(duration) if duration is not None else None,
+                    display_time(started, ended, e.get("at")),
                 )  # fmt: skip
             except (KeyError, TypeError, ValueError):
                 continue  # a malformed event is dropped
@@ -471,6 +510,95 @@ class SandboxAgent:
             )  # fmt: skip
             return FALLBACK, False
         return str(said), False
+
+    # ---- the pipeline panel (issue #15) ----------------------------------------
+
+    def collect_denials(
+        self, claim_id: str, record: SandboxRecord, wait_for: int = 0
+    ) -> None:
+        """Stores each denial line of the sandbox log that is not stored yet as one
+        `denied` event (token cut). The log reaches the gateway about 0.3 s after the
+        request, so with `wait_for` it reads again, for at most `denial_wait` seconds,
+        until that many new denials are there. A failed read is not an error: the next
+        call reads the same lines again, and a line is never stored twice."""
+        deadline = time.monotonic() + self.denial_wait
+        store = self.gateway.store
+        while True:
+            try:
+                lines = self.shell.log_lines(record.name)
+            except ShellError:
+                return
+            known = {
+                e.inputs.get("line")
+                for e in store.events_since(claim_id, 0)
+                if e.actor == "sandbox" and e.stage == "denied"
+            }
+            new: dict[str, Denial] = {}
+            for raw in lines:
+                found = parse_denial(raw)
+                if found is not None and found.line not in known:
+                    new[found.line] = found
+            if len(new) >= wait_for or time.monotonic() >= deadline:
+                break
+            time.sleep(0.25)
+        now = datetime.now(UTC)
+        for d in new.values():
+            store.append_event(
+                claim_id, "sandbox", "denied", f"Denied: {d.what}",
+                {"line": d.line, "kind": d.kind, "policy": d.policy},
+                {"reason": d.reason}, None, None, min(d.at, now),
+            )  # fmt: skip
+
+    def probe(self, claim_id: str) -> dict[str, Any]:
+        """The confinement test: a fixed script in the sandbox of this claim. Nothing
+        of a request reaches the command. One `probe` event per try, then the denials
+        it caused. Raises `ShellError` when the sandbox cannot run it."""
+        record = self.gateway.store.get_sandbox(claim_id)
+        if record is None or record.closed or not self.shell.exists(record.name):
+            raise SandboxNotRunning("the sandbox is not running")
+        try:
+            out = self.shell.exec(record.name, PROBE_COMMAND, PROBE, PROBE_EXEC_TIMEOUT)
+            lines = [line for line in out.splitlines() if line.strip()]
+            try:
+                raw = json.loads(lines[-1])
+            except (IndexError, ValueError):
+                raise ShellError("the probe printed no JSON line") from None
+        except ShellError as e:
+            self._event(
+                claim_id, "failed", "Sandbox probe failed", {},
+                {"reason": clean(e)},
+            )  # fmt: skip
+            raise
+        results = judge(raw)
+        for r in results:
+            verdict = "denied" if r.denied else "NOT denied"
+            self._event(
+                claim_id, "probe", f"Probe: {r.label} → {verdict}",
+                {"what": r.what}, {"denied": r.denied, "detail": r.detail},
+            )  # fmt: skip
+        self.collect_denials(claim_id, record, wait_for=3)
+        return {
+            "confined": all(r.denied for r in results),
+            "results": [r.model_dump() for r in results],
+        }
+
+
+def display_time(started: datetime, ended: datetime, at: Any) -> datetime | None:
+    """When an event of the sandbox happened, in the time of the backend.
+
+    The sandbox gives each event `at`, its own clock in epoch seconds. The sandbox is
+    a container on the machine of the backend (on a Mac, in the Colima VM), and its
+    clock agreed with the backend to a few milliseconds when measured. The result
+    stays inside the time the backend waited for the turn (`started` to `ended`), so
+    a clock that is wrong places events at the start or the end of their turn and
+    never outside it. Counting back from the end of the turn does not work: the
+    process takes a time to exit and `openshell` to return, about 0.2 s here, which
+    is more than the gap between a node event and its first tool call.
+
+    None when `at` is not a usable number: the event keeps its arrival time."""
+    if isinstance(at, bool) or not isinstance(at, int | float) or not 0 < at < 4e9:
+        return None  # also a NaN or an infinity: they are not between the bounds
+    return min(ended, max(started, datetime.fromtimestamp(at, UTC)))
 
 
 def _scrub(text: str, token: str) -> str:

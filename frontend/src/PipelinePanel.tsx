@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import GraphStrip from './GraphStrip'
+import SandboxSection from './SandboxSection'
 import { ChecksSection, ExtractedSection, FraudReportSection, OutcomeSection } from './PipelineSections'
 import type { PipelineClaim } from './PipelineSections'
 
 type PipelineEvent = {
   sequence: number
+  time: string
   actor: string
   stage: string
   title: string
@@ -12,6 +14,21 @@ type PipelineEvent = {
   outputs: unknown
   model: string | null
   duration: number | null // seconds
+}
+
+// The sandbox reports its node and model events after the turn, with the time they happened:
+// show the events in the order of that time (a tie keeps the order they were stored in).
+const byTime = (a: PipelineEvent, b: PipelineEvent) => Date.parse(a.time) - Date.parse(b.time) || a.sequence - b.sequence
+
+// tool events are the trusted ones (ok); a sandbox event: a denial warns, a failure is bad,
+// a probe is ok when the try was denied, and the life cycle (created, turn, deleted) is idle
+const pillOf = (e: PipelineEvent) => {
+  if (e.actor === 'tool') return 'pill-ok'
+  if (e.actor !== 'sandbox') return 'pill-idle'
+  if (e.stage === 'denied') return 'pill-warn'
+  if (e.stage === 'failed') return 'pill-bad'
+  if (e.stage === 'probe') return (e.outputs as { denied?: boolean }).denied === false ? 'pill-bad' : 'pill-ok'
+  return 'pill-idle'
 }
 
 const RELOAD = ['extract_document', 'run_checks', 'check_tampering', 'check_consistency', 'assess_and_route', 'write_fraud_report']
@@ -32,7 +49,7 @@ function Events({ claimId }: { claimId: string | null }) {
     source.onmessage = (m: MessageEvent<string>) => {
       const e = JSON.parse(m.data) as PipelineEvent
       // the browser reconnects with Last-Event-ID, but a repeat must never show twice
-      setEvents((all) => (all.some((x) => x.sequence === e.sequence) ? all : [...all, e]))
+      setEvents((all) => (all.some((x) => x.sequence === e.sequence) ? all : [...all, e].sort(byTime)))
       // the fields, signals and outcome live in the claim: reload it when one of them changed
       if (RELOAD.includes(e.stage))
         void fetch(`/claims/${claimId}`)
@@ -55,6 +72,7 @@ function Events({ claimId }: { claimId: string | null }) {
       <h2>Pipeline</h2>
       {claimId && <p className="mono">Claim {claimId}</p>}
       {claimId && <GraphStrip events={events} />}
+      {claimId && <SandboxSection claimId={claimId} events={events} />}
       {claim?.fraud_report && <FraudReportSection report={claim.fraud_report} />}
       {claim && <OutcomeSection claim={claim} />}
       {claim && <ChecksSection claim={claim} ran={checksRan} />}
@@ -68,7 +86,7 @@ function Events({ claimId }: { claimId: string | null }) {
             <li key={e.sequence}>
               <details>
                 <summary>
-                  <span className={`pill ${e.actor === 'tool' ? 'pill-ok' : 'pill-idle'}`}>{e.actor}</span>
+                  <span className={`pill ${pillOf(e)}`}>{e.actor}</span>
                   <span className="event-title">{e.title}</span>
                   {e.model && <span className="mono muted">{e.model}</span>}
                   {e.duration !== null && <span className="mono muted">{Math.round(e.duration * 1000)} ms</span>}

@@ -203,3 +203,62 @@ def test_the_environment_inside_a_live_sandbox_holds_no_key_value(
     assert out["key_hits"] == []
     assert all("nvapi-" not in v for v in out["env_keys"].values())
     assert json.dumps(out).count("nvapi-") == 0
+
+
+# ---- the pipeline panel: policy, denials, confinement probe (issue #15) -----------
+
+
+def test_the_probe_of_a_live_sandbox_gives_five_denials_and_the_token_stays_in(
+    backend: LiveClient,
+) -> None:
+    agent: SandboxAgent = backend.app.state.agent
+    store = backend.app.state.store
+    cid = store.create_claim("C-1001").id
+    record = agent._create(cid)
+    token = Path(record.policy_file).read_text().split("/mcp/")[1].split()[0]
+    assert len(token) >= 43
+
+    res = backend.post(f"/claims/{cid}/sandbox/probe")
+    assert res.status_code == 200, res.text
+    out = res.json()
+    print(json.dumps(out, indent=1))  # the evidence: pytest -m sandbox -s
+    assert [r["denied"] for r in out["results"]] == [True] * 5
+    assert out["confined"] is True
+    assert out["results"][3]["detail"].startswith(
+        "the variable holds a placeholder: openshell:resolve:env:"
+    )
+
+    events = store.events_since(cid, 0)
+    probes = [e for e in events if e.stage == "probe"]
+    assert [e.outputs["denied"] for e in probes] == [True] * 5
+    denials = [e for e in events if e.stage == "denied"]
+    print([e.title for e in denials])
+    assert len(denials) >= 3  # example.com, another claim, another tool
+    assert any("example.com" in e.title for e in denials)
+    assert any("write_fraud_report" in e.title for e in denials)
+    assert all(e.outputs["reason"] for e in denials)
+
+    view = backend.get(f"/claims/{cid}/sandbox")
+    assert view.status_code == 200 and view.json()["state"] == "running"
+    assert view.json()["policy"]["gateway"]["path"] == f"/mcp/{token[:6]}…"
+
+    # the token is in no answer and no event, though the OpenShell log holds it whole
+    raw = "\n".join(agent.shell.log_lines(record.name))
+    assert token in raw
+    answers = [
+        view,
+        res,
+        backend.get(f"/claims/{cid}"),
+        backend.get(f"/claims/{cid}/messages"),
+        backend.get(f"/claims/{cid}/customer"),
+        backend.post(f"/claims/{cid}/sandbox/probe"),  # a second probe: new denials
+    ]
+    for answer in answers:
+        assert token not in answer.text
+    events = store.events_since(cid, 0)
+    assert token not in json.dumps([e.model_dump(mode="json") for e in events])
+    assert len([e for e in events if e.stage == "denied"]) > len(denials)
+
+    backend.post("/demo/reset")
+    assert not OpenShell().exists(record.name)
+    assert backend.post(f"/claims/{cid}/sandbox/probe").status_code == 404

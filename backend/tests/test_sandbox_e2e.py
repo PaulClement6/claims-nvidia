@@ -141,3 +141,29 @@ def test_the_graph_only_calls_tools_the_policy_allows(live: Live) -> None:
     allowed = set(GRAPH_TOOLS)
     assert used - {"write_fraud_report"} <= allowed
     assert allowed <= used  # no tool in the policy that the graph never calls
+
+
+def test_the_events_of_a_real_turn_sort_into_the_order_they_happened(
+    live: Live,
+) -> None:
+    """The graph runs in one process and reports its node events after the turn, while
+    the gateway wrote its tool events at once. Sorted by display time, a node comes
+    before the tool calls it made, and the model event of the turn after them."""
+    cid = test_travel_api.run_claim(live.client)  # type: ignore[arg-type]
+    events = live.store.events_since(cid, 0)
+    shown = [e for e in events if e.actor != "sandbox" and e.stage != "message"]
+    by_time = sorted(shown, key=lambda e: (e.time, e.sequence))
+    stages = [(e.actor, e.stage) for e in by_time]
+    # the greeting turn: the node intake, then its two tools
+    assert stages[0] == ("workflow", "intake")
+    assert stages[1][0] == "tool"
+    first_tool = next(e for e in shown if e.actor == "tool")
+    intake = next(e for e in shown if e.stage == "intake")
+    assert intake.sequence > first_tool.sequence  # stored after: the problem of #14
+    assert intake.time < first_tool.time  # and shown before
+    # a node is never shown after a tool call of the next node: every `checks` node
+    # event comes before the run_checks tool event
+    checks = next(e for e in shown if e.stage == "checks" and e.actor == "workflow")
+    run_checks = next(e for e in shown if e.stage == "run_checks")
+    assert checks.time < run_checks.time
+    assert all(e.time <= by_time[-1].time for e in by_time)

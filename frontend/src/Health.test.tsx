@@ -22,3 +22,32 @@ test('shows down when the proxy returns an error', async () => {
   render(<Health />)
   expect(await screen.findByText('Backend: down')).toBeInTheDocument()
 })
+
+test('shows the mode under the backend pill, with the agent model when there is one', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ status: 'ok', mode: 'sandbox', agent_model: 'nvidia/some-model' })))
+  render(<Health />)
+  expect(await screen.findByText('Mode: sandbox')).toHaveClass('pill-ok')
+  expect(screen.getByText('nvidia/some-model')).toHaveClass('mono')
+})
+
+test.each([
+  ['local', 'pill-idle'],
+  ['nim', 'pill-warn'],
+])('the %s mode pill is %s and local has no model', async (mode, tone) => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ status: 'ok', mode, agent_model: mode === 'nim' ? 'm-1' : null })))
+  render(<Health />)
+  expect(await screen.findByText(`Mode: ${mode}`)).toHaveClass(tone)
+  expect(screen.queryByText('m-1') === null).toBe(mode === 'local')
+})
+
+test('an old backend with no mode shows no mode pill, and a down backend shows none', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ status: 'ok' })))
+  const { unmount } = render(<Health />)
+  expect(await screen.findByText('Backend: ok')).toBeInTheDocument()
+  expect(screen.queryByText(/^Mode:/)).not.toBeInTheDocument()
+  unmount()
+  vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('network')))
+  render(<Health />)
+  expect(await screen.findByText('Backend: down')).toBeInTheDocument()
+  expect(screen.queryByText(/^Mode:/)).not.toBeInTheDocument()
+})

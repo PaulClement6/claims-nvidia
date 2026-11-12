@@ -32,7 +32,7 @@ export default function Chat({ claimId }: { claimId: string }) {
   }, [claimId])
   useEffect(() => {
     if (list.current) list.current.scrollTop = list.current.scrollHeight
-  }, [messages])
+  }, [messages, busy])
   useEffect(() => {
     if (!busy) field.current?.focus() // a disabled input loses the focus
   }, [busy])
@@ -114,6 +114,19 @@ export default function Chat({ claimId }: { claimId: string }) {
             {m.text}
           </p>
         ))}
+        {busy && (
+          <p className="bubble bubble-agent typing">
+            <span className="sr-only">The agent is typing</span>
+            <span className="typing-dots" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+            <span className="typing-still" aria-hidden="true">
+              …
+            </span>
+          </p>
+        )}
       </div>
       <form
         className="chat-form"

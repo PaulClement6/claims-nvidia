@@ -2,6 +2,8 @@ from pathlib import Path
 
 import pytest
 
+from tests.rig import make as make  # the fake-openshell fixture, shared
+
 
 @pytest.fixture(autouse=True)
 def _mode_local(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

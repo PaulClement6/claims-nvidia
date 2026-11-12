@@ -15,6 +15,58 @@ from app.agent.sandbox import ShellError, ShellTimeout
 
 Turn = Callable[["FakeShell", str, list[str], str], str]
 
+# Lines of `openshell logs <sandbox> --source sandbox` (OpenShell 0.1.5), copied from a
+# live run of the confinement probe. `{token}` is the token of the sandbox, which the
+# real log shows whole; `{other}` is the made-up token of "another claim"; `{port}` the
+# backend port. Only the ALLOWED lines, the warning and the DENIED lines are here.
+OTHER = "x" * 43
+DENIAL_LINES = (
+    "[1794522333.576] [sandbox] [OCSF ] [ocsf] NET:LISTEN [INFO] 127.0.0.1:3128",
+    "[1794522333.771] [sandbox] [OCSF ] [ocsf] NET:REFUSE [MED] DENIED example.com "
+    "[reason:policy_dns_ineligible]",
+    "[1794522333.771] [sandbox] [WARN ] [openshell_supervisor_network::proxy] Denied "
+    "staged transparent connection destination=198.18.0.2:443 reason=endpoint "
+    "example.com:443 is not allowed by any policy",
+    "[1794522333.771] [sandbox] [OCSF ] [ocsf] NET:OPEN [MED] DENIED "
+    "/usr/local/bin/python3.12(0) -> example.com:443 "
+    "[reason:transparent_tcp_policy_denied]",
+    "[1794522333.778] [sandbox] [OCSF ] [ocsf] NET:OPEN [INFO] ALLOWED "
+    "/usr/local/bin/python3.12(0) -> host.openshell.internal:{port} "
+    "[policy:claims_gateway engine:opa]",
+    "[1794522333.778] [sandbox] [OCSF ] [ocsf] HTTP:POST [MED] DENIED POST "
+    "http://host.openshell.internal:{port}/mcp/{other} "
+    "[policy:claims_gateway engine:l7-mcp] [reason:JSONRPC_L7_REQUEST decision=deny "
+    "rule_methods=tools/call tools=get_claim http_method=POST "
+    "endpoint=host.openshell.internal:{port}/mcp/{other} policy_version=1 "
+    "reason=POST /mcp/{other} n...]",
+    "[1794522333.788] [sandbox] [OCSF ] [ocsf] HTTP:POST [MED] DENIED POST "
+    "http://host.openshell.internal:{port}/mcp/{token} "
+    "[policy:claims_gateway engine:l7-mcp] [reason:JSONRPC_L7_REQUEST decision=deny "
+    "rule_methods=tools/call tools=write_fraud_report http_method=POST "
+    "endpoint=host.openshell.internal:{port}/mcp/{token} policy_version=1 "
+    "reason=MCP tool call has no matching allow rule; ask ...]",
+)
+PLACEHOLDER = "openshell:resolve:env:v15876687825480274345_NVIDIA_API_KEY"
+
+
+def probe_line(**changes: Any) -> str:
+    """The stdout of `PROBE` in a confined sandbox (what a live run printed)."""
+    out: dict[str, Any] = {
+        "other_host": {
+            "error": "ConnectError",
+            "detail": "[Errno 13] Permission denied",
+        },
+        "other_claim": {"status": 403, "detail": "policy_denied"},
+        "other_tool": {"status": 403, "detail": "policy_denied"},
+        "model_key": {"has_real_key": False, "placeholder": PLACEHOLDER},
+        "host_files": {
+            "/Users": {"error": "FileNotFoundError"},
+            "/host": {"error": "FileNotFoundError"},
+        },
+        **changes,
+    }
+    return f"noise\n{json.dumps(out)}\n"
+
 
 def line(reply: str | None, events: list[dict[str, Any]] | None = None) -> str:
     """The stdout of a good turn: noise, then the JSON line."""
@@ -31,6 +83,11 @@ class FakeShell:
             None
         )
         self.fail_exec: ShellError | None = None
+        self.probe_out = probe_line()  # what `python -` prints in the sandbox
+        self.log: list[str] = []  # the sandbox log; a probe adds its denials
+        self.probes: list[str] = []  # the stdin of each probe
+        self.log_reads = 0
+        self.fail_log = False
         self.fail_delete = False
         self.is_available = True
         self.is_connected = True
@@ -79,7 +136,26 @@ class FakeShell:
             raise self.fail_exec
         if name not in self.sandboxes:
             raise ShellError("no such sandbox")
+        if argv == ["python", "-"]:  # the confinement probe
+            self.probes.append(stdin)
+            self.log += self.denial_lines(name)
+            return self.probe_out
         return self.turn(self, name, argv, stdin)
+
+    def denial_lines(self, name: str) -> list[str]:
+        """What the supervisor logs for the probe of this sandbox, token whole."""
+        env = self.sandboxes[name]["env"]
+        token = env["MCP_URL"].rsplit("/", 1)[1]
+        port = env["MCP_URL"].split(":")[2].split("/")[0]
+        return [ln.format(token=token, other=OTHER, port=port) for ln in DENIAL_LINES]
+
+    def log_lines(self, name: str) -> list[str]:
+        self.log_reads += 1
+        if self.fail_log:
+            raise ShellError("openshell logs failed (1): boom")
+        if name not in self.sandboxes:
+            raise ShellError("no such sandbox")
+        return list(self.log)
 
     def delete(self, name: str) -> None:
         self.calls.append(("delete", (name,)))
@@ -103,4 +179,12 @@ def use_fake_shell(
     return shell
 
 
-__all__ = ["FakeShell", "ShellError", "ShellTimeout", "line", "use_fake_shell"]
+__all__ = [
+    "DENIAL_LINES",
+    "FakeShell",
+    "ShellError",
+    "ShellTimeout",
+    "line",
+    "probe_line",
+    "use_fake_shell",
+]

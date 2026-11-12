@@ -6,6 +6,7 @@ from collections.abc import AsyncIterator, Iterator
 from contextlib import AsyncExitStack, asynccontextmanager, contextmanager
 from io import BytesIO
 from pathlib import Path
+from typing import Any
 
 from fastapi import FastAPI, Header, HTTPException, Query, Request, UploadFile
 from fastapi.responses import FileResponse, PlainTextResponse, StreamingResponse
@@ -14,6 +15,7 @@ from pypdf import PdfReader
 from starlette.types import Receive, Scope, Send
 
 from app.agent import Agent, get_agent
+from app.agent.sandbox_panel import SandboxView, clean, policy_view
 from app.demo import router as demo_router
 from app.docintel.reader import get_reader
 from app.models import Claim, Customer, Document, Message, Policy
@@ -126,8 +128,14 @@ def create_app() -> FastAPI:
         return out
 
     @app.get("/health")
-    def health() -> dict[str, str]:
-        return {"status": "ok"}
+    def health() -> dict[str, str | None]:
+        mode = os.environ.get("CLAIMS_MODE", "local")
+        model = os.environ.get("AGENT_MODEL") or None
+        return {
+            "status": "ok",
+            "mode": mode,
+            "agent_model": model if mode != "local" else None,
+        }
 
     @app.get("/customers")
     def customers(request: Request) -> list[Customer]:
@@ -245,6 +253,48 @@ def create_app() -> FastAPI:
             media_type=MEDIA_TYPES[path.suffix],
             headers={"X-Content-Type-Options": "nosniff"},
         )
+
+    @app.get("/claims/{claim_id}/sandbox")
+    def sandbox_view(claim_id: str, request: Request) -> SandboxView:
+        """The sandbox of a claim and its policy, for the pipeline panel only. The
+        token in the path is cut to 6 characters."""
+        claim_or_404(request, claim_id)
+        record = store(request).get_sandbox(claim_id)
+        if record is None:
+            raise HTTPException(404, "this claim has no sandbox")
+        made = [
+            e
+            for e in store(request).events_since(claim_id, 0)
+            if e.actor == "sandbox" and e.stage == "created" and e.duration is not None
+        ]
+        try:
+            return policy_view(
+                record,
+                round(made[-1].duration * 1000) if made and made[-1].duration else None,
+            )
+        except OSError:
+            raise HTTPException(
+                404, "the policy file of this sandbox is gone"
+            ) from None
+
+    @app.post("/claims/{claim_id}/sandbox/probe")
+    def sandbox_probe(claim_id: str, request: Request) -> dict[str, Any]:
+        """Runs the confinement test in the sandbox of the claim. It takes no input:
+        the script is a constant of the backend."""
+        claim_or_404(request, claim_id)
+        if store(request).get_sandbox(claim_id) is None:
+            raise HTTPException(404, "this claim has no sandbox")
+        from app.agent.sandbox import SandboxAgent, SandboxNotRunning, ShellError
+
+        agent = request.app.state.agent
+        assert isinstance(agent, SandboxAgent)  # a record exists only in sandbox mode
+        with claim_lock(request, claim_id):
+            try:
+                return agent.probe(claim_id)
+            except SandboxNotRunning:
+                raise HTTPException(409, "the sandbox is not running") from None
+            except ShellError as e:
+                raise HTTPException(502, clean(e)) from None
 
     @app.get("/claims/{claim_id}/events")
     def events(
