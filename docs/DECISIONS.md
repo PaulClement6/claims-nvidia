@@ -44,6 +44,17 @@
 | D28 | NeMo Guardrails in front of the agent model: after the first demo. | O6 |
 | D29 | The pipeline panel is read-only in version 1. Confirm and correct per field is a later ticket. | O9 |
 
+## Taken while we built the base (2026-11-12)
+
+| # | Decision |
+|---|---|
+| D30 | The agent runs the checks only when the customer says "done" (or presses Done). When the required documents are all present it asks for more documents first. Reason: a visitor can add a second photo or any other document of the kit. |
+| D31 | The agent gets only the customer text from `assess_and_route`. It never sees the outcome, the score or the reasons. Trusted code writes the fraud report when the outcome is `investigation`. Reason: the next agent is an LLM, and it must not be able to tell the outcome or to skip the report. |
+| D32 | The outcome `investigation` and its fraud report are saved in one write. The store refuses an `investigation` with no report (non-negotiable 4). |
+| D33 | Two API views: `GET /claims/{id}/customer` for the customer panel, `GET /claims/{id}` and `/events` for the pipeline panel. There is no access control between them: both panels are on one screen in the demo. Add it before the customer panel is served alone. |
+| D34 | Thresholds, each one named constant: low confidence below 0.8; R003 window 0 to 14 days; T003 tolerance CHF 0.05. The points per signal are one table in `backend/app/checks/rules.py`. |
+| D35 | The fixture reader finds a mock document by the SHA-256 of its bytes. The mock PDFs are byte-identical on every run of the generator. The damage photos are simple drawings: real-looking photos come with the document kit (issue #23). |
+
 ## Open
 
 | # | Question | Proposal |
