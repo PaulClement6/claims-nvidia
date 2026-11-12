@@ -42,7 +42,8 @@ class FixtureReader:
                 "source": {
                     "document_id": document.id,
                     "page": f["page"],
-                    "snippet": f["snippet"],
+                    "snippet": f.get("snippet"),  # a photo has a box, not a snippet
+                    "box": f.get("box"),
                 },
             }
             for f in found["fields"]

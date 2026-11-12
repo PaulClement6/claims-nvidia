@@ -23,7 +23,7 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClie
 
 
 def start(client: TestClient) -> str:
-    cid = str(client.post("/claims", json={"customer_id": "C-1001"}).json()["id"])
+    cid = str(client.post("/claims", json={"customer_id": "C-1001"}).json()["claim_id"])
     res = client.put(f"/claims/{cid}/policy", json={"policy_number": "TRV-2026-0417"})
     assert res.status_code == 200
     return cid
@@ -183,7 +183,7 @@ def test_messages_errors(client: TestClient) -> None:
     assert (
         client.post(f"/claims/{cid}/messages", json={"text": "  "}).status_code == 422
     )
-    bare = client.post("/claims", json={"customer_id": "C-1001"}).json()["id"]
+    bare = client.post("/claims", json={"customer_id": "C-1001"}).json()["claim_id"]
     assert (
         client.post(f"/claims/{bare}/messages", json={"text": "hi"}).status_code == 409
     )

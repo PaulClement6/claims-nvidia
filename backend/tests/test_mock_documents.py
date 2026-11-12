@@ -17,7 +17,7 @@ def sha(folder: Path) -> dict[str, str]:
     return {
         str(p.relative_to(folder)): hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted(folder.glob("**/*"))
-        if p.suffix in {".pdf", ".json"} and p.name != "policies.json"
+        if p.suffix in {".pdf", ".jpg", ".json"} and p.name != "policies.json"
     }
 
 
@@ -28,4 +28,4 @@ def test_generator_is_deterministic_and_matches_the_committed_files(
     gen.generate(tmp_path / "b")
     committed = sha(ROOT / "data" / "mock")
     assert sha(tmp_path / "a") == sha(tmp_path / "b") == committed
-    assert len(committed) == 6  # three PDFs, three expected.json
+    assert len(committed) == 12  # six files (4 PDF, 2 JPEG), six expected.json

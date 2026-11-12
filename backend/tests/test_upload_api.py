@@ -21,7 +21,9 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClie
 
 
 def claim_id(client: TestClient) -> str:
-    return str(client.post("/claims", json={"customer_id": "C-1001"}).json()["id"])
+    return str(
+        client.post("/claims", json={"customer_id": "C-1001"}).json()["claim_id"]
+    )
 
 
 def upload(client: TestClient, cid: str, name: str, data: bytes, mime: str = "x/y"):  # type: ignore[no-untyped-def]

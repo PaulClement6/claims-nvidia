@@ -1,0 +1,18 @@
+{
+  "document_type": "damage_photo",
+  "fields": [
+    {
+      "name": "damage_description",
+      "value": "water stain on the kitchen floor and the lower cabinets",
+      "confidence": 1.0,
+      "page": 1,
+      "box": [
+        320.0,
+        370.0,
+        700.0,
+        585.0
+      ]
+    }
+  ],
+  "line_items": []
+}

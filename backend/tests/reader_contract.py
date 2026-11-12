@@ -1,7 +1,7 @@
 """Contract every Reader must pass. The intern calls check_reader_contract(his_reader).
 
-It reads the committed mock files of data/mock/ (every PDF with an expected.json)
-and some unknown bytes.
+It reads the committed mock files of data/mock/ (every PDF and image with an
+expected.json) and some unknown bytes. An image has one page.
 """
 
 from io import BytesIO
@@ -17,11 +17,12 @@ KNOWN = {t.value for t in DocumentType}
 
 
 def check_reader_contract(reader: Reader) -> None:
-    pdfs = sorted(MOCK.glob("**/*.pdf"))
-    assert pdfs, "no mock PDF found"
-    for pdf in pdfs:
+    files = sorted(p for e in ("pdf", "jpg", "png") for p in MOCK.glob(f"**/*.{e}"))
+    assert any(p.suffix == ".pdf" for p in files), "no mock PDF found"
+    assert any(p.suffix != ".pdf" for p in files), "no mock image found"
+    for pdf in files:
         data = pdf.read_bytes()
-        pages = len(PdfReader(BytesIO(data)).pages)
+        pages = len(PdfReader(BytesIO(data)).pages) if pdf.suffix == ".pdf" else 1
         doc = Document(id="D-contract", file=pdf.name, pages=pages)
         assert reader.classify(doc, data) in KNOWN
         out = reader.extract(doc, data, "travel")

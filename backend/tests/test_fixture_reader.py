@@ -29,6 +29,19 @@ def test_known_file_gives_expected_fields_with_the_uploaded_document_id() -> Non
     assert len(out.line_items) == 3
 
 
+def test_a_photo_gives_its_box_as_source() -> None:
+    jpg = MOCK / "claim-2-property" / "damage-photo-1.jpg"
+    doc = Document(id="D-ph", file="x.jpg")
+    reader = FixtureReader()
+
+    assert reader.classify(doc, jpg.read_bytes()) == "damage_photo"
+    out = reader.extract(doc, jpg.read_bytes(), "property")
+    [f] = out.fields
+    assert f.name == "damage_description" and f.source.page == 1
+    assert f.source.snippet is None and f.source.box is not None
+    assert f.source.document_id == "D-ph"
+
+
 def test_unknown_bytes_give_unknown_and_no_field() -> None:
     reader = FixtureReader()
     doc = Document(id="D-x", file="x")

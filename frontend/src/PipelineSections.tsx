@@ -1,7 +1,7 @@
 // The claim sections of the pipeline panel: outcome, checks and signals, extracted data.
 
 export type Source = { document_id: string; page: number; snippet: string | null }
-export type Field = { name: string; value: unknown; source: { page: number; snippet: string | null } }
+export type Field = { name: string; value: unknown; source: { page: number; snippet: string | null; box?: number[] | null } }
 export type Doc = { id: string; file: string; document_type: string; fields: Field[]; file_metadata: { original_name?: string } }
 export type Signal = { code: string; title: string; severity: string; points: number; detail: string; evidence: Source[] }
 export type PipelineClaim = {
@@ -81,7 +81,7 @@ export function ChecksSection({ claim, ran }: { claim: PipelineClaim; ran: boole
   )
 }
 
-export function ExtractedSection({ docs }: { docs: Doc[] }) {
+export function ExtractedSection({ docs, claimId }: { docs: Doc[]; claimId: string }) {
   if (docs.length === 0) return null
   return (
     <div className="stack" aria-label="Extracted data">
@@ -91,6 +91,13 @@ export function ExtractedSection({ docs }: { docs: Doc[] }) {
           <p>
             <span className="mono">{d.file_metadata.original_name || d.file}</span> <span className="pill pill-idle">{d.document_type}</span>
           </p>
+          {/\.(jpe?g|png)$/.test(d.file) && (
+            <img
+              src={`/claims/${claimId}/documents/${d.id}/file`}
+              alt={d.file_metadata.original_name || d.file}
+              style={{ maxHeight: '96px', maxWidth: '100%' }}
+            />
+          )}
           {d.fields.length === 0 ? (
             <p className="muted">No field read.</p>
           ) : (
@@ -107,7 +114,7 @@ export function ExtractedSection({ docs }: { docs: Doc[] }) {
                   <tr key={f.name}>
                     <td>{f.name}</td>
                     <td className="mono">{String(f.value)}</td>
-                    <td className="muted">{`page ${f.source.page} · “${f.source.snippet ?? ''}”`}</td>
+                    <td className="muted">{f.source.snippet ? `page ${f.source.page} · “${f.source.snippet}”` : `page ${f.source.page} · box ${f.source.box?.join(', ') ?? ''}`}</td>
                   </tr>
                 ))}
               </tbody>

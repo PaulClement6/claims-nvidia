@@ -9,26 +9,18 @@ const policy = (number: string, line: string) => ({ number, line_of_business: li
 
 // what the customer endpoint gives: nothing else
 const view = (policy_number: string | null) => ({ claim_id: 'CL-1', policy_number, status: 'open', message: null })
-const claim = (policy: { number: string } | null, type: string | null = null) => ({
-  id: 'CL-1',
-  type,
-  policy,
-  customer: { id: 'C-1001', name: 'Anna Keller' },
-})
 
 test('pick an account to create the claim, then pick a policy to set it', async () => {
-  let current = claim(null)
   let picked = false
   const fetchMock = vi.fn((url: string, init?: RequestInit) => {
     if (url === '/customers') return Promise.resolve(Response.json([{ id: 'C-1001', name: 'Anna Keller' }]))
-    if (url === '/claims' && init?.method === 'POST') return Promise.resolve(Response.json(current, { status: 201 }))
+    if (url === '/claims' && init?.method === 'POST') return Promise.resolve(Response.json(view(null), { status: 201 }))
     if (url === '/claims/CL-1/customer') return Promise.resolve(Response.json(view(picked ? 'TRV-2026-0417' : null)))
     if (url === '/claims/CL-1/policies')
       return Promise.resolve(Response.json([policy('TRV-2026-0417', 'Travel'), policy('HH-2025-1182', 'Household')]))
     if (url === '/claims/CL-1/policy' && init?.method === 'PUT') {
       picked = true
-      current = claim({ number: 'TRV-2026-0417' }, 'travel')
-      return Promise.resolve(Response.json(current))
+      return Promise.resolve(Response.json(view('TRV-2026-0417')))
     }
     return Promise.reject(new Error(url))
   })

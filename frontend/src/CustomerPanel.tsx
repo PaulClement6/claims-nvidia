@@ -34,16 +34,15 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
 
   // the claim is created when the customer picks an account, before any policy
   const pickCustomer = (c: Customer) =>
-    send<{ id: string }>('/claims', json('POST', { customer_id: c.id }))
+    send<View>('/claims', json('POST', { customer_id: c.id }))
       .then((created) => {
         setName(c.name)
-        onClaim(created.id)
+        onClaim(created.claim_id)
       })
       .catch(() => setError('The claim was not created.'))
 
   const pickPolicy = (p: Policy) =>
-    send(`/claims/${claimId}/policy`, json('PUT', { policy_number: p.number }))
-      .then(() => send<View>(`/claims/${claimId}/customer`))
+    send<View>(`/claims/${claimId}/policy`, json('PUT', { policy_number: p.number }))
       .then((c) => {
         setClaim(c)
         setFilter('')

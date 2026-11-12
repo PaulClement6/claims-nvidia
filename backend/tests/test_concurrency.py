@@ -28,7 +28,9 @@ def test_three_uploads_at_the_same_time_keep_three_documents(
     client: TestClient,
 ) -> None:
     for _ in range(5):  # the race is rare: try several claims
-        cid = str(client.post("/claims", json={"customer_id": "C-1001"}).json()["id"])
+        cid = str(
+            client.post("/claims", json={"customer_id": "C-1001"}).json()["claim_id"]
+        )
         client.put(f"/claims/{cid}/policy", json={"policy_number": "TRV-2026-0417"})
 
         def up(name: str, cid: str = cid) -> int:

@@ -1,0 +1,66 @@
+{
+  "document_type": "repair_invoice",
+  "fields": [
+    {
+      "name": "invoice_number",
+      "value": "BSU-2026-1187",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "BSU-2026-1187"
+    },
+    {
+      "name": "invoice_date",
+      "value": "2026-09-22",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-09-22"
+    },
+    {
+      "name": "repair_company",
+      "value": "Blaubach Sanitaer & Umbau AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Blaubach Sanitaer & Umbau AG"
+    },
+    {
+      "name": "total",
+      "value": 3200.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 3,200.00"
+    },
+    {
+      "name": "customer_name",
+      "value": "Marco Bianchi",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Marco Bianchi"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Emergency call-out and leak detection",
+      "quantity": 1,
+      "unit_price": 380.0,
+      "amount": 380.0
+    },
+    {
+      "description": "Replace damaged supply pipe under the sink",
+      "quantity": 1,
+      "unit_price": 720.0,
+      "amount": 720.0
+    },
+    {
+      "description": "Dry-out of floor and cabinets (dehumidifier, days)",
+      "quantity": 6,
+      "unit_price": 95.0,
+      "amount": 570.0
+    },
+    {
+      "description": "Replace lower kitchen cabinets and floor covering",
+      "quantity": 1,
+      "unit_price": 1530.0,
+      "amount": 1530.0
+    }
+  ]
+}

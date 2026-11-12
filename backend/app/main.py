@@ -7,7 +7,7 @@ from io import BytesIO
 from pathlib import Path
 
 from fastapi import FastAPI, Header, HTTPException, Query, Request, UploadFile
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 from pypdf import PdfReader
 
@@ -27,6 +27,7 @@ from app.views import CustomerView, customer_view
 MAX_UPLOAD = 10 * 1024 * 1024
 # magic bytes -> extension; the client file name and content type are never trusted
 MAGIC = {b"%PDF-": ".pdf", b"\x89PNG\r\n\x1a\n": ".png", b"\xff\xd8\xff": ".jpg"}
+MEDIA_TYPES = {".pdf": "application/pdf", ".png": "image/png", ".jpg": "image/jpeg"}
 
 
 class NewClaim(BaseModel):
@@ -105,11 +106,11 @@ def create_app() -> FastAPI:
         return store(request).get_customers()
 
     @app.post("/claims", status_code=201)
-    def create_claim(body: NewClaim, request: Request) -> Claim:
+    def create_claim(body: NewClaim, request: Request) -> CustomerView:
         claim = store(request).create_claim(body.customer_id)
         if claim is None:
             raise HTTPException(404, "unknown customer")
-        return claim
+        return customer_view(claim)
 
     @app.get("/claims/{claim_id}")
     def get_claim(claim_id: str, request: Request) -> Claim:
@@ -130,7 +131,7 @@ def create_app() -> FastAPI:
         return [Policy.model_validate(p) for p in out["policies"]]
 
     @app.put("/claims/{claim_id}/policy")
-    def set_policy(claim_id: str, body: ClaimPolicy, request: Request) -> Claim:
+    def set_policy(claim_id: str, body: ClaimPolicy, request: Request) -> CustomerView:
         claim_or_404(request, claim_id)
         with claim_lock(request, claim_id):
             claim = store(request).set_claim_policy(claim_id, body.policy_number)
@@ -139,7 +140,7 @@ def create_app() -> FastAPI:
             if not store(request).get_messages(claim_id):
                 run_agent(request, claim_id, None, None)  # the greeting
                 claim = claim_or_404(request, claim_id)
-            return claim
+            return customer_view(claim)
 
     @app.get("/claims/{claim_id}/messages")
     def get_messages(claim_id: str, request: Request) -> list[Message]:
@@ -193,6 +194,29 @@ def create_app() -> FastAPI:
             run_agent(request, claim_id, None, doc.id)
             found = store(request).find_document(doc.id)
             return found[1] if found else doc
+
+    @app.get("/claims/{claim_id}/documents/{document_id}/file")
+    def document_file(
+        claim_id: str, document_id: str, request: Request
+    ) -> FileResponse:
+        """The stored file, for the pipeline panel. The path comes from the stored
+        document of this claim (its id and extension), never from the request."""
+        doc = next(
+            (
+                d
+                for d in claim_or_404(request, claim_id).documents
+                if d.id == document_id
+            ),
+            None,
+        )
+        path: Path = request.app.state.uploads / doc.file if doc else Path()
+        if doc is None or not path.is_file():
+            raise HTTPException(404, "unknown document")
+        return FileResponse(
+            path,
+            media_type=MEDIA_TYPES[path.suffix],
+            headers={"X-Content-Type-Options": "nosniff"},
+        )
 
     @app.get("/claims/{claim_id}/events")
     def events(
