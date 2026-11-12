@@ -300,6 +300,21 @@ def test_the_story_alone_stays_in_intake_and_the_model_asks(rig: Rig) -> None:
     assert rig.claim()["agent_state"] == "ask_date"
 
 
+def test_a_claim_that_already_holds_the_three_facts_skips_the_intake_questions(
+    rig: Rig,
+) -> None:
+    """For example a claim started in another mode: nothing is left to ask."""
+    rig.start()
+    gateway = rig.client.app.state.gateway  # type: ignore[attr-defined]
+    gateway.call(
+        rig.cid, "update_claim", {"claim_id": rig.cid, **story().tool_calls[0]["args"]}
+    )
+    rig.fake.replies += [calls(("required_documents", {})), text("Please upload.")]
+    assert rig.say("hello") == "Please upload."
+    assert node_events(rig)[-2:] == ["intake", "documents"]
+    assert len(rig.fake.seen) == 3  # the greeting, then the documents node only
+
+
 def test_the_model_never_gets_a_tool_that_checks_or_routes(rig: Rig) -> None:
     prepare_for_done(rig)
     rig.fake.replies += []

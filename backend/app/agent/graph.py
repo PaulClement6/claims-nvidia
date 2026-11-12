@@ -431,6 +431,8 @@ def build_graph(
     @node("intake")
     def intake(state: State) -> dict[str, Any]:
         summary = call_tool("get_claim_summary", {})
+        if next_state(summary) == "ask_documents":  # nothing to ask: the next node
+            return {"reply": None, "step": "documents"}
         turn = converse("intake", INTAKE_PROMPT, state, summary, [])
         step = "documents" if turn.reply is None else state.get("step", "intake")
         return {"messages": spoken(turn, []), "reply": turn.reply, "step": step}
