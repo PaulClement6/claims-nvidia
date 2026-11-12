@@ -4,6 +4,8 @@ import { json, send } from './api'
 
 type Message = { role: 'customer' | 'agent'; text: string; time: string }
 
+type KitFile = { folder: string; file: string; document_type: string | null; size: number }
+
 const uploadError = (e: Error) =>
   e.message === '415' ? 'Only PDF, PNG or JPEG files.' : e.message === '413' ? 'The file is larger than 10 MB.' : 'The upload failed.'
 
@@ -13,6 +15,7 @@ export default function Chat({ claimId }: { claimId: string }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [over, setOver] = useState(false)
+  const [kit, setKit] = useState<KitFile[] | null>(null) // null: list closed
   const [step, setStep] = useState('') // the chat step of the customer view; Done needs it
   const list = useRef<HTMLDivElement>(null)
   const field = useRef<HTMLInputElement>(null)
@@ -70,6 +73,24 @@ export default function Chat({ claimId }: { claimId: string }) {
     void run(send(`/claims/${claimId}/documents`, { method: 'POST', body }), `Uploaded ${file.name}`, uploadError)
   }
 
+  const openKit = () =>
+    kit
+      ? setKit(null)
+      : void send<KitFile[]>('/demo/kit')
+          .then(setKit)
+          .catch(() => setError('The sample documents did not load.'))
+
+  // the sample goes through the normal upload endpoint, like a file from the device
+  const pickSample = async (f: KitFile) => {
+    setKit(null)
+    try {
+      const blob = await fetch(`/demo/kit/${f.folder}/${f.file}`).then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
+      upload(new File([blob], f.file, { type: blob.type }))
+    } catch {
+      setError('The sample document did not load.')
+    }
+  }
+
   const drop = (e: DragEvent) => {
     e.preventDefault()
     setOver(false)
@@ -119,10 +140,29 @@ export default function Chat({ claimId }: { claimId: string }) {
             }}
           />
         </label>
+        <button type="button" disabled={busy} aria-expanded={kit !== null} onClick={openKit}>
+          Use a sample document
+        </button>
         <button type="button" disabled={busy || step !== 'ask_documents'} onClick={() => say('done')}>
           Done
         </button>
       </form>
+      {kit && (
+        <div className="stack" role="group" aria-label="Sample documents">
+          {[...new Set(kit.map((f) => f.folder))].map((folder) => (
+            <div key={folder}>
+              <h3>{folder}</h3>
+              {kit
+                .filter((f) => f.folder === folder)
+                .map((f) => (
+                  <button key={f.file} type="button" disabled={busy} onClick={() => void pickSample(f)}>
+                    {f.file} · {f.document_type ?? 'document'} · {Math.max(1, Math.round(f.size / 1024))} KB
+                  </button>
+                ))}
+            </div>
+          ))}
+        </div>
+      )}
       <p className="muted">Drop a PDF, PNG or JPEG here, or press Upload.</p>
     </div>
   )

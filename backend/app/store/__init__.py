@@ -241,6 +241,14 @@ class Store:
             ).fetchall()
         return [PipelineEvent.model_validate_json(r[0]) for r in rows]
 
+    def reset(self) -> dict[str, int]:
+        """Deletes claims, messages and events; keeps customers and policies."""
+        counts = {}
+        with self.lock, self.db:
+            for table in ("claims", "messages", "events"):
+                counts[table] = self.db.execute(f"DELETE FROM {table}").rowcount
+        return counts
+
     def get_claim(self, claim_id: str) -> Claim | None:
         with self.lock:
             row = self.db.execute(
