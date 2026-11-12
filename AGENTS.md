@@ -21,7 +21,7 @@ Target: a working demo on real-looking mock claim files at the Q1 2027 event.
 
 ## Status
 
-2026-11-12: decisions taken (`docs/DECISIONS.md`). The base (M0 to M3 of `docs/BACKLOG.md`) is in progress. The intern owns M4: the document reading pipeline behind the contract of `extract_document`.
+2026-11-12: M0 to M2 are built (issues #2 to #11): the full claim flow works in `local` mode, and the three mock claim files give `straight_through`, `handler_review` and `investigation`. Next for the base: M3 (LLM agent, OpenShell sandbox, deploy on the VM). The intern owns M4: the document reading pipeline behind the `Reader` contract (`README.md`).
 
 ## Commands (target, same as NemoForge)
 
@@ -29,7 +29,8 @@ Backend in `backend/` (Python, FastAPI, uv). Frontend in `frontend/` (React, Vit
 
 - Test: `cd backend && uv run pytest` and `cd frontend && npm test`
 - Types: `cd backend && uv run mypy .` and `cd frontend && npm run typecheck`
-- Lint: `cd backend && uv run ruff check .` and `cd frontend && npm run lint`
+- Lint: `cd backend && uv run ruff check . ../scripts` and `cd frontend && npm run lint`
+- Mock documents: `cd backend && uv run python ../scripts/generate_mock_documents.py`
 - Run tests and types before you say a task is done.
 
 ## Non-negotiables
