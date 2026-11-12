@@ -1,6 +1,10 @@
 services:
   backend:
     build: ./backend
+    environment:
+      CLAIMS_DATA: /data
+    volumes:
+      - ./data:/data:ro
     ports:
       - "${BACKEND_PORT:-8000}:8000"
 

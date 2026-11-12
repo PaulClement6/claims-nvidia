@@ -96,8 +96,8 @@ class PipelineEvent(BaseModel):
 class Claim(BaseModel):
     id: str
     customer: Customer
-    policy: Policy
-    type: ClaimType
+    policy: Policy | None = None
+    type: ClaimType | None = None
     description: str | None = None
     incident_date: date | None = None
     claimed_amount: float | None = None
