@@ -1,0 +1,66 @@
+{
+  "document_type": "repair_invoice",
+  "fields": [
+    {
+      "name": "invoice_number",
+      "value": "ZI-2026-0652",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "ZI-2026-0652"
+    },
+    {
+      "name": "invoice_date",
+      "value": "2026-11-09",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-11-09"
+    },
+    {
+      "name": "repair_company",
+      "value": "Zanetti Impianti SA",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Zanetti Impianti SA"
+    },
+    {
+      "name": "total",
+      "value": 4740.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 4,740.00"
+    },
+    {
+      "name": "customer_name",
+      "value": "Marco Bianchi",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Marco Bianchi"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Emergency call-out and leak detection",
+      "quantity": 1,
+      "unit_price": 290.0,
+      "amount": 290.0
+    },
+    {
+      "description": "Replace the burst supply pipe in the bathroom wall",
+      "quantity": 1,
+      "unit_price": 640.0,
+      "amount": 640.0
+    },
+    {
+      "description": "Dry-out of walls and floor (dehumidifier, days)",
+      "quantity": 4,
+      "unit_price": 85.0,
+      "amount": 340.0
+    },
+    {
+      "description": "Re-tile the wall and the floor of the bathroom",
+      "quantity": 1,
+      "unit_price": 470.0,
+      "amount": 470.0
+    }
+  ]
+}

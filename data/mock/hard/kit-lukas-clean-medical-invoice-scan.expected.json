@@ -1,0 +1,74 @@
+{
+  "document_type": "medical_invoice",
+  "fields": [
+    {
+      "name": "invoice_number",
+      "value": "GLB-2026-5521",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "GLB-2026-5521"
+    },
+    {
+      "name": "invoice_date",
+      "value": "2026-11-09",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-11-09"
+    },
+    {
+      "name": "provider",
+      "value": "Gesundheitszentrum Limmatblick AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Gesundheitszentrum Limmatblick AG"
+    },
+    {
+      "name": "patient_name",
+      "value": "Lukas Meier",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Lukas Meier"
+    },
+    {
+      "name": "total",
+      "value": 840.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 840.00"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Consultation, first visit, 30 min",
+      "quantity": 1,
+      "unit_price": 180.0,
+      "amount": 180.0
+    },
+    {
+      "description": "X-ray of the wrist, 2 views",
+      "quantity": 1,
+      "unit_price": 160.0,
+      "amount": 160.0
+    },
+    {
+      "description": "Wrist support, incl. fitting",
+      "quantity": 1,
+      "unit_price": 110.0,
+      "amount": 110.0
+    },
+    {
+      "description": "Follow-up consultation, 15 min",
+      "quantity": 1,
+      "unit_price": 90.0,
+      "amount": 90.0
+    },
+    {
+      "description": "Physiotherapy session, 30 min",
+      "quantity": 2,
+      "unit_price": 150.0,
+      "amount": 300.0
+    }
+  ],
+  "variant": "scan",
+  "source_document": "kit-lukas-clean/medical-invoice.pdf"
+}

@@ -1,0 +1,49 @@
+{
+  "document_type": "receipt",
+  "fields": [
+    {
+      "name": "merchant",
+      "value": "Bergfreund Sport AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Bergfreund Sport AG"
+    },
+    {
+      "name": "purchase_date",
+      "value": "2026-03-18",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-03-18"
+    },
+    {
+      "name": "item_description",
+      "value": "Rain jacket, waterproof",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Rain jacket, waterproof"
+    },
+    {
+      "name": "amount_paid",
+      "value": 398.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 398.00"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Rain jacket, waterproof",
+      "quantity": 1,
+      "unit_price": 219.0,
+      "amount": 219.0
+    },
+    {
+      "description": "Walking shoes",
+      "quantity": 1,
+      "unit_price": 179.0,
+      "amount": 179.0
+    }
+  ],
+  "variant": "photo",
+  "source_document": "kit-anna-luggage/receipt-jacket-shoes.pdf"
+}

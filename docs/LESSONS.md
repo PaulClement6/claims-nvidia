@@ -41,3 +41,12 @@
 - The setup script builds the image from the graph files: run it again after a change of `sandbox_turn.py` or the graph, or the sandbox runs the old code.
 - A shared pytest fixture (`make` in `tests/rig.py`) is imported once in `conftest.py`. Never name a test argument like an imported fixture in the test file.
 
+
+## Document kit (issue #23, 2026-11-13)
+
+- C003 (outside travel) compares the claimed amount with the first `total` field of the claim, so a receipt must not call its amount `total`: it uses `amount_paid`. A quote is `quote_number` and `quote_date`, never `invoice_date`, or R005 would read it.
+- One message can hold the story, the date and the amount: the scripted agent fills the three slots from it. The kit stories are one line each.
+- The expected signals of a story are checked against the real rules, not computed by hand: a threshold story (60 points for `investigation`, 20 for a review) breaks the day somebody tunes the points. The test names the story that moved.
+- reportlab keeps a JPEG as it is (DCTDecode) when `drawImage` gets a JPEG file or an `ImageReader` of one: the scan PDF is a plain page with one image, no text layer, and the bytes of the JPEG are the ones Pillow wrote.
+- pdfium does not embed the standard fonts of the reportlab PDFs: it draws a substitute that depends on the machine. A pixel test of a scan must be coarse (reduced to 1/8, mean grey level): two different documents differ by about 11 on that scale, a Mac against Linux by far less.
+- The titles and stories of `/demo/kit` are read by a visitor in the customer panel (non-negotiable 2): never write "fraud", "tampered" or "edited" there. The seeded signals live in `index.json` only, which no route serves.

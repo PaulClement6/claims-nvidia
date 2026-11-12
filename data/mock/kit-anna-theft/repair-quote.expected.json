@@ -1,0 +1,66 @@
+{
+  "document_type": "repair_quote",
+  "fields": [
+    {
+      "name": "quote_number",
+      "value": "TWG-Q-2026-0731",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "TWG-Q-2026-0731"
+    },
+    {
+      "name": "quote_date",
+      "value": "2026-10-12",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-10-12"
+    },
+    {
+      "name": "repair_company",
+      "value": "Tuerenwerk Gantrisch AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Tuerenwerk Gantrisch AG"
+    },
+    {
+      "name": "total",
+      "value": 2640.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 2,640.00"
+    },
+    {
+      "name": "customer_name",
+      "value": "Anna Keller",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Anna Keller"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Remove the forced door and frame, disposal",
+      "quantity": 1,
+      "unit_price": 420.0,
+      "amount": 420.0
+    },
+    {
+      "description": "Front door, steel and wood, security class RC2, with frame",
+      "quantity": 1,
+      "unit_price": 1380.0,
+      "amount": 1380.0
+    },
+    {
+      "description": "Multipoint lock and cylinder",
+      "quantity": 1,
+      "unit_price": 390.0,
+      "amount": 390.0
+    },
+    {
+      "description": "Fitting, sealing and paintwork (hours)",
+      "quantity": 6,
+      "unit_price": 75.0,
+      "amount": 450.0
+    }
+  ]
+}

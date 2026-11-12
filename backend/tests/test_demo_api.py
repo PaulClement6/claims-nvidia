@@ -1,3 +1,5 @@
+import json
+import re
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -52,7 +54,40 @@ def test_kit_lists_the_mock_documents(client: TestClient) -> None:
     assert row["folder"] == "claim-1-travel"
     assert row["document_type"] == "booking_confirmation"
     assert row["size"] == BOOKING.stat().st_size
-    assert len(kit) == 8
+    assert len(kit) == 33  # 24 documents of the scenarios and 9 hard versions
+    assert {r["folder"] for r in kit} >= {"claim-3-health", "kit-anna-theft", "hard"}
+
+
+def test_kit_rows_say_which_scenario_a_document_belongs_to(client: TestClient) -> None:
+    kit = client.get("/demo/kit").json()
+    row = next(
+        r
+        for r in kit
+        if (r["folder"], r["file"]) == ("kit-anna-theft", "police-report.pdf")
+    )
+    assert row["scenario"] == "kit-anna-theft" and row["policy"] == "HH-2025-1182"
+    assert row["customer_id"] == "C-1001" and row["variant"] is None
+    assert row["title"] == "Burglary: forced front door"
+    assert "9 October 2026" in row["story"] and "CHF 2,640" in row["story"]
+    # a hard version belongs to the scenario of its source document
+    hard = next(r for r in kit if r["folder"] == "hard" and r["variant"] == "photo")
+    source = hard["source_document"]
+    assert hard["scenario"] == source.split("/")[0]
+    assert hard["policy"] and hard["story"]
+    assert client.get(f"/demo/kit/hard/{hard['file']}").status_code == 200
+    # a visitor reads these texts: nothing in them tells what the checks will find
+    assert not re.search(r"fraud|tamper|signal|edited", json.dumps(kit), re.I)
+
+
+def test_kit_without_an_index_still_lists_the_files(
+    client: TestClient, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    mock = tmp_path / "data" / "mock" / "claim-1-travel"
+    mock.mkdir(parents=True)
+    (mock / "a.pdf").write_bytes(BOOKING.read_bytes())
+    monkeypatch.setenv("CLAIMS_DATA", str(tmp_path / "data"))
+    [row] = client.get("/demo/kit").json()
+    assert row["file"] == "a.pdf" and row["scenario"] is None and row["story"] is None
 
 
 def test_kit_serves_listed_files_only(client: TestClient) -> None:

@@ -1,0 +1,41 @@
+{
+  "document_type": "receipt",
+  "fields": [
+    {
+      "name": "merchant",
+      "value": "Hardware Rosengarten AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Hardware Rosengarten AG"
+    },
+    {
+      "name": "purchase_date",
+      "value": "2025-05-12",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2025-05-12"
+    },
+    {
+      "name": "item_description",
+      "value": "Security lock set, 5-point, with cylinder",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Security lock set, 5-point, with cylinder"
+    },
+    {
+      "name": "amount_paid",
+      "value": 318.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 318.00"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Security lock set, 5-point, with cylinder",
+      "quantity": 1,
+      "unit_price": 318.0,
+      "amount": 318.0
+    }
+  ]
+}

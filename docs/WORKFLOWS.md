@@ -36,7 +36,7 @@ These lists are a first reading of a typical claims flow. Paul must confirm them
 | | |
 |---|---|
 | Causes | Trip cancellation, luggage, medical cost abroad |
-| Required documents | Booking confirmation; cancellation confirmation or receipts |
+| Required documents | Booking confirmation; cancellation confirmation or receipts (for the cause `luggage`, the airline's luggage report counts too) |
 | Required for illness | Medical certificate |
 | Fields | Booking reference, departure date, trip price, cancellation date, refund received, cause |
 | Straight-through limit | CHF 2,500 |

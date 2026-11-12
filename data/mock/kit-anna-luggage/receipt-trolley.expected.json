@@ -1,0 +1,41 @@
+{
+  "document_type": "receipt",
+  "fields": [
+    {
+      "name": "merchant",
+      "value": "Kofferhaus Limmat AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Kofferhaus Limmat AG"
+    },
+    {
+      "name": "purchase_date",
+      "value": "2026-04-02",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-04-02"
+    },
+    {
+      "name": "item_description",
+      "value": "Cabin trolley, hard shell, 55 cm",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Cabin trolley, hard shell, 55 cm"
+    },
+    {
+      "name": "amount_paid",
+      "value": 389.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 389.00"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Cabin trolley, hard shell, 55 cm",
+      "quantity": 1,
+      "unit_price": 389.0,
+      "amount": 389.0
+    }
+  ]
+}

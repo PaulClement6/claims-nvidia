@@ -1,0 +1,47 @@
+{
+  "document_type": "receipt",
+  "fields": [
+    {
+      "name": "merchant",
+      "value": "Bauzentrum Wankdorf AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Bauzentrum Wankdorf AG"
+    },
+    {
+      "name": "purchase_date",
+      "value": "2025-06-03",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2025-06-03"
+    },
+    {
+      "name": "item_description",
+      "value": "Steel door frame reinforcement kit",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Steel door frame reinforcement kit"
+    },
+    {
+      "name": "amount_paid",
+      "value": 300.5,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 300.50"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Steel door frame reinforcement kit",
+      "quantity": 1,
+      "unit_price": 214.0,
+      "amount": 214.0
+    },
+    {
+      "description": "Door handle set, stainless steel",
+      "quantity": 1,
+      "unit_price": 86.5,
+      "amount": 86.5
+    }
+  ]
+}

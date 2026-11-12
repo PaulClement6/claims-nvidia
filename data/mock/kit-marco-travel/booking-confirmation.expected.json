@@ -1,0 +1,53 @@
+{
+  "document_type": "booking_confirmation",
+  "fields": [
+    {
+      "name": "booking_reference",
+      "value": "SHR-770245",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "SHR-770245"
+    },
+    {
+      "name": "departure_date",
+      "value": "2026-08-23",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-08-23"
+    },
+    {
+      "name": "trip_price",
+      "value": 3200.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 3,200.00"
+    },
+    {
+      "name": "traveller_name",
+      "value": "Marco Bianchi",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Marco Bianchi"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Return flights Zurich - Palermo",
+      "quantity": 2,
+      "unit_price": 410.0,
+      "amount": 820.0
+    },
+    {
+      "description": "Hotel Corallo Azzurro, double room, 9 nights",
+      "quantity": 1,
+      "unit_price": 2080.0,
+      "amount": 2080.0
+    },
+    {
+      "description": "Car hire, compact, 5 days",
+      "quantity": 5,
+      "unit_price": 60.0,
+      "amount": 300.0
+    }
+  ]
+}

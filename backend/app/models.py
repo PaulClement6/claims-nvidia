@@ -67,6 +67,7 @@ class DocumentType(StrEnum):
     medical_invoice = "medical_invoice"
     medical_report = "medical_report"
     receipt = "receipt"
+    luggage_report = "luggage_report"
     unknown = "unknown"
 
 

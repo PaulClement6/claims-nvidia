@@ -1,0 +1,36 @@
+{
+  "document_type": "police_report",
+  "fields": [
+    {
+      "name": "report_number",
+      "value": "RPA-2026-04417",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "RPA-2026-04417"
+    },
+    {
+      "name": "incident_date",
+      "value": "2026-10-09",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-10-09, 07:30"
+    },
+    {
+      "name": "customer_name",
+      "value": "Anna Keller",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Anna Keller (born 1988-04-12)"
+    },
+    {
+      "name": "offence",
+      "value": "burglary",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Burglary (forced entry)"
+    }
+  ],
+  "line_items": [],
+  "variant": "scan",
+  "source_document": "kit-anna-theft/police-report.pdf"
+}
