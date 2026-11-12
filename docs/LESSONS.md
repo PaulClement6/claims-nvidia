@@ -29,3 +29,15 @@
 - Do not send a key into a sandbox to look for it. A real NVIDIA key has the form `nvapi-...`: look for that form in the environment and the files.
 - A test that calls the API of a backend in `sandbox` mode starts a sandbox on each greeting and each upload, and the new sandbox gets a new token. A test that made a token by hand must store its documents and its policy without a turn of the agent.
 - `ruff format` does not wrap a long string, so `E501` stays. The `timeout` command does not exist on macOS, and BSD `sed -i` needs an argument: use Python for an edit in a script.
+
+## Sandbox panel (issue #15, 2026-11-12)
+
+- `openshell logs` is about 0.3 s late: a read right after the request does not hold its lines yet. Read again until the lines you expect are there, with a limit.
+- Do not place the events of a process by counting back from its end. The process takes about 0.2 s to exit and `openshell` to return. Use the clock of the process and keep the result inside the time you waited.
+- A function that cuts a secret and adds a mark (`/mcp/ab12cd…`) must also match the mark, or a second run adds a second one. Test it twice.
+- The test of non-negotiable 1 reads all string literals of the backend. A new feature that needs `denied` for another meaning needs a named exception in that test.
+- One refused connection gives two OpenShell lines: the DNS refusal (`NET:REFUSE`), then the connection (`NET:OPEN`). A non-DENIED line (`WARN`, `ALLOWED`) can talk about the same host: keep only the OCSF lines with `DENIED`.
+- A JSON line from a sandbox is data. Judge a probe in the backend (status, error name) and accept a placeholder only if it matches its form: a lying sandbox then cannot show a key.
+- The setup script builds the image from the graph files: run it again after a change of `sandbox_turn.py` or the graph, or the sandbox runs the old code.
+- A shared pytest fixture (`make` in `tests/rig.py`) is imported once in `conftest.py`. Never name a test argument like an imported fixture in the test file.
+

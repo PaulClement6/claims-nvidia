@@ -21,7 +21,7 @@ Target: a working demo on real-looking mock claim files at the Q1 2027 event.
 
 ## Status
 
-2026-11-12: M0 to M2 are built (issues #2 to #11): the full claim flow works in `local` mode, and the three mock claim files give `straight_through`, `handler_review` and `investigation`. M3 has started: the LLM agent runs in `nim` mode (issue #12, `docs/EVALUATION.md`). Next for the base: the OpenShell sandbox and the deploy on the VM. The intern owns M4: the document reading pipeline behind the `Reader` contract (`README.md`).
+2026-11-12: M0 to M3 are built (issues #2 to #15), except the deploy on the VM (backlog task 24). The full claim flow works in the three modes: `local` (the default, and CI), `nim` (the LangGraph agent in the backend) and `sandbox` (the same graph in OpenShell). The pipeline panel shows the sandbox policy, the denials and a confinement test. The three mock claim files give `straight_through`, `handler_review` and `investigation` (`docs/EVALUATION.md`). Next for the base: the deploy on a Brev VM. The intern owns M4: the document reading pipeline behind the `Reader` contract (`README.md`).
 
 ## Commands (target, same as NemoForge)
 
@@ -29,9 +29,13 @@ Backend in `backend/` (Python, FastAPI, uv). Frontend in `frontend/` (React, Vit
 
 - Test: `cd backend && uv run pytest` and `cd frontend && npm test`
 - Types: `cd backend && uv run mypy .` and `cd frontend && npm run typecheck`
-- Lint: `cd backend && uv run ruff check . ../scripts` and `cd frontend && npm run lint`
+- Lint: `cd backend && uv run ruff check . ../scripts && uv run ruff format --check . ../scripts` and `cd frontend && npm run lint`
+- Build the frontend: `cd frontend && npm run build`
 - Mock documents: `cd backend && uv run python ../scripts/generate_mock_documents.py`
-- Run: `cd backend && uv run uvicorn app.main:app --env-file ../.env` (loads `.env`: `CLAIMS_MODE`, `NVIDIA_KEY`, the model settings) and `cd frontend && npm run dev`
+- Run, `local` mode (the default): `cd backend && uv run uvicorn app.main:app` and `cd frontend && npm run dev`
+- Run, `nim` mode (the graph in the backend, the real model, needs `NVIDIA_KEY` in `.env`): `cd backend && CLAIMS_MODE=nim uv run uvicorn app.main:app --env-file ../.env`
+- Run, `sandbox` mode (the graph in OpenShell, needs OpenShell 0.1.5, Colima and `NVIDIA_KEY` in `.env`): once `infra/sandbox/setup.sh` (run it again after a change of the graph files: it builds the image), then `cd backend && CLAIMS_MODE=sandbox BACKEND_PORT=8000 uv run uvicorn app.main:app --env-file ../.env --host 127.0.0.1 --port 8000`. `BACKEND_PORT` must be the port of uvicorn. On a Mac, `export DOCKER_HOST=unix://$HOME/.colima/default/docker.sock` first.
+- Sandbox tests (need OpenShell and the image, skipped in CI): `cd backend && uv run pytest -m sandbox`
 - Live tests (the real model, needs `NVIDIA_KEY` in `.env`, skipped in CI): `cd backend && uv run pytest -m live`. Measure: `cd backend && uv run python ../scripts/measure_agent.py` (`docs/EVALUATION.md`)
 - Run tests and types before you say a task is done.
 
