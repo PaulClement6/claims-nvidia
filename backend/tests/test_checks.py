@@ -56,6 +56,16 @@ def test_medical_certificate_is_not_required_for_luggage() -> None:
     assert codes(claim) == []
 
 
+def test_a_luggage_report_stands_in_for_the_receipt_of_a_luggage_claim_only() -> None:
+    booking = travel_documents()[0]
+    report = document("D-lost", "luggage_report", {"traveller_name": "Anna Keller"})
+    luggage = travel_claim(cause="luggage", documents=[booking, report])
+    assert codes(luggage) == []
+    cancelled = travel_claim(cause="cancellation", documents=[booking, report])
+    [s] = run_rules(cancelled, TRAVEL)
+    assert s.code == "R001" and "cancellation confirmation or a receipt" in s.detail
+
+
 @pytest.mark.parametrize(
     ("incident", "expected"),
     [

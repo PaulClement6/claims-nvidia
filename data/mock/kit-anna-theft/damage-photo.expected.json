@@ -1,0 +1,18 @@
+{
+  "document_type": "damage_photo",
+  "fields": [
+    {
+      "name": "damage_description",
+      "value": "front door forced open at the lock, frame splintered, pry marks on the leaf",
+      "confidence": 1.0,
+      "page": 1,
+      "box": [
+        460.0,
+        220.0,
+        570.0,
+        370.0
+      ]
+    }
+  ],
+  "line_items": []
+}

@@ -1,0 +1,53 @@
+{
+  "document_type": "booking_confirmation",
+  "fields": [
+    {
+      "name": "booking_reference",
+      "value": "WPR-519207",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "WPR-519207"
+    },
+    {
+      "name": "departure_date",
+      "value": "2026-05-14",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-05-14"
+    },
+    {
+      "name": "trip_price",
+      "value": 1320.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 1,320.00"
+    },
+    {
+      "name": "traveller_name",
+      "value": "Anna Keller",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Anna Keller"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Return flights Zurich - Porto",
+      "quantity": 2,
+      "unit_price": 235.0,
+      "amount": 470.0
+    },
+    {
+      "description": "Hotel Ribeira Velha, double room, 7 nights",
+      "quantity": 1,
+      "unit_price": 760.0,
+      "amount": 760.0
+    },
+    {
+      "description": "Airport transfers",
+      "quantity": 1,
+      "unit_price": 90.0,
+      "amount": 90.0
+    }
+  ]
+}

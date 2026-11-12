@@ -1,0 +1,66 @@
+{
+  "document_type": "repair_quote",
+  "fields": [
+    {
+      "name": "quote_number",
+      "value": "GFB-Q-2026-0388",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "GFB-Q-2026-0388"
+    },
+    {
+      "name": "quote_date",
+      "value": "2026-09-16",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-09-16"
+    },
+    {
+      "name": "repair_company",
+      "value": "Glas & Fenster Brunner GmbH",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Glas & Fenster Brunner GmbH"
+    },
+    {
+      "name": "total",
+      "value": 1260.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 1,260.00"
+    },
+    {
+      "name": "customer_name",
+      "value": "Lukas Meier",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Lukas Meier"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Site visit and measuring",
+      "quantity": 1,
+      "unit_price": 95.0,
+      "amount": 95.0
+    },
+    {
+      "description": "Insulated glass unit 120 x 140 cm, low-E",
+      "quantity": 1,
+      "unit_price": 760.0,
+      "amount": 760.0
+    },
+    {
+      "description": "Removal and disposal of the broken pane",
+      "quantity": 1,
+      "unit_price": 120.0,
+      "amount": 120.0
+    },
+    {
+      "description": "Fitting, sealing and finishing (hours)",
+      "quantity": 3,
+      "unit_price": 95.0,
+      "amount": 285.0
+    }
+  ]
+}

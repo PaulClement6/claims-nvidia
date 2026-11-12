@@ -1,0 +1,40 @@
+{
+  "document_type": "cancellation_confirmation",
+  "fields": [
+    {
+      "name": "booking_reference",
+      "value": "SHR-770245",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "SHR-770245"
+    },
+    {
+      "name": "cancellation_date",
+      "value": "2026-07-13",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-07-13"
+    },
+    {
+      "name": "refund_received",
+      "value": 900.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "900.00"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Trip price paid",
+      "amount": 3200.0
+    },
+    {
+      "description": "Cancellation fees (terms, art. 4)",
+      "amount": -2300.0
+    },
+    {
+      "description": "Refund to your card",
+      "amount": 900.0
+    }
+  ]
+}

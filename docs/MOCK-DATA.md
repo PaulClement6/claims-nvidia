@@ -43,6 +43,29 @@ Lukas Meier, policy ACC-2026-2210. Sprained ankle. Incident 2026-10-25. Claimed 
 
 Expected signals: R003, R004, R005, T001, T002, T003, C001. Score above 60. Fraud report with every signal.
 
+## The document kit (D14, issue #23)
+
+The three claim files above and six more scenarios: 24 documents in 9 folders of `data/mock/`, and 9 hard versions in `data/mock/hard/`. `data/mock/index.json` is the source of this table (the generator writes it). A visitor picks an account, types the story of a row, uploads its documents and types "done". `backend/tests/test_document_kit.py` plays every row in `local` mode and checks the exact signals and outcome.
+
+| Folder | Account, policy | Story to type | Docs | Signals | Outcome |
+|---|---|---|---|---|---|
+| `claim-1-travel` | Anna, TRV-2026-0417 | My trip was cancelled because I was ill. It began on 3 August 2026 and I claim CHF 1,500. | 3 | none | `straight_through` |
+| `claim-2-property` | Marco, HH-2024-0933 | Water damage in the kitchen on 14 September 2026. I claim CHF 3,200. | 3 | none | `handler_review` |
+| `claim-3-health` | Lukas, ACC-2026-2210 | I sprained my ankle in an accident on 25 October 2026. I claim CHF 4,450. | 2 | C001, R003, R004, R005, T001, T002, T003 | `investigation` |
+| `kit-anna-luggage` | Anna, TRV-2026-0417 | My luggage was lost on arrival in Porto on 14 May 2026. I claim CHF 787. | 4 | none | `straight_through` |
+| `kit-anna-theft` | Anna, HH-2025-1182 | Burglary at my flat on 9 October 2026: the front door was forced. I claim CHF 2,640. | 5 | none | `handler_review` |
+| `kit-marco-travel` | Marco, TRV-2026-0721 | I had to cancel my trip to Sicily on 12 July 2026 because of a family emergency. I claim CHF 2,300. | 2 | none | `straight_through` |
+| `kit-marco-travel` | same | The same story, but I claim CHF 3,200 (the full trip price, not price minus refund of CHF 900). | | C003 | `handler_review` |
+| `kit-marco-inflated` | Marco, HH-2024-0933 | A leaking pipe flooded my bathroom on 3 November 2026. I claim CHF 4,740. | 2 | T001, T002, T003 | `investigation` |
+| `kit-lukas-clean` | Lukas, ACC-2026-2210 | I fell off my bike on 6 November 2026 and hurt my wrist. I claim CHF 840. | 2 | none | `straight_through` |
+| `kit-lukas-household` | Lukas, HH-2026-0102 | A football broke the living-room window on 14 September 2026. I claim CHF 1,260. | 1 | R001 (no photo) | `handler_review` |
+
+The luggage report is a new document type, `luggage_report`: the airline report of a lost bag. It counts for the "cancellation confirmation or receipt" requirement of a travel claim with the cause `luggage`, and only then. `kit-marco-inflated` is the invoice of claim 2 made again with a printed total (CHF 4,740) above its lines (CHF 1,740), saved by an editing tool two days after its creation: 60 points, the lowest score of an `investigation`.
+
+**Hard versions** (`hard/`, for the reader, not for a claim story): the same content in other bytes. Six scans (150 DPI, grey, turned 1 to 2 degrees, noise and blur, a one-page PDF that holds only the image: no text layer) of `claim-2-property/repair-invoice`, `kit-lukas-clean/medical-invoice`, `claim-1-travel/booking-confirmation`, `claim-1-travel/medical-certificate`, `kit-anna-theft/police-report`, `kit-anna-luggage/receipt-jacket-shoes`. Three phone photos (a page on a wooden table, tilted, unevenly lit, JPEG) of the repair invoice, the receipt and the luggage report. Each has an `expected.json` with the fields of its source plus `variant` (`scan` or `photo`) and `source_document`. A scan loses the PDF metadata, so T001 and T002 cannot fire on it: that is the case for the reader, not for the checks.
+
+The damage photos stay drawings (D35): a kitchen floor (two), a forced door, a bathroom floor.
+
 ## Test set
 
-Each claim file has an `expected.json`: the fields a handler would type, the signals and the outcome. The evaluation compares the pipeline output with this file. The intern grows the set: more files per workflow, scans, phone photos, and more seeded fraud cases.
+Each document has an `expected.json`: the fields a handler would type. `index.json` has the signals and the outcome of each story. The evaluation compares the pipeline output with these files. To add a scenario, read the header of `scripts/mockdocs/kit.py`.

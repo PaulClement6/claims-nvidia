@@ -1,0 +1,169 @@
+%PDF-1.3
+%“Œ‹ž ReportLab Generated PDF document (opensource)
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R /F3 4 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding /Name /F3 /Subtype /Type1 /Type /Font
+>>
+endobj
+5 0 obj
+<<
+/Contents 9 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 8 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+6 0 obj
+<<
+/PageMode /UseNone /Pages 8 0 R /Type /Catalog
+>>
+endobj
+7 0 obj
+<<
+/Author () /CreationDate (D:20000101000000+00'00') /Creator (anonymous) /Keywords () /ModDate (D:20000101000000+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (unspecified) /Title (Baggage irregularity report) /Trapped /False
+>>
+endobj
+8 0 obj
+<<
+/Count 1 /Kids [ 5 0 R ] /Type /Pages
+>>
+endobj
+9 0 obj
+<<
+/Length 3488
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+0 .35 .6 rg
+n 0 823.8898 595.2756 18 re f*
+0 0 0 rg
+BT /F2 18 Tf 21.6 TL ET
+BT 1 0 0 1 56 785.8898 Tm (Alpenwind Airlines AG) Tj T* ET
+BT /F1 8.5 Tf 10.2 TL ET
+BT 1 0 0 1 56 769.8898 Tm (Flughafenstrasse 1, 8058 Zurich-Airport) Tj T* ET
+BT /F1 8.5 Tf 10.2 TL ET
+BT 1 0 0 1 56 758.8898 Tm (Baggage service  |  Tel. +41 43 555 14 00  |  baggage@alpenwind.example) Tj T* ET
+BT /F1 8.5 Tf 10.2 TL ET
+BT 1 0 0 1 56 747.8898 Tm (UID CHE-000.000.000) Tj T* ET
+0 .35 .6 RG
+n 56 729.8898 m 539.2756 729.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 691.8898 Tm (Anna Keller) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 678.8898 Tm (Rosenweg 7) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 665.8898 Tm (3011 Bern) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 652.8898 Tm (Switzerland) Tj T* ET
+BT /F2 9 Tf 10.8 TL ET
+BT 1 0 0 1 330 691.8898 Tm (Date:) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 420 691.8898 Tm (2026-05-14) Tj T* ET
+BT /F2 9 Tf 10.8 TL ET
+BT 1 0 0 1 330 678.8898 Tm (Station:) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 420 678.8898 Tm (Porto \(OPO\)) Tj T* ET
+BT /F2 9 Tf 10.8 TL ET
+BT 1 0 0 1 330 665.8898 Tm (Desk:) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 420 665.8898 Tm (Baggage service) Tj T* ET
+BT /F2 16 Tf 19.2 TL ET
+BT 1 0 0 1 56 601.8898 Tm (Baggage irregularity report) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 56 571.8898 Tm (Report reference:) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 170 571.8898 Tm (AW-OPO-20471) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 56 555.8898 Tm (Passenger:) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 170 555.8898 Tm (Anna Keller) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 56 539.8898 Tm (Flight:) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 170 539.8898 Tm (AW 618 Zurich - Porto, 2026-05-14) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 56 523.8898 Tm (Bag tag:) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 170 523.8898 Tm (AW 481516 \(1 checked bag, black hard-shell trolley\)) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 56 507.8898 Tm (Reported:) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 170 507.8898 Tm (2026-05-14, at the arrival hall, Porto) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 56 491.8898 Tm (Status:) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 170 491.8898 Tm (Bag not delivered. Tracing file open.) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 451.8898 Tm (The passenger reported on arrival that the checked bag did not appear) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 436.8898 Tm (on the belt. The bag could not be located in the system of the airline.) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 421.8898 Tm (If the bag is not found within 21 days it is declared lost. Please keep) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 406.8898 Tm (this report for your insurer and add your receipts.) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 130 Tm (Porto, 2026-05-14) Tj T* ET
+BT /F3 13 Tf 15.6 TL ET
+BT 1 0 0 1 56 100 Tm (J. Carvalho) Tj T* ET
+BT /F1 8 Tf 9.6 TL ET
+BT 1 0 0 1 56 86 Tm (Baggage service, Alpenwind Airlines AG, Porto) Tj T* ET
+0 .35 .6 RG
+n
+515.2756 112 m
+515.2756 128.5685 486.1741 142 450.2756 142 c
+414.3771 142 385.2756 128.5685 385.2756 112 c
+385.2756 95.43146 414.3771 82 450.2756 82 c
+486.1741 82 515.2756 95.43146 515.2756 112 c
+S
+BT /F2 8 Tf 9.6 TL ET
+BT 1 0 0 1 414.2676 120 Tm (Alpenwind Airlines) Tj T* ET
+BT /F1 8 Tf 9.6 TL ET
+BT 1 0 0 1 420.4836 109 Tm (Baggage service) Tj T* ET
+BT /F1 8 Tf 9.6 TL ET
+BT 1 0 0 1 430.7116 98 Tm (Porto OPO) Tj T* ET
+ 
+endstream
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000061 00000 n 
+0000000112 00000 n 
+0000000219 00000 n 
+0000000331 00000 n 
+0000000446 00000 n 
+0000000649 00000 n 
+0000000717 00000 n 
+0000000988 00000 n 
+0000001047 00000 n 
+trailer
+<<
+/ID 
+[<bff5d71a140cba9004c799584ace18f6><bff5d71a140cba9004c799584ace18f6>]
+% ReportLab generated PDF document -- digest (opensource)
+
+/Info 7 0 R
+/Root 6 0 R
+/Size 10
+>>
+startxref
+4586
+%%EOF

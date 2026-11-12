@@ -48,6 +48,7 @@ TYPE_NAMES = {
     "repair_quote": "a repair quote",
     "damage_photo": "a damage photo",
     "police_report": "a police report",
+    "luggage_report": "a lost luggage report",
 }
 
 

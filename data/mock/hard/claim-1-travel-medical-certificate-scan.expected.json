@@ -1,0 +1,29 @@
+{
+  "document_type": "medical_certificate",
+  "fields": [
+    {
+      "name": "patient_name",
+      "value": "Anna Keller",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Anna Keller"
+    },
+    {
+      "name": "cause",
+      "value": "illness",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "acute illness"
+    },
+    {
+      "name": "unfit_from",
+      "value": "2026-08-03",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "unfit to travel from 2026-08-03"
+    }
+  ],
+  "line_items": [],
+  "variant": "scan",
+  "source_document": "claim-1-travel/medical-certificate.pdf"
+}

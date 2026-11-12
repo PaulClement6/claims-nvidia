@@ -13,12 +13,12 @@ from app.workflows.engine import RequiredDocument, Workflow
 
 
 def required_documents(cause: str | None) -> list[RequiredDocument]:
+    proof = ["cancellation_confirmation", "receipt"]
+    if cause == "luggage":
+        proof.append("luggage_report")  # the airline report of a lost bag
     docs: list[RequiredDocument] = [
         {"label": "a booking confirmation", "any_of": ["booking_confirmation"]},
-        {
-            "label": "a cancellation confirmation or a receipt",
-            "any_of": ["cancellation_confirmation", "receipt"],
-        },
+        {"label": "a cancellation confirmation or a receipt", "any_of": proof},
     ]
     if cause == "illness":
         docs.append(

@@ -1,0 +1,342 @@
+{
+  "scenarios": [
+    {
+      "folder": "claim-1-travel",
+      "customer_id": "C-1001",
+      "policy": "TRV-2026-0417",
+      "title": "Trip cancelled because of illness",
+      "documents": [
+        {
+          "file": "booking-confirmation.pdf",
+          "document_type": "booking_confirmation"
+        },
+        {
+          "file": "cancellation-confirmation.pdf",
+          "document_type": "cancellation_confirmation"
+        },
+        {
+          "file": "medical-certificate.pdf",
+          "document_type": "medical_certificate"
+        }
+      ],
+      "stories": [
+        {
+          "text": "My trip was cancelled because I was ill. It began on 3 August 2026 and I claim CHF 1,500.",
+          "incident_date": "2026-08-03",
+          "amount": 1500,
+          "cause": "illness",
+          "signals": [],
+          "outcome": "straight_through"
+        }
+      ]
+    },
+    {
+      "folder": "claim-2-property",
+      "customer_id": "C-1002",
+      "policy": "HH-2024-0933",
+      "title": "Water damage in the kitchen",
+      "documents": [
+        {
+          "file": "repair-invoice.pdf",
+          "document_type": "repair_invoice"
+        },
+        {
+          "file": "damage-photo-1.jpg",
+          "document_type": "damage_photo"
+        },
+        {
+          "file": "damage-photo-2.jpg",
+          "document_type": "damage_photo"
+        }
+      ],
+      "stories": [
+        {
+          "text": "Water damage in the kitchen on 14 September 2026. I claim CHF 3,200.",
+          "incident_date": "2026-09-14",
+          "amount": 3200,
+          "cause": "water",
+          "signals": [],
+          "outcome": "handler_review"
+        }
+      ]
+    },
+    {
+      "folder": "claim-3-health",
+      "customer_id": "C-1003",
+      "policy": "ACC-2026-2210",
+      "title": "Sprained ankle after a fall at a station",
+      "documents": [
+        {
+          "file": "medical-invoice.pdf",
+          "document_type": "medical_invoice"
+        },
+        {
+          "file": "medical-report.pdf",
+          "document_type": "medical_report"
+        }
+      ],
+      "stories": [
+        {
+          "text": "I sprained my ankle in an accident on 25 October 2026. I claim CHF 4,450.",
+          "incident_date": "2026-10-25",
+          "amount": 4450,
+          "cause": "accident",
+          "signals": [
+            "C001",
+            "R003",
+            "R004",
+            "R005",
+            "T001",
+            "T002",
+            "T003"
+          ],
+          "outcome": "investigation"
+        }
+      ]
+    },
+    {
+      "folder": "kit-anna-luggage",
+      "customer_id": "C-1001",
+      "policy": "TRV-2026-0417",
+      "title": "Luggage lost on a trip to Porto",
+      "documents": [
+        {
+          "file": "booking-confirmation.pdf",
+          "document_type": "booking_confirmation"
+        },
+        {
+          "file": "receipt-trolley.pdf",
+          "document_type": "receipt"
+        },
+        {
+          "file": "receipt-jacket-shoes.pdf",
+          "document_type": "receipt"
+        },
+        {
+          "file": "luggage-report.pdf",
+          "document_type": "luggage_report"
+        }
+      ],
+      "stories": [
+        {
+          "text": "My luggage was lost on arrival in Porto on 14 May 2026. I claim CHF 787.",
+          "incident_date": "2026-05-14",
+          "amount": 787,
+          "cause": "luggage",
+          "signals": [],
+          "outcome": "straight_through"
+        }
+      ]
+    },
+    {
+      "folder": "kit-anna-theft",
+      "customer_id": "C-1001",
+      "policy": "HH-2025-1182",
+      "title": "Burglary: forced front door",
+      "documents": [
+        {
+          "file": "police-report.pdf",
+          "document_type": "police_report"
+        },
+        {
+          "file": "repair-quote.pdf",
+          "document_type": "repair_quote"
+        },
+        {
+          "file": "receipt-lock-set.pdf",
+          "document_type": "receipt"
+        },
+        {
+          "file": "receipt-door-frame.pdf",
+          "document_type": "receipt"
+        },
+        {
+          "file": "damage-photo.jpg",
+          "document_type": "damage_photo"
+        }
+      ],
+      "stories": [
+        {
+          "text": "Burglary at my flat on 9 October 2026: the front door was forced. I claim CHF 2,640.",
+          "incident_date": "2026-10-09",
+          "amount": 2640,
+          "cause": "theft",
+          "signals": [],
+          "outcome": "handler_review"
+        }
+      ]
+    },
+    {
+      "folder": "kit-marco-travel",
+      "customer_id": "C-1002",
+      "policy": "TRV-2026-0721",
+      "title": "Trip to Sicily cancelled",
+      "documents": [
+        {
+          "file": "booking-confirmation.pdf",
+          "document_type": "booking_confirmation"
+        },
+        {
+          "file": "cancellation-confirmation.pdf",
+          "document_type": "cancellation_confirmation"
+        }
+      ],
+      "stories": [
+        {
+          "text": "I had to cancel my trip to Sicily on 12 July 2026 because of a family emergency. I claim CHF 2,300.",
+          "incident_date": "2026-07-12",
+          "amount": 2300,
+          "cause": "cancellation",
+          "signals": [],
+          "outcome": "straight_through"
+        },
+        {
+          "text": "I had to cancel my trip to Sicily on 12 July 2026 because of a family emergency. I claim CHF 3,200.",
+          "incident_date": "2026-07-12",
+          "amount": 3200,
+          "cause": "cancellation",
+          "signals": [
+            "C003"
+          ],
+          "outcome": "handler_review"
+        }
+      ]
+    },
+    {
+      "folder": "kit-marco-inflated",
+      "customer_id": "C-1002",
+      "policy": "HH-2024-0933",
+      "title": "Bathroom flooded by a leaking pipe",
+      "documents": [
+        {
+          "file": "repair-invoice.pdf",
+          "document_type": "repair_invoice"
+        },
+        {
+          "file": "damage-photo.jpg",
+          "document_type": "damage_photo"
+        }
+      ],
+      "stories": [
+        {
+          "text": "A leaking pipe flooded my bathroom on 3 November 2026. I claim CHF 4,740.",
+          "incident_date": "2026-11-03",
+          "amount": 4740,
+          "cause": "water",
+          "signals": [
+            "T001",
+            "T002",
+            "T003"
+          ],
+          "outcome": "investigation"
+        }
+      ]
+    },
+    {
+      "folder": "kit-lukas-clean",
+      "customer_id": "C-1003",
+      "policy": "ACC-2026-2210",
+      "title": "Bike fall, hurt wrist",
+      "documents": [
+        {
+          "file": "medical-invoice.pdf",
+          "document_type": "medical_invoice"
+        },
+        {
+          "file": "medical-report.pdf",
+          "document_type": "medical_report"
+        }
+      ],
+      "stories": [
+        {
+          "text": "I fell off my bike on 6 November 2026 and hurt my wrist. I claim CHF 840.",
+          "incident_date": "2026-11-06",
+          "amount": 840,
+          "cause": "accident",
+          "signals": [],
+          "outcome": "straight_through"
+        }
+      ]
+    },
+    {
+      "folder": "kit-lukas-household",
+      "customer_id": "C-1003",
+      "policy": "HH-2026-0102",
+      "title": "Broken living-room window",
+      "documents": [
+        {
+          "file": "repair-quote.pdf",
+          "document_type": "repair_quote"
+        }
+      ],
+      "stories": [
+        {
+          "text": "A football broke the living-room window on 14 September 2026. I claim CHF 1,260.",
+          "incident_date": "2026-09-14",
+          "amount": 1260,
+          "cause": "breakage",
+          "signals": [
+            "R001"
+          ],
+          "outcome": "handler_review"
+        }
+      ]
+    }
+  ],
+  "hard": [
+    {
+      "file": "hard/claim-2-property-repair-invoice-scan.pdf",
+      "variant": "scan",
+      "source_document": "claim-2-property/repair-invoice.pdf",
+      "document_type": "repair_invoice"
+    },
+    {
+      "file": "hard/kit-lukas-clean-medical-invoice-scan.pdf",
+      "variant": "scan",
+      "source_document": "kit-lukas-clean/medical-invoice.pdf",
+      "document_type": "medical_invoice"
+    },
+    {
+      "file": "hard/claim-1-travel-booking-confirmation-scan.pdf",
+      "variant": "scan",
+      "source_document": "claim-1-travel/booking-confirmation.pdf",
+      "document_type": "booking_confirmation"
+    },
+    {
+      "file": "hard/claim-1-travel-medical-certificate-scan.pdf",
+      "variant": "scan",
+      "source_document": "claim-1-travel/medical-certificate.pdf",
+      "document_type": "medical_certificate"
+    },
+    {
+      "file": "hard/kit-anna-theft-police-report-scan.pdf",
+      "variant": "scan",
+      "source_document": "kit-anna-theft/police-report.pdf",
+      "document_type": "police_report"
+    },
+    {
+      "file": "hard/kit-anna-luggage-receipt-jacket-shoes-scan.pdf",
+      "variant": "scan",
+      "source_document": "kit-anna-luggage/receipt-jacket-shoes.pdf",
+      "document_type": "receipt"
+    },
+    {
+      "file": "hard/claim-2-property-repair-invoice-photo.jpg",
+      "variant": "photo",
+      "source_document": "claim-2-property/repair-invoice.pdf",
+      "document_type": "repair_invoice"
+    },
+    {
+      "file": "hard/kit-anna-luggage-receipt-jacket-shoes-photo.jpg",
+      "variant": "photo",
+      "source_document": "kit-anna-luggage/receipt-jacket-shoes.pdf",
+      "document_type": "receipt"
+    },
+    {
+      "file": "hard/kit-anna-luggage-luggage-report-photo.jpg",
+      "variant": "photo",
+      "source_document": "kit-anna-luggage/luggage-report.pdf",
+      "document_type": "luggage_report"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "document_type": "luggage_report",
+  "fields": [
+    {
+      "name": "report_reference",
+      "value": "AW-OPO-20471",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "AW-OPO-20471"
+    },
+    {
+      "name": "traveller_name",
+      "value": "Anna Keller",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Anna Keller"
+    },
+    {
+      "name": "incident_date",
+      "value": "2026-05-14",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-05-14, at the arrival hall"
+    },
+    {
+      "name": "airline",
+      "value": "Alpenwind Airlines AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Alpenwind Airlines AG"
+    }
+  ],
+  "line_items": [],
+  "variant": "photo",
+  "source_document": "kit-anna-luggage/luggage-report.pdf"
+}

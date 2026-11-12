@@ -123,8 +123,8 @@ Example, from `cancellation-confirmation.expected.json`:
 
 To generate the documents again, run:
 `cd backend && uv run python ../scripts/generate_mock_documents.py`
-The script writes to `data/mock/`. It gives the same bytes on every run.
-To add a document, read the header of `scripts/generate_mock_documents.py`.
+The script writes to `data/mock/`: the documents, their `expected.json`, the hard versions (scans, phone photos) and `index.json`. It gives the same bytes on every run on one machine (images may differ between a Mac and Linux, see D55).
+To add a document or a scenario, read the header of `scripts/mockdocs/kit.py`.
 
 ## Rules that matter most
 
