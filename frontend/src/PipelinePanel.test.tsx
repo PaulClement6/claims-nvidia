@@ -184,6 +184,16 @@ test('a run_checks event loads the claim and shows the signals with their eviden
   expect(screen.getByText('low')).toHaveClass('pill-idle')
 })
 
+test('every table of the panel sits in a box that scrolls on its own, so the panel never scrolls sideways', async () => {
+  serve({ ...emptyClaim, documents: [booking], signals: [c003] })
+  render(<PipelinePanel claimId="CL-1" />)
+  FakeEventSource.all[0].emit(event(1, { stage: 'run_checks' }))
+  await screen.findByText('Checks and signals')
+  const tables = screen.getAllByRole('table')
+  expect(tables.length).toBeGreaterThan(0)
+  for (const t of tables) expect(t.parentElement).toHaveClass('table-scroll')
+})
+
 test.each(['check_tampering', 'check_consistency'])('a %s event reloads the claim', async (stage) => {
   const fetchMock = serve({ ...emptyClaim, signals: [c003] })
   render(<PipelinePanel claimId="CL-1" />)

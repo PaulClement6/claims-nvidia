@@ -45,7 +45,8 @@ def customer_view(claim: Claim) -> CustomerView:
     return CustomerView(
         claim_id=claim.id,
         policy_number=claim.policy.number if claim.policy else None,
-        status=customer_status(claim.outcome),
+        # no outcome: the claim status (open, or in_review after a failure of ours)
+        status=customer_status(claim.outcome) if claim.outcome else claim.status,
         message=customer_message(claim.outcome) if claim.outcome else None,
         step=claim.agent_state,
     )

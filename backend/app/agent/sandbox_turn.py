@@ -38,7 +38,7 @@ from mcp.client.streamable_http import streamable_http_client
 
 from app.agent.graph import CallTool, Model, build_graph, turn_input
 from app.agent.model import make_model
-from app.agent.phrases import FALLBACK
+from app.agent.phrases import FALLBACK, failed_node
 
 CHECKPOINTS = "/sandbox/state/checkpoints.sqlite"
 TOOL_TIMEOUT = 120  # seconds, for one MCP call (a document read can be slow)
@@ -133,17 +133,20 @@ def run_turn(
         )
 
     reply: str | None = FALLBACK
+    config: RunnableConfig = {"configurable": {"thread_id": thread}}
+    graph = None
     try:
         Path(checkpoints).parent.mkdir(parents=True, exist_ok=True)
         saver = SqliteSaver(sqlite3.connect(checkpoints, check_same_thread=False))
         graph = build_graph(model, mcp_caller(url), saver, tool_specs(url), emit)
-        config: RunnableConfig = {"configurable": {"thread_id": thread}}
         out = graph.invoke(
             turn_input(payload.get("text"), payload.get("document_id")), config
         )
         reply = out.get("reply") or FALLBACK
     except Exception as e:  # a tool failed in a code node: the next message resumes
-        emit("agent", "fallback", "Fallback message", {}, {"reason": _why(e)})
+        # `node`: the backend counts two failures in a row in the same code node
+        emit("agent", "fallback", "Fallback message", {},
+             {"reason": _why(e), "node": failed_node(graph, config)})  # fmt: skip
     return {
         "reply": reply,
         "events": events,

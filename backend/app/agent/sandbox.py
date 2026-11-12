@@ -44,6 +44,7 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from app.agent.graph import GRAPH_TOOLS
+from app.agent.handover import hand_over_if_stuck, is_handed_over
 from app.agent.phrases import CLOSED, FALLBACK, check_message
 from app.agent.sandbox_panel import (
     PROBE,
@@ -399,7 +400,7 @@ class SandboxAgent:
     ) -> list[str]:
         store = self.gateway.store
         claim = store.get_claim(claim_id)
-        if claim is not None and claim.outcome is not None:
+        if (claim is not None and claim.outcome is not None) or is_handed_over(claim):
             return [CLOSED]  # closed: the sandbox is gone, nothing to run
         record = store.get_sandbox(claim_id)
         try:
@@ -429,6 +430,8 @@ class SandboxAgent:
             {"seconds": round(seconds, 2)}, seconds,
         )  # fmt: skip
         reply, closed = self._reply(claim_id, data.get("reply"))
+        if not closed and (handover := hand_over_if_stuck(store, claim_id)):
+            reply, closed = handover, True  # a code node failed twice: a person
         self.collect_denials(claim_id, record)  # before a close: the log goes with it
         if closed:
             self._close(claim_id, record, "the claim is closed")
