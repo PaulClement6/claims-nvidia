@@ -2,8 +2,10 @@
 
 It imports no store (tested). State, kept on the claim:
 ask_story -> ask_date -> ask_amount -> ask_documents -> ready_for_checks -> closed.
-At ready_for_checks, in the same turn, it runs the checks and the routing, gives the
-customer the text the routing tool returns, and closes.
+In ask_documents it says what is still missing. When all the required documents are
+there it says so and asks for another one: the checks start only when the customer
+says they are done. Then, in the same turn, it runs the checks and the routing,
+gives the customer the text the routing tool returns, and closes.
 """
 
 import re
@@ -33,7 +35,13 @@ DATE_FORMATS = [
 NUM = r"\d[\d'’,.]*"
 AMOUNT_RE = re.compile(rf"(?:CHF|Fr\.?)\s*({NUM})|({NUM})\s*(?:CHF|francs)", re.I)
 
+# What a customer types to say "I have nothing more to add", without case, spaces,
+# apostrophes and punctuation. The Done button of the chat sends "done".
+DONE = {"done", "no", "no more", "thats all", "nothing else", "finish"}
+
 TYPE_NAMES = {
+    "medical_invoice": "a medical invoice",
+    "medical_report": "a medical report",
     "booking_confirmation": "a booking confirmation",
     "cancellation_confirmation": "a cancellation confirmation",
     "medical_certificate": "a medical certificate",
@@ -43,6 +51,11 @@ TYPE_NAMES = {
     "damage_photo": "a damage photo",
     "police_report": "a police report",
 }
+
+
+def is_done(text: str) -> bool:
+    words = re.sub(r"[^\w\s]", "", text.replace("'", "").replace("’", ""))
+    return " ".join(words.lower().split()) in DONE
 
 
 def parse_date(text: str) -> date | None:
@@ -104,9 +117,7 @@ class ScriptedAgent:
             )
         elif s["agent_state"] == "closed":
             return ["Thank you. I have your claim and I will come back to you."]
-        elif (
-            s["agent_state"] == "ask_documents" and text.strip(" .!").lower() == "done"
-        ):
+        elif s["agent_state"] == "ask_documents" and is_done(text):
             return ["Thank you. " + self._close(claim_id)]
         elif s["agent_state"] != "ready_for_checks":
             asked = s["agent_state"]
@@ -122,10 +133,7 @@ class ScriptedAgent:
             return [self._close(claim_id)]
 
         missing = self._missing(claim_id, s)
-        state = self._state(s, missing)
-        if state == "ready_for_checks":
-            out.append(self._close(claim_id))
-            return [" ".join(out)]
+        state = self._state(s)
         if state != s["agent_state"]:
             self._call(claim_id, "update_claim", agent_state=state)
         out.append(self._question(state, missing))
@@ -135,6 +143,8 @@ class ScriptedAgent:
         """Checks, routing, the result text for the customer, then the state closed."""
         self._call(claim_id, "update_claim", agent_state="ready_for_checks")
         self._call(claim_id, "run_checks")
+        self._call(claim_id, "check_tampering")
+        self._call(claim_id, "check_consistency")
         message = self._call(claim_id, "assess_and_route")["customer_message"]
         self._call(claim_id, "update_claim", agent_state="closed")
         return str(message)
@@ -167,7 +177,7 @@ class ScriptedAgent:
         have = set(s["document_types"])
         return [r["label"] for r in required if not have & set(r["any_of"])]
 
-    def _state(self, s: dict[str, Any], missing: list[str]) -> str:
+    def _state(self, s: dict[str, Any]) -> str:
         for slot, state in (
             ("description", "ask_story"),
             ("incident_date", "ask_date"),
@@ -175,7 +185,7 @@ class ScriptedAgent:
         ):
             if not s[slot]:
                 return state
-        return "ask_documents" if missing else "ready_for_checks"
+        return "ask_documents"
 
     def _question(self, state: str, missing: list[str]) -> str:
         if state == "ask_story":
@@ -184,6 +194,11 @@ class ScriptedAgent:
             return "On what date did it happen? For example: 3 August 2026."
         if state == "ask_amount":
             return "What amount do you claim, in CHF? For example: CHF 1,500."
+        if not missing:
+            return (
+                "I have all the documents I need. "
+                "Do you have another document to add? If not, type done."
+            )
         return (
             f"Please upload the documents I still need: {', and '.join(missing)}. "
             "You can add them one by one. If you have nothing more, type done."

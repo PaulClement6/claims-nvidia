@@ -13,7 +13,7 @@ type PipelineEvent = {
   duration: number | null // seconds
 }
 
-const RELOAD = ['extract_document', 'run_checks', 'assess_and_route']
+const RELOAD = ['extract_document', 'run_checks', 'check_tampering', 'check_consistency', 'assess_and_route']
 
 // a new claim remounts the list, so the old events never show under it
 export default function PipelinePanel({ claimId }: { claimId: string | null }) {

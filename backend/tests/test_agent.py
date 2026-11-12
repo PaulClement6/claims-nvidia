@@ -70,15 +70,18 @@ def test_claim_file_1_ends_closed_with_the_result(client: TestClient) -> None:
             "text": f"Uploaded {name}.pdf",
         }
         assert last[-1]["role"] == "agent"
+        assert state(client, cid) == "ask_documents"
         if i < 2:
-            assert state(client, cid) == "ask_documents"
             assert "still" in last[-1]["text"].lower()
-        else:
-            assert "validated" in last[-1]["text"]
+        else:  # all there: the agent says so, asks for more, and does not close
+            assert "all the documents I need" in last[-1]["text"]
+            assert "another document to add? If not, type done." in last[-1]["text"]
+            assert "validated" not in last[-1]["text"]
 
+    assert "validated" in say(client, cid, "done")
+    last = client.get(f"/claims/{cid}/messages").json()
     claim = client.get(f"/claims/{cid}").json()
     assert claim["agent_state"] == "closed"
-    assert "validated" in last[-1]["text"]
     assert claim["cause"] == "illness"
     assert claim["incident_date"] == "2026-08-03" and claim["claimed_amount"] == 1500
     assert [d["document_type"] for d in claim["documents"]] == [
@@ -236,9 +239,54 @@ def test_every_data_access_is_a_gateway_event(
     assert [e.stage for e in events if e.actor == "tool"] == calls
     assert {"get_claim_summary", "update_claim", "required_documents"} <= set(calls)
     assert {"classify_document", "extract_document"} <= set(calls)
-    assert calls[-4:] == [
+    assert calls[-6:] == [
         "update_claim",  # ready_for_checks
         "run_checks",
+        "check_tampering",
+        "check_consistency",
         "assess_and_route",
         "update_claim",  # closed
     ]
+
+
+def all_documents(client: TestClient) -> str:
+    cid = start(client)
+    say(client, cid, "The trip was cancelled on 3 August 2026, I claim CHF 1,500")
+    for name in PDFS:
+        assert (
+            upload(client, cid, (CLAIM1 / f"{name}.pdf").read_bytes()).status_code
+            == 201
+        )
+    return cid
+
+
+def test_with_all_documents_a_fourth_one_is_still_taken(client: TestClient) -> None:
+    cid = all_documents(client)
+    assert state(client, cid) == "ask_documents"
+    res = upload(client, cid, (CLAIM1 / "booking-confirmation.pdf").read_bytes())
+    assert res.status_code == 201
+    assert state(client, cid) == "ask_documents"
+    claim = client.get(f"/claims/{cid}").json()
+    assert claim["outcome"] is None and len(claim["documents"]) == 4
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["done", "Done.", "DONE!", "no", "No.", "no more", "No more!", "that's all",
+     "That’s all.", "thats all", "nothing else", "Nothing else.", "finish",
+     "  Finish ! "],
+)  # fmt: skip
+def test_the_customer_closes_with_a_done_phrase(client: TestClient, text: str) -> None:
+    cid = all_documents(client)
+    assert "validated" in say(client, cid, text)
+    assert state(client, cid) == "closed"
+
+
+@pytest.mark.parametrize("text", ["hello", "no thanks, wait", "I am done soon", "yes"])
+def test_any_other_text_keeps_the_documents_step_open(
+    client: TestClient, text: str
+) -> None:
+    cid = all_documents(client)
+    reply = say(client, cid, text)
+    assert "type done" in reply and "validated" not in reply
+    assert state(client, cid) == "ask_documents"

@@ -1,6 +1,7 @@
 """What the customer sees (non-negotiable 2, decision D18).
 
-The customer view drops signals, score, reasons and the report. The two outcomes
+The customer view drops signals, score, reasons and the report. `step` is the chat
+step (ask_story ... closed): it holds nothing about the checks. The two outcomes
 that go to a person give the same exact text: a different text would tell a
 fraudster that the system flagged the claim.
 """
@@ -29,6 +30,7 @@ class CustomerView(BaseModel):
     policy_number: str | None
     status: str
     message: str | None
+    step: str  # where the chat is (the agent state): the Done button needs it
 
 
 def customer_message(outcome: Outcome) -> str:
@@ -45,4 +47,5 @@ def customer_view(claim: Claim) -> CustomerView:
         policy_number=claim.policy.number if claim.policy else None,
         status=customer_status(claim.outcome),
         message=customer_message(claim.outcome) if claim.outcome else None,
+        step=claim.agent_state,
     )

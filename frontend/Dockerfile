@@ -3,4 +3,5 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-CMD ["npm", "run", "dev"]
+# the container must listen on all addresses; `npm run dev` alone stays on localhost
+CMD ["npm", "run", "dev", "--", "--host"]

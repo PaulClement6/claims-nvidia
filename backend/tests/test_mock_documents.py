@@ -2,10 +2,12 @@
 
 import hashlib
 import importlib.util
+import json
 from io import BytesIO
 from pathlib import Path
 
 from PIL import Image, ImageChops, ImageStat
+from pypdf import PdfReader
 
 ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location(
@@ -31,7 +33,7 @@ def test_generator_is_deterministic_and_matches_the_committed_files(
     gen.generate(tmp_path / "b")
     committed = sha(ROOT / "data" / "mock")
     assert sha(tmp_path / "a") == sha(tmp_path / "b") == committed
-    assert len(committed) == 10  # four PDFs, six expected.json
+    assert len(committed) == 14  # six PDFs, eight expected.json
 
 
 def test_photos_are_deterministic_and_match_the_committed_files_up_to_the_jpeg_codec(
@@ -51,3 +53,30 @@ def test_photos_are_deterministic_and_match_the_committed_files_up_to_the_jpeg_c
         committed = Image.open(ROOT / "data" / "mock" / "claim-2-property" / name)
         diff = ImageChops.difference(made, committed.convert("L"))
         assert made.size == committed.size and ImageStat.Stat(diff).mean[0] < 2
+
+
+CLAIM3 = ROOT / "data" / "mock" / "claim-3-health"
+
+
+def test_the_medical_invoice_is_tampered_in_its_bytes() -> None:
+    meta = PdfReader(CLAIM3 / "medical-invoice.pdf").metadata
+    assert meta is not None
+    assert meta.producer == meta.creator == gen.EDITOR
+    assert meta.creation_date is not None and meta.modification_date is not None
+    assert str(meta.creation_date.date()) == "2026-10-18"
+    assert str(meta.modification_date.date()) == "2026-11-02"
+
+
+def test_the_medical_report_is_clean() -> None:
+    meta = PdfReader(CLAIM3 / "medical-report.pdf").metadata
+    assert meta is not None and meta.producer is not None
+    assert "ReportLab" in meta.producer and meta.creator == "anonymous"
+    assert meta.creation_date == meta.modification_date
+
+
+def test_the_invoice_prints_a_total_that_its_lines_do_not_add_up_to() -> None:
+    expected = json.loads((CLAIM3 / "medical-invoice.expected.json").read_text())
+    fields = {f["name"]: f["value"] for f in expected["fields"]}
+    assert fields["patient_name"] == "Jonas Meier"
+    assert fields["invoice_date"] == "2026-10-18" and fields["total"] == 4450.0
+    assert sum(i["amount"] for i in expected["line_items"]) == 1450.0

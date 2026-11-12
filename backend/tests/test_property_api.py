@@ -29,7 +29,7 @@ def run_claim(
     files: list[str] = FILES,
     story: str = STORY,
     amount: str = "CHF 3,200",
-    done: bool = False,
+    done: bool = True,
 ) -> str:
     cid = str(client.post("/claims", json={"customer_id": "C-1002"}).json()["claim_id"])
     client.put(f"/claims/{cid}/policy", json={"policy_number": "HH-2024-0933"})
@@ -95,7 +95,7 @@ def test_the_agent_says_what_it_read(client: TestClient) -> None:
 
 
 def test_a_photo_alone_leaves_the_invoice_missing(client: TestClient) -> None:
-    cid = run_claim(client, ["damage-photo-1.jpg"])
+    cid = run_claim(client, ["damage-photo-1.jpg"], done=False)
     assert claim(client, cid)["agent_state"] == "ask_documents"
     text = client.get(f"/claims/{cid}/messages").json()[-1]["text"]
     assert "a repair invoice or a repair quote" in text
@@ -114,8 +114,9 @@ def test_theft_with_no_police_report_gives_r001(client: TestClient) -> None:
 def test_a_water_claim_needs_no_police_report(client: TestClient) -> None:
     cid = run_claim(client, amount="CHF 1,900")
     c = claim(client, cid)
-    assert c["signals"] == [] and c["outcome"] == "straight_through"
-    assert c["status"] == "validated"
+    # no R001, and the amount differs from the invoice total: C003 only
+    assert [s["code"] for s in c["signals"]] == ["C003"] and c["score"] == 15
+    assert c["outcome"] == "straight_through" and c["status"] == "validated"
 
 
 @pytest.mark.parametrize(

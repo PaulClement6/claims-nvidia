@@ -8,6 +8,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import create_app
+from app.workflows import WORKFLOWS
 from tests.reader_contract import MOCK
 
 CLAIM1 = MOCK / "claim-1-travel"
@@ -30,7 +31,7 @@ def run_claim(
     pdfs: list[str] = PDFS,
     amount: str = "CHF 1,500",
     date: str = "3 August 2026",
-    done: bool = False,
+    done: bool = True,
 ) -> str:
     cid = str(client.post("/claims", json={"customer_id": "C-1001"}).json()["claim_id"])
     client.put(f"/claims/{cid}/policy", json={"policy_number": "TRV-2026-0417"})
@@ -69,6 +70,7 @@ def test_claim_file_1_gives_no_signal_score_0_and_straight_through(
         "policy_number": "TRV-2026-0417",
         "status": "validated",
         "message": VALIDATED,
+        "step": "closed",
     }
 
 
@@ -79,8 +81,19 @@ def test_checks_and_routing_are_two_tool_events_without_a_model(
     events = client.app.state.store.events_since(cid, 0)  # type: ignore[attr-defined]
     stages = [e.stage for e in events if e.actor == "tool"]
     tail = stages[stages.index("run_checks") :]
-    assert tail == ["run_checks", "assess_and_route", "update_claim"]
-    for name in ("run_checks", "assess_and_route"):
+    assert tail == [
+        "run_checks",
+        "check_tampering",
+        "check_consistency",
+        "assess_and_route",
+        "update_claim",
+    ]
+    for name in (
+        "run_checks",
+        "check_tampering",
+        "check_consistency",
+        "assess_and_route",
+    ):
         [e] = [e for e in events if e.stage == name]
         assert e.model is None and e.duration is not None
         assert e.inputs == {"claim_id": cid}
@@ -164,13 +177,14 @@ def test_a_closed_claim_takes_no_more_documents(client: TestClient) -> None:
     assert claim(client, cid)["outcome"] == "straight_through"
 
 
-def test_a_claim_type_with_no_workflow_goes_to_a_person(client: TestClient) -> None:
+def test_a_claim_type_with_no_workflow_goes_to_a_person(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delitem(WORKFLOWS, "health")  # the accident policy has no workflow
     cid = str(client.post("/claims", json={"customer_id": "C-1003"}).json()["claim_id"])
     client.put(f"/claims/{cid}/policy", json={"policy_number": "ACC-2026-2210"})
-    client.post(
-        f"/claims/{cid}/messages",
-        json={"text": "I fell on 1 December 2026, CHF 3,200"},
-    )
+    for text in ("I fell on 1 December 2026, CHF 3,200", "done"):
+        client.post(f"/claims/{cid}/messages", json={"text": text})
     c = claim(client, cid)
     assert c["outcome"] == "handler_review" and c["agent_state"] == "closed"
     assert c["signals"] == []
