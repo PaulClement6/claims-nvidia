@@ -15,4 +15,11 @@ def register(gateway: Gateway) -> None:
             return {"documents": [], "note": "no table for this claim type yet"}
         return {"documents": workflow.required_documents(claim.cause)}
 
-    gateway.register("required_documents", required_documents)
+    gateway.register(
+        "required_documents",
+        required_documents,
+        description=(
+            "The documents this claim needs. Each entry has a `label`; any one of its "
+            "`any_of` document types satisfies it."
+        ),
+    )

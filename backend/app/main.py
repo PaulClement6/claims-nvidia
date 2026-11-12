@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 from pypdf import PdfReader
 
-from app.agent.scripted import ScriptedAgent
+from app.agent import Agent, get_agent
 from app.docintel.reader import get_reader
 from app.models import Claim, Customer, Document, Message, Policy
 from app.store import Store
@@ -55,7 +55,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     checks_tool.register(gateway, uploads)
     requirements_tool.register(gateway)
     routing_tool.register(gateway)
-    app.state.agent = ScriptedAgent(gateway)
+    app.state.agent = get_agent(gateway)  # CLAIMS_MODE: local or nim
     app.state.uploads = uploads
     app.state.store = store
     app.state.gateway = gateway
@@ -81,6 +81,10 @@ def create_app() -> FastAPI:
         """One turn at a time per claim: a message, an upload or a policy change.
 
         ponytail: one lock per claim id, never freed (a few bytes per claim).
+        ponytail: in `nim` mode a turn holds the lock for its model calls, at most 12
+        of up to 60 s (a timeout), so worst case minutes for that claim only; one
+        demo visitor types one message at a time. Other claims run in the thread
+        pool. Take the model call out of the lock if one claim ever has two writers.
         """
         locks: dict[str, threading.Lock] = request.app.state.locks
         with locks.setdefault(claim_id, threading.Lock()):
@@ -90,7 +94,7 @@ def create_app() -> FastAPI:
         request: Request, claim_id: str, text: str | None, document_id: str | None
     ) -> list[Message]:
         """The agent answers; each answer is stored and shown in the pipeline."""
-        agent: ScriptedAgent = request.app.state.agent
+        agent: Agent = request.app.state.agent
         out = []
         for reply in agent.handle(claim_id, text, document_id):
             store(request).append_event(

@@ -1,6 +1,7 @@
 from typing import Any
 
 from app.tools.gateway import Gateway
+from app.workflows import WORKFLOWS
 
 
 def register(gateway: Gateway) -> None:
@@ -8,6 +9,7 @@ def register(gateway: Gateway) -> None:
         claim = gateway.store.get_claim(claim_id)
         if claim is None:
             raise KeyError(f"unknown claim: {claim_id}")
+        workflow = WORKFLOWS.get(claim.type or "")
         return {
             "customer_name": claim.customer.name,
             "policy_number": claim.policy.number if claim.policy else None,
@@ -20,6 +22,15 @@ def register(gateway: Gateway) -> None:
             "cause": claim.cause,
             "agent_state": claim.agent_state,
             "document_types": [d.document_type for d in claim.documents],
+            "documents": [
+                {
+                    "id": d.id,
+                    "file_name": d.file_metadata.get("original_name", ""),
+                    "type": d.document_type,
+                }
+                for d in claim.documents
+            ],
+            "allowed_causes": workflow.all_causes() if workflow else [],
         }
 
     def update_claim(
@@ -38,9 +49,49 @@ def register(gateway: Gateway) -> None:
             "agent_state": agent_state,
         }
         changes = {k: v for k, v in given.items() if v is not None}
+        if cause is not None:
+            claim = gateway.store.get_claim(claim_id)
+            workflow = WORKFLOWS.get(claim.type or "") if claim else None
+            if workflow and cause not in workflow.all_causes():
+                raise ValueError(
+                    f"cause must be one of: {', '.join(workflow.all_causes())}"
+                )
         if gateway.store.update_claim(claim_id, changes) is None:
             raise KeyError(f"unknown claim: {claim_id}")
         return {"updated": sorted(changes)}
 
-    gateway.register("get_claim_summary", get_claim_summary)
-    gateway.register("update_claim", update_claim)
+    gateway.register(
+        "get_claim_summary",
+        get_claim_summary,
+        description=(
+            "Read the claim: what is saved so far (story, date, amount, cause), the "
+            "documents with their ids and types, and the causes you may use."
+        ),
+    )
+    gateway.register(
+        "update_claim",
+        update_claim,
+        description=(
+            "Save what the customer told you. Give only the fields you know. "
+            "`cause` must be one of `allowed_causes` of the claim summary."
+        ),
+        parameters={
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "description": "What happened, in the customer's words, short.",
+                },
+                "incident_date": {
+                    "type": "string",
+                    "description": "Date of the incident, YYYY-MM-DD.",
+                },
+                "claimed_amount": {
+                    "type": "number",
+                    "description": "Amount claimed, in CHF.",
+                },
+                "cause": {"type": "string", "description": "One allowed cause."},
+            },
+            "additionalProperties": False,
+        },
+    )

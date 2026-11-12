@@ -12,6 +12,7 @@ from app.models import Claim, FraudReport, Outcome
 from app.views import CustomerView, customer_view
 from tests import test_health_api, test_property_api
 from tests.builders import signal, travel_claim
+from tests.fake_chat import use_fake_model
 
 VALIDATED = "Your claim is validated. You will receive a confirmation by e-mail."
 REVIEW = "A claims specialist will review your case and contact you."
@@ -70,8 +71,13 @@ def test_no_message_before_the_result() -> None:
     assert view.message is None and view.status == "open"
 
 
-@pytest.fixture
-def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
+@pytest.fixture(params=["local", "nim"])
+def client(
+    request: pytest.FixtureRequest, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> Iterator[TestClient]:
+    """Both agents: the scripted one, and the LLM agent with a fake model."""
+    if request.param == "nim":
+        use_fake_model(monkeypatch)
     monkeypatch.setenv("CLAIMS_DB", str(tmp_path / "claims.db"))
     monkeypatch.setenv("CLAIMS_UPLOADS", str(tmp_path / "uploads"))
     with TestClient(create_app()) as c:
