@@ -27,45 +27,94 @@ class SignalKind:
     severity: Severity
     points: int
     title: str
+    expected: str  # what a good claim shows; the fraud report prints it
 
 
-# docs/FRAUD.md. One table: code -> category, severity, points, title.
+# docs/FRAUD.md. One table: code -> category, severity, points, title, expected.
 SIGNALS: dict[str, SignalKind] = {
-    "R001": SignalKind("rule", "medium", 25, "A required document is missing"),
-    "R002": SignalKind("rule", "high", 40, "Incident date outside the policy period"),
+    "R001": SignalKind(
+        "rule",
+        "medium",
+        25,
+        "A required document is missing",
+        "Every document the workflow requires is uploaded.",
+    ),
+    "R002": SignalKind(
+        "rule",
+        "high",
+        40,
+        "Incident date outside the policy period",
+        "The incident date is inside the policy period.",
+    ),
     "R003": SignalKind(
-        "rule", "medium", 20, "Incident within 14 days of the policy start"
+        "rule",
+        "medium",
+        20,
+        "Incident within 14 days of the policy start",
+        "An incident more than 14 days after the policy start.",
     ),
     "R004": SignalKind(
-        "rule", "low", 10, "Claimed amount at 95% or more of the coverage limit"
+        "rule",
+        "low",
+        10,
+        "Claimed amount at 95% or more of the coverage limit",
+        "A claimed amount below 95% of the coverage limit.",
     ),
-    "R005": SignalKind("rule", "medium", 20, "Invoice dated before the incident"),
+    "R005": SignalKind(
+        "rule",
+        "medium",
+        20,
+        "Invoice dated before the incident",
+        "An invoice dated on or after the incident.",
+    ),
     "T001": SignalKind(
-        "tampering", "medium", 20, "PDF last written by an editing tool"
+        "tampering",
+        "medium",
+        20,
+        "PDF last written by an editing tool",
+        "A PDF written by the tool of its issuer, not by a PDF editor.",
     ),
     "T002": SignalKind(
-        "tampering", "low", 10, "PDF modified more than one day after its creation"
+        "tampering",
+        "low",
+        10,
+        "PDF modified more than one day after its creation",
+        "A modification date within one day of the creation date.",
     ),
     "T003": SignalKind(
-        "tampering", "high", 30, "Line items do not add up to the total"
+        "tampering",
+        "high",
+        30,
+        "Line items do not add up to the total",
+        "Line items that add up to the total (tolerance CHF 0.05).",
     ),
     "C001": SignalKind(
-        "consistency", "medium", 20, "Name on a document is not the insured person"
+        "consistency",
+        "medium",
+        20,
+        "Name on a document is not the insured person",
+        "Every name on the documents is the insured person.",
     ),
     "C002": SignalKind(
         "consistency",
         "medium",
         15,
         "Dates of the documents do not fit the declared incident",
+        "Document dates that fit the declared incident date.",
     ),
     "C003": SignalKind(
-        "consistency", "medium", 15, "Claimed amount differs from the documented amount"
+        "consistency",
+        "medium",
+        15,
+        "Claimed amount differs from the documented amount",
+        "A claimed amount equal to the documented amount.",
     ),
     "C004": SignalKind(
         "consistency",
         "medium",
         20,
         "Photo or report does not fit the declared damage (VLM)",
+        "A photo or report that fits the declared damage.",
     ),
 }
 
@@ -79,6 +128,7 @@ def signal(code: str, detail: str, evidence: list[Source] | None = None) -> Sign
         points=kind.points,
         title=kind.title,
         detail=detail,
+        expected=kind.expected,
         evidence=evidence or [],
     )
 
@@ -129,6 +179,30 @@ def _workflow(claim: Claim) -> "Workflow | None":
     return WORKFLOWS.get(claim.type or "")
 
 
+# Fields that carry the date of the incident itself (a report, a certificate).
+INCIDENT_DATE_FIELDS = ("incident_date", "treatment_date", "unfit_from")
+
+
+def _documents_that_say(
+    claim: Claim, names: tuple[str, ...], value: object
+) -> list[Source]:
+    """The sources of the fields that hold the same value as the claim says: the
+    documents that back a fact the customer declared in the chat. May be empty."""
+    found = []
+    for d in claim.documents:
+        for f in d.fields:
+            if f.name in names and _same(f.value, value):
+                found.append(f.source)
+    return found
+
+
+def _same(a: object, b: object) -> bool:
+    try:
+        return abs(float(a) - float(b)) < 0.005  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return str(a) == str(b)
+
+
 def r001(claim: Claim) -> Signal | None:
     from app.workflows.engine import missing_documents
 
@@ -162,6 +236,9 @@ def r003(claim: Claim) -> Signal | None:
         "R003",
         f"Incident {days} days after the start of policy {claim.policy.number} "
         f"({claim.policy.start}).",
+        _documents_that_say(
+            claim, INCIDENT_DATE_FIELDS, claim.incident_date.isoformat()
+        ),
     )
 
 
@@ -174,6 +251,7 @@ def r004(claim: Claim) -> Signal | None:
     return signal(
         "R004",
         f"Claimed CHF {claim.claimed_amount:g} against a limit of CHF {limit:g}.",
+        _documents_that_say(claim, ("total",), claim.claimed_amount),
     )
 
 

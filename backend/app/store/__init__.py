@@ -14,8 +14,10 @@ from app.models import (
     ClaimType,
     Customer,
     Document,
+    FraudReport,
     LineOfBusiness,
     Message,
+    Outcome,
     PipelineEvent,
     Policy,
 )
@@ -27,6 +29,10 @@ CLAIM_TYPE: dict[LineOfBusiness, ClaimType] = {
     "Household": "property",
     "Accident": "health",
 }
+
+
+class InvestigationWithoutReport(ValueError):
+    """Non-negotiable 4: a claim routed to investigation always has a fraud report."""
 
 
 class Store:
@@ -161,7 +167,32 @@ class Store:
             ).fetchall()
         return [Message.model_validate_json(r[0]) for r in rows]
 
+    def save_routing(
+        self,
+        claim_id: str,
+        score: int,
+        outcome: Outcome,
+        reasons: list[str],
+        status: str,
+        report: FraudReport | None = None,
+    ) -> Claim | None:
+        """Outcome, score, reasons and report in one write: an investigation and
+        its report are saved together or not at all."""
+        fields = {
+            "score": score,
+            "outcome": outcome.value,
+            "outcome_reasons": reasons,
+            "status": status,
+            "fraud_report": report.model_dump(mode="json") if report else None,
+        }
+        return self.update_claim(claim_id, fields)
+
     def _save_claim(self, claim: Claim) -> None:
+        """Every save of a claim goes through here: the one place of rule 4."""
+        if claim.outcome == Outcome.investigation and claim.fraud_report is None:
+            raise InvestigationWithoutReport(
+                "a claim with outcome investigation needs a fraud report"
+            )
         with self.lock, self.db:
             self.db.execute(
                 "INSERT OR REPLACE INTO claims VALUES (?, ?)",
