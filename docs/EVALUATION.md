@@ -104,3 +104,38 @@ The only 429 answers came from Lightning: 2 of them in one run, after 34 model c
 - One run of the first measure ended with 11 model calls failing at once (about 0 s each) after a 74 s call. Its cause is not known: the error text was not kept. The later runs kept the reason of every failure (`fallback` events); the only failure in 36 claims was one 60 s timeout. Not reproduced.
 - Reasoning off (`chat_template_kwargs.enable_thinking: false`, from the NVIDIA model card) works on both models (checked with one call each: `reasoning_tokens` is 0, the tool call is the same). The client supports it with `AGENT_THINKING=off`. It was not measured.
 - Both models return several `tool_calls` in one answer. The runner runs them in order.
+
+## Sandbox mode against nim mode (issue #14)
+
+Date: 2026-11-12. Same player, same 9 claim files, 2 runs of each of the three claim files per mode (6 claims per mode), `nvidia/nemotron-3.5-lightning-30b-a3b`. Command: `cd backend && uv run python ../scripts/measure_agent.py --mode nim --runs 2` and `--mode sandbox --runs 2`, one after the other (the 40 requests per minute of the key). `nim`: the graph in the backend process. `sandbox`: the same graph in an OpenShell 0.1.5 sandbox on Colima, the tools over MCP, the image already on the Docker engine. Wifi and the model endpoint are not the same from one minute to the next: read the difference between the modes as a size, not as a precise value.
+
+A turn is the time of one HTTP call of the customer panel: a message, an upload, the Done message or the policy choice that starts the chat. In `sandbox` mode the first turn of a claim includes the creation of its sandbox.
+
+| Claim file | Mode | Right outcome | Model calls | Seconds per turn (median / worst) | Tokens | Fallback messages |
+|---|---|---|---|---|---|---|
+| travel | nim | 2/2 | 17.0 | 5.5 / 19.4 | 25,514 | 0 |
+| travel | sandbox | 2/2 | 15.5 | 6.1 / 25.7 | 22,948 | 0 |
+| property | nim | 2/2 | 15.5 | 6.3 / 13.7 | 22,808 | 0 |
+| property | sandbox | 2/2 | 16.5 | 8.5 / 26.5 | 24,630 | 0 |
+| health | nim | 2/2 | 14.0 | 9.6 / 23.2 | 20,654 | 0 |
+| health | sandbox | 2/2 | 11.0 | 6.6 / 16.8 | 15,153 | 0 |
+| **All** | **nim** | **6/6** | 15.5 | **6.6 / 23.2** | 22,992 | 0 |
+| **All** | **sandbox** | **6/6** | 14.3 | **7.4 / 26.5** | 20,910 | 0 |
+
+The sandbox itself, from the `sandbox` events of the same runs:
+
+| What | Seconds |
+|---|---|
+| Create a sandbox (image already on the engine), 6 claims | median 0.49, worst 0.52 |
+| `exec` of a turn (34 turns): median / worst | 7.15 / 26.50 |
+| Fixed cost of a turn: `exec` of `true` | 0.05 |
+| Fixed cost of a turn: Python start and imports (LangGraph, LangChain, MCP) | 0.9 |
+| Delete a sandbox (the `deleted` event of the browser run; a demo reset with one sandbox took 0.18 in all) | 0.12 |
+
+What the numbers say:
+
+- The sandbox costs about 0.5 s once per claim (the creation) and about 1 s per turn (Python and the imports start again in each turn, 0.9 s). The median turn is 0.8 s slower (7.4 against 6.6 s); the model call is the rest of every turn, as in the spike. The per-file differences (property slower, health faster) are the number of model calls and the wifi, not the mode.
+- Same result in both modes: 6/6 right outcomes, right date and amount, and 0 fallback messages. The three customer texts were word for word (checked by the test, and by the player).
+- The worst turn (26.5 s) is a turn with a slow model call, as in `nim` mode (23.2 s).
+- The MCP calls cost milliseconds: the backend and the sandbox are on the same machine.
+- Not measured: many sandboxes at the same time, the 429 limit with two visitors, a first creation on a host where the image is not yet there (pulling `python:3.12-slim` took 4.4 minutes on the slow wifi, spike notes).

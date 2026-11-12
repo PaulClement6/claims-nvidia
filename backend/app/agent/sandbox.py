@@ -272,7 +272,7 @@ class SandboxAgent:
         return cls(
             gateway, shell, env["AGENT_MODEL"], {"PYTHONPATH": "/app", **settings},
             int(env.get("BACKEND_PORT", "8000")),
-            Path(env.get("CLAIMS_SANDBOX_DIR", ".dev-data/sandboxes")), image,
+            Path(env.get("CLAIMS_SANDBOX_DIR", ".dev-data/sandboxes")).resolve(), image,
             float(env.get("CLAIMS_SANDBOX_TURN_TIMEOUT", "150")),
         )  # fmt: skip
 
@@ -384,6 +384,12 @@ class SandboxAgent:
             if isinstance(e, ShellTimeout) and record is not None:
                 # a process may still run in it: delete it, the next one starts clean
                 self._forget(record)
+                record = None
+            # the routing may have run before the failure: the customer still gets it
+            if (text := self._outcome_text(claim_id)) is not None:
+                if record is not None:
+                    self._close(claim_id, record, "the claim is closed")
+                return [text]
             return [FALLBACK]
         self._keep_events(claim_id, data.get("events"))
         self._event(
@@ -442,17 +448,24 @@ class SandboxAgent:
             except (KeyError, TypeError, ValueError):
                 continue  # a malformed event is dropped
 
-    def _reply(self, claim_id: str, said: Any) -> tuple[str, bool]:
-        """What the customer reads, and whether the claim is closed."""
+    def _outcome_text(self, claim_id: str) -> str | None:
+        """Our text for the customer when the claim has an outcome, else None. The
+        claim is closed here if the graph did not do it."""
         store = self.gateway.store
         claim = store.get_claim(claim_id)
-        if claim is not None and claim.outcome is not None:
-            if claim.agent_state != "closed":
-                store.update_claim(claim_id, {"agent_state": "closed"})
-            return customer_message(claim.outcome), True  # ours, word for word
+        if claim is None or claim.outcome is None:
+            return None
+        if claim.agent_state != "closed":
+            store.update_claim(claim_id, {"agent_state": "closed"})
+        return customer_message(claim.outcome)  # ours, word for word
+
+    def _reply(self, claim_id: str, said: Any) -> tuple[str, bool]:
+        """What the customer reads, and whether the claim is closed."""
+        if (text := self._outcome_text(claim_id)) is not None:
+            return text, True  # the text of the sandbox is dropped
         why = check_message(said if isinstance(said, str) else None, self.model)
         if why:
-            store.append_event(
+            self.gateway.store.append_event(
                 claim_id, "agent", "fallback", "Fallback message", {},
                 {"reason": f"the text from the sandbox was refused ({why})"},
             )  # fmt: skip

@@ -537,3 +537,39 @@ def test_a_command_that_times_out_is_a_shell_timeout(
         sandbox.OpenShell("openshell").exec("claims-x", ["true"], "", 3.0)
     with pytest.raises(ShellError):
         sandbox.OpenShell("openshell").delete("claims-x")
+
+
+def test_a_turn_that_fails_after_the_routing_still_gives_the_customer_our_text(
+    make: Any,
+) -> None:
+    """The graph ran `assess_and_route`, then the turn timed out: the claim has its
+    outcome, so the customer must read the routing text and not the fallback."""
+    rig = make()
+
+    def route_then_hang(
+        shell: FakeShell, name: str, argv: list[str], stdin: str
+    ) -> str:
+        rig.store.save_routing(rig.cid, 0, Outcome.handler_review, [], "x")
+        shell.fail_exec = ShellTimeout("the turn timed out after 150 s")
+        return shell.exec(name, argv, stdin, 1.0)
+
+    rig.shell.turn = route_then_hang
+    assert rig.say("done") == TO_A_PERSON
+    assert rig.store.get_claim(rig.cid).agent_state == "closed"
+    assert rig.shell.sandboxes == {}
+    assert "failed" in rig.sandbox_stages()
+
+
+def test_a_failing_exec_after_the_routing_closes_the_sandbox_too(make: Any) -> None:
+    rig = make()
+
+    def route_then_crash(
+        shell: FakeShell, name: str, argv: list[str], stdin: str
+    ) -> str:
+        rig.store.save_routing(rig.cid, 0, Outcome.straight_through, [], "x")
+        raise ShellError("openshell sandbox exec failed (1): boom")
+
+    rig.shell.turn = route_then_crash
+    assert rig.say("done") == VALIDATED
+    assert rig.shell.sandboxes == {}
+    assert rig.sandbox_stages()[-1] == "deleted"
