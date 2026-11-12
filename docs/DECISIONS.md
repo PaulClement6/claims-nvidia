@@ -40,7 +40,7 @@
 
 | # | Decision | Closes |
 |---|---|---|
-| D27 | Agent harness: Hermes, driven without a terminal through its API server. A spike confirms it. Start from the OpenShell 0.1.5 setup that NemoForge proved, then test 0.1.8 (breaking changes: the gateway refuses to start without authentication, and static credentials go only in the `Authorization` header). | O2 |
+| D27 | **Replaced by D36.** Agent harness: Hermes, driven without a terminal through its API server. A spike confirms it. Start from the OpenShell 0.1.5 setup that NemoForge proved, then test 0.1.8 (breaking changes: the gateway refuses to start without authentication, and static credentials go only in the `Authorization` header). | O2 |
 | D28 | NeMo Guardrails in front of the agent model: after the first demo. | O6 |
 | D29 | The pipeline panel is read-only in version 1. Confirm and correct per field is a later ticket. | O9 |
 
@@ -54,6 +54,14 @@
 | D33 | Two API views: `GET /claims/{id}/customer` for the customer panel, `GET /claims/{id}` and `/events` for the pipeline panel. There is no access control between them: both panels are on one screen in the demo. Add it before the customer panel is served alone. |
 | D34 | Thresholds, each one named constant: low confidence below 0.8; R003 window 0 to 14 days; T003 tolerance CHF 0.05. The points per signal are one table in `backend/app/checks/rules.py`. |
 | D35 | The fixture reader finds a mock document by the SHA-256 of its bytes. The mock PDFs are byte-identical on every run of the generator. The damage photos are simple drawings: real-looking photos come with the document kit (issue #23). |
+| D36 | The claim agent is built with LangGraph and LangChain, not Hermes (Paul, 2026-11-12). It replaces D27. The claim flow is a graph of five nodes with the edges in code (`docs/ARCHITECTURE.md` section 1a). The spike of issue #13 proved that LangGraph, the `ChatOpenAI` client and the MCP tools run in OpenShell. Versions are the ones the spike tested: `langgraph` 1.2.21, `langchain` 1.5.0, `langchain-openai` 1.7.4, `langgraph-checkpoint-sqlite` 3.1.3. Issue #47 built it and removed the hand-written loop of issue #12. |
+| D37 | The model client is `ChatOpenAI`, not `ChatNVIDIA`. Reason: the spike proved `ChatOpenAI` with the OpenShell key swap, so the sandbox ticket needs no second proof. Settings: `AGENT_BASE_URL`, `AGENT_MODEL`, `NVIDIA_KEY`, `AGENT_THINKING`. Timeout 60 s, `max_completion_tokens` 2000, two retries (the OpenAI client retries a 429, a 5xx and a timeout). |
+| D38 | `build_graph(model, call_tool, checkpointer, specs, emit)` is in a module that imports nothing from the store, the gateway or FastAPI. The brief had three arguments. Two more are needed: `specs` (the tool schemas in OpenAI format, from `tool_specs()` or from the MCP tool list) and `emit` (the pipeline events; in the sandbox it prints JSON lines). A test checks the imports. |
+| D39 | Per-node tools. `intake` has `get_claim_summary` and `update_claim`. `documents` has `required_documents`, `classify_document`, `extract_document`, `get_claim_summary` and `customer_is_done`. The model never gets `run_checks`, `check_tampering`, `check_consistency`, `assess_and_route` or `write_fraud_report`: the nodes `checks` and `route` call them in code. Code decides "done" for the Done button and the phrases of the scripted agent. The model decides it for free text, with `customer_is_done`, a flag in the graph state that is not a gateway tool. |
+| D40 | The rules of issue #12 stay in trusted code, as a second line behind the graph. `app/tools/guard.py` says why `assess_and_route` may not run (story missing, document unread, checks not up to date after the last change). The backend `call_tool` applies it before the gateway call, because direct callers of the gateway (the scripted agent, tests) must not change. The MCP server of ticket #14 must call the same function. The customer gets `customer_message` word for word. Every message of the model passes the output filter, once again on a retry, then the fallback message. Mutation test: removing each rule makes a test fail. |
+| D41 | A turn ends after one message and the graph ends. It does not wait with `interrupt()`. The next `invoke` on the same thread starts at the node that is due (the `step` in the state). Reason: a failure in a code node (a tool error) leaves the step in the checkpoint, so the next message resumes there. An interrupt would keep a half-run turn. The `intake` node ends in silence when the three facts are saved, and `documents` writes the message of that turn: one chat message per turn. |
+| D42 | The checkpoint holds the conversation only: no tool calls and no tool results of earlier turns. The model context is the node prompt with the claim summary, then the conversation. The checkpoint file is `CLAIMS_CHECKPOINTS` (default `.dev-data/checkpoints.sqlite`, tests use a temporary file). The demo reset empties it, because it holds the text of the claims. The stored chat messages stay the source of the customer panel. |
+| D43 | The graph strip in the pipeline panel reads only the `workflow` events of the claim: the last node that started is current, the others that started are done. The scripted agent writes the same events at the same moments, so `local` mode shows the strip too. The strip stays at the top of the panel while the list of events scrolls. It wraps when the panel is narrow. |
 
 ## Open
 
@@ -65,6 +73,8 @@
 | O15 | What is the rate limit of the free NVIDIA developer key? | Measure it in the first intern task. |
 
 # Spike: LangGraph agent in OpenShell (issue #13)
+
+The decision of this spike is D36 in the table "Taken while we built the base" above. The table below is its first form (the spike agent used `create_agent`). Issue #47 replaced it by an explicit graph.
 
 Date: 2026-11-12
 
@@ -82,7 +92,7 @@ The spike passes. All 21 checks print PASS on one clean run (the first run had 1
 
 | # | Decision |
 |---|---|
-| D36 | The claim agent is a LangGraph agent (`langchain.agents.create_agent`) with a SQLite checkpointer. It runs in an OpenShell sandbox. The backend sends each turn with `openshell sandbox exec` and reads one JSON line. One sandbox per claim. The thread id is the claim id. Replaces D27. |
+| D36 (first form) | The claim agent is a LangGraph agent (`langchain.agents.create_agent`) with a SQLite checkpointer. It runs in an OpenShell sandbox. The backend sends each turn with `openshell sandbox exec` and reads one JSON line. One sandbox per claim. The thread id is the claim id. Replaces D27. |
 
 ## Tested versions
 
