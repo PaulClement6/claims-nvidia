@@ -666,3 +666,54 @@ td {
     display: inline;
   }
 }
+
+/* Sample cases of the chat: collapsed by default, scrolls inside its own box */
+
+.cases {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.cases-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.case {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+}
+.case h3 {
+  margin: 0;
+}
+.case blockquote {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  padding-left: 10px;
+  border-left: 3px solid var(--border);
+  overflow-wrap: anywhere;
+}
+.case-doc {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.case-doc button {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.case-hard {
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+}

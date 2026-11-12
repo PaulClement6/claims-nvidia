@@ -53,7 +53,7 @@ Each task ends with a number.
 
 ## M5: Make it better (intern or later)
 
-31. Mock document kit: grow from the three claim files to 20 to 30 documents, with scans, phone photos and seeded fraud cases (decision D14). Done in #23 (D55): 24 documents, 9 hard versions, `data/mock/index.json`. Left for the intern: real photographs, more scans per type, more seeded fraud cases.
+31. Mock document kit: grow from the three claim files to 20 to 30 documents, with scans, phone photos and seeded fraud cases (decision D14). Done in #23 (D57): 24 documents, 9 hard versions, `data/mock/index.json`. Left for the intern: real photographs, more scans per type, more seeded fraud cases.
 32. Specialised chain: OCR v2, page elements, table structure. Measure what each one adds.
 33. Damage photo description and check C004.
 34. Fraud report written by an LLM from the signals only.
