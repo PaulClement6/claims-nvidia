@@ -91,3 +91,50 @@ def test_the_model_provider_is_the_only_holder_of_the_key() -> None:
     assert "env_vars: [NVIDIA_API_KEY]" in profile
     assert "integrate.api.nvidia.com" in profile
     assert "nvapi-" not in profile
+
+
+# ---- the confinement probe (issue #15): the model key, try (d) ---------------------
+
+
+def test_the_probe_reports_the_key_only_as_a_boolean_and_a_placeholder(
+    client: TestClient,
+) -> None:
+    from app.agent.sandbox_panel import PROBE
+    from tests.fake_shell import PLACEHOLDER, probe_line
+
+    shell: FakeShell = client.app.state.shell  # type: ignore[attr-defined]
+    cid = client.post("/claims", json={"customer_id": "C-1001"}).json()["claim_id"]
+    client.put(f"/claims/{cid}/policy", json={"policy_number": "TRV-2026-0417"})
+    store = client.app.state.store  # type: ignore[attr-defined]
+
+    def everything() -> str:
+        events = [e.model_dump(mode="json") for e in store.events_since(cid, 0)]
+        return json.dumps([events, shell.calls, shell.probes], default=str)
+
+    assert KEY not in PROBE and "nvapi-" in PROBE  # only the prefix, to compare with
+    out = client.post(f"/claims/{cid}/sandbox/probe").json()
+    key = next(r for r in out["results"] if r["id"] == "model_key")
+    assert key["denied"] is True and PLACEHOLDER in key["detail"]
+    assert KEY not in json.dumps(out) + everything()
+
+    # a sandbox that holds a real key: the probe says so, and shows no value
+    shell.probe_out = probe_line(model_key={"has_real_key": True, "placeholder": None})
+    out = client.post(f"/claims/{cid}/sandbox/probe").json()
+    assert out["confined"] is False
+    assert KEY not in json.dumps(out) + everything()
+    titles = [e.title for e in store.events_since(cid, 0) if e.stage == "probe"]
+    assert "Probe: model key → NOT denied" in titles
+
+    # a sandbox that lies and sends the key as its "placeholder": it is not shown
+    lie = {"has_real_key": False, "placeholder": KEY}
+    shell.probe_out = probe_line(model_key=lie)
+    out = client.post(f"/claims/{cid}/sandbox/probe").json()
+    assert out["confined"] is False
+    assert KEY not in json.dumps(out) + everything()
+    # nor in a detail that the sandbox wrote itself
+    shell.probe_out = probe_line(
+        other_tool={"status": 200, "detail": f"here: {KEY}"},
+    )
+    out = client.post(f"/claims/{cid}/sandbox/probe").json()
+    assert KEY not in json.dumps(out) + everything()
+    assert "<key>" in json.dumps(out)

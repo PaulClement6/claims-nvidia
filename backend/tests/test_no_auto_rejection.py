@@ -64,6 +64,11 @@ def test_whatever_the_signals_and_the_amount_the_outcome_is_one_of_three() -> No
 
 
 FORBIDDEN = re.compile(r"\b(reject\w*|den(y|ied|ial)|declin\w*)\b", re.I)
+# The sandbox modules say "denied" of a network request that the policy of a sandbox
+# refused (issue #15: `Denied: GET example.com:443`). That is not a claim outcome: they
+# still may not say reject or decline.
+SANDBOX_FILES_NAMES = {"sandbox.py", "sandbox_panel.py"}
+SANDBOX_FILES = re.compile(r"\b(reject\w*|declin\w*)\b", re.I)
 
 
 def string_literals(tree: ast.AST) -> list[str]:
@@ -92,9 +97,10 @@ def string_literals(tree: ast.AST) -> list[str]:
 )
 def test_the_backend_source_has_no_rejection_outcome(path: Path) -> None:
     # the output filter of the agent lists these words to block them
+    forbidden = SANDBOX_FILES if path.name in SANDBOX_FILES_NAMES else FORBIDDEN
     found = [
         s
         for s in string_literals(ast.parse(path.read_text()))
-        if FORBIDDEN.search(s) and s != phrases.FORBIDDEN.pattern
+        if forbidden.search(s) and s != phrases.FORBIDDEN.pattern
     ]
     assert found == []

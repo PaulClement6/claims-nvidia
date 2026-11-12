@@ -212,7 +212,10 @@ class Store:
         outputs: dict[str, Any] | None = None,
         model: str | None = None,
         duration: float | None = None,
+        at: datetime | None = None,
     ) -> PipelineEvent:
+        """`at` is the display time of an event that happened earlier than it is
+        stored (the events a sandbox reports after its turn). Default: now."""
         with self.lock, self.db:
             (sequence,) = self.db.execute(
                 "SELECT COALESCE(MAX(sequence), 0) + 1 FROM events WHERE claim_id = ?",
@@ -220,7 +223,7 @@ class Store:
             ).fetchone()
             event = PipelineEvent(
                 sequence=sequence,
-                time=datetime.now(UTC),
+                time=at or datetime.now(UTC),
                 actor=actor,
                 stage=stage,
                 title=title,
