@@ -1,5 +1,6 @@
 """Non-negotiable 2: the customer never sees a score, a flag or the word "fraud"."""
 
+import re
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
@@ -116,7 +117,9 @@ def test_the_customer_endpoints_of_claim_file_3_hold_nothing_of_the_report(
     low = body.lower()
     for text in secrets:
         assert text not in body
-    for word in ("fraud", "score", "130", "signal", "finding", "evidence", "tamper",
+    # the score is a whole number: "130" inside a time stamp or an id is not a leak
+    assert not re.search(r"\b130\b", body)
+    for word in ("fraud", "score", "signal", "finding", "evidence", "tamper",
                  "investigation", "handler_review", "straight_through",
                  "r003", "r004", "r005", "t001", "t002", "t003", "c001",
                  "not_checked", "next_steps", "edited", "jonas"):  # fmt: skip
