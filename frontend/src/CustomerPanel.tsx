@@ -4,13 +4,15 @@ import Chat from './Chat'
 
 type Customer = { id: string; name: string }
 type Policy = { number: string; line_of_business: string }
-type Claim = { id: string; type: string | null; policy: { number: string } | null; customer: Customer }
+// the customer endpoint: claim id, policy, status and the result text, nothing else
+type View = { claim_id: string; policy_number: string | null; status: string; message: string | null }
 
 export default function CustomerPanel({ claimId, onClaim }: { claimId: string | null; onClaim: (id: string) => void }) {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [policies, setPolicies] = useState<Policy[]>([])
   const [filter, setFilter] = useState('')
-  const [claim, setClaim] = useState<Claim | null>(null)
+  const [claim, setClaim] = useState<View | null>(null)
+  const [name, setName] = useState('')
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -21,23 +23,27 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
   useEffect(() => {
     if (!claimId) return
     const fail = () => setError('The server did not answer.')
-    send<Claim>(`/claims/${claimId}`)
+    send<View>(`/claims/${claimId}/customer`)
       .then((c) => {
         setClaim(c)
         // the policy list goes through the gateway: it is the first event of the claim
-        if (!c.policy) send<Policy[]>(`/claims/${claimId}/policies`).then(setPolicies).catch(fail)
+        if (!c.policy_number) send<Policy[]>(`/claims/${claimId}/policies`).then(setPolicies).catch(fail)
       })
       .catch(fail)
   }, [claimId])
 
   // the claim is created when the customer picks an account, before any policy
   const pickCustomer = (c: Customer) =>
-    send<Claim>('/claims', json('POST', { customer_id: c.id }))
-      .then((created) => onClaim(created.id))
+    send<{ id: string }>('/claims', json('POST', { customer_id: c.id }))
+      .then((created) => {
+        setName(c.name)
+        onClaim(created.id)
+      })
       .catch(() => setError('The claim was not created.'))
 
   const pickPolicy = (p: Policy) =>
-    send<Claim>(`/claims/${claimId}/policy`, json('PUT', { policy_number: p.number }))
+    send(`/claims/${claimId}/policy`, json('PUT', { policy_number: p.number }))
+      .then(() => send<View>(`/claims/${claimId}/customer`))
       .then((c) => {
         setClaim(c)
         setFilter('')
@@ -61,14 +67,14 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
             </button>
           ))}
         </div>
-      ) : claim?.policy ? (
+      ) : claim?.policy_number ? (
         <>
-          <p className="mono">{`Claim ${claim.id} · ${claim.policy.number} · ${claim.type}`}</p>
-          <Chat claimId={claim.id} />
+          <p className="mono">{`Claim ${claim.claim_id} · ${claim.policy_number}`}</p>
+          <Chat claimId={claim.claim_id} />
         </>
       ) : claim ? (
         <div className="stack">
-          <h3>2. Pick a policy of {claim.customer.name}</h3>
+          <h3>{name ? `2. Pick a policy of ${name}` : '2. Pick a policy'}</h3>
           <input aria-label="Filter policies" placeholder="Number or line of business" value={filter} onChange={(e) => setFilter(e.target.value)} />
           {shown.map((p) => (
             <button key={p.number} type="button" onClick={() => void pickPolicy(p)}>

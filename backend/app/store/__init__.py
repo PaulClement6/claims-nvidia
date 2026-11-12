@@ -34,9 +34,10 @@ class Store:
         path = path or os.environ.get("CLAIMS_DB", ".dev-data/claims.db")
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(path, check_same_thread=False)
-        # One connection for all threads: every write, and the sequence
-        # allocation, runs under this lock.
-        self.lock = threading.Lock()
+        # One connection for all threads: every write, the sequence allocation and
+        # every read-modify-write of a claim run under this lock (reentrant: the
+        # read-modify-write methods call _save_claim).
+        self.lock = threading.RLock()
         self.db.executescript(
             """
             CREATE TABLE IF NOT EXISTS customers (
@@ -92,27 +93,29 @@ class Store:
 
     def set_claim_policy(self, claim_id: str, policy_number: str) -> Claim | None:
         """None when the claim is unknown or the policy is not this customer's."""
-        claim = self.get_claim(claim_id)
-        if claim is None:
-            return None
-        policy = next(
-            (
-                p
-                for p in self.get_customer_policies(claim.customer.id)
-                if p.number == policy_number
-            ),
-            None,
-        )
-        if policy is None:
-            return None
-        claim.policy = policy
-        claim.type = CLAIM_TYPE[policy.line_of_business]
-        self._save_claim(claim)
-        return claim
+        with self.lock:
+            claim = self.get_claim(claim_id)
+            if claim is None:
+                return None
+            policy = next(
+                (
+                    p
+                    for p in self.get_customer_policies(claim.customer.id)
+                    if p.number == policy_number
+                ),
+                None,
+            )
+            if policy is None:
+                return None
+            claim.policy = policy
+            claim.type = CLAIM_TYPE[policy.line_of_business]
+            self._save_claim(claim)
+            return claim
 
     def find_document(self, document_id: str) -> tuple[Claim, Document] | None:
         # ponytail: scans all claims, add a documents table if the demo grows
-        rows = self.db.execute("SELECT data FROM claims").fetchall()
+        with self.lock:
+            rows = self.db.execute("SELECT data FROM claims").fetchall()
         for (data,) in rows:
             claim = Claim.model_validate_json(data)
             for doc in claim.documents:
@@ -122,21 +125,23 @@ class Store:
 
     def save_document(self, claim_id: str, document: Document) -> Claim | None:
         """Adds the document, or replaces the one with the same id."""
-        claim = self.get_claim(claim_id)
-        if claim is None:
-            return None
-        docs = [document if d.id == document.id else d for d in claim.documents]
-        claim.documents = docs if document in docs else [*docs, document]
-        self._save_claim(claim)
-        return claim
+        with self.lock:
+            claim = self.get_claim(claim_id)
+            if claim is None:
+                return None
+            docs = [document if d.id == document.id else d for d in claim.documents]
+            claim.documents = docs if document in docs else [*docs, document]
+            self._save_claim(claim)
+            return claim
 
     def update_claim(self, claim_id: str, fields: dict[str, Any]) -> Claim | None:
-        claim = self.get_claim(claim_id)
-        if claim is None:
-            return None
-        claim = Claim.model_validate({**claim.model_dump(mode="json"), **fields})
-        self._save_claim(claim)
-        return claim
+        with self.lock:
+            claim = self.get_claim(claim_id)
+            if claim is None:
+                return None
+            claim = Claim.model_validate({**claim.model_dump(mode="json"), **fields})
+            self._save_claim(claim)
+            return claim
 
     def add_message(
         self, claim_id: str, role: Literal["customer", "agent"], text: str
@@ -150,9 +155,10 @@ class Store:
         return message
 
     def get_messages(self, claim_id: str) -> list[Message]:
-        rows = self.db.execute(
-            "SELECT data FROM messages WHERE claim_id = ? ORDER BY id", (claim_id,)
-        )
+        with self.lock:  # a read next to another thread's write sees half of it
+            rows = self.db.execute(
+                "SELECT data FROM messages WHERE claim_id = ? ORDER BY id", (claim_id,)
+            ).fetchall()
         return [Message.model_validate_json(r[0]) for r in rows]
 
     def _save_claim(self, claim: Claim) -> None:
@@ -196,15 +202,17 @@ class Store:
         return event
 
     def events_since(self, claim_id: str, sequence: int) -> list[PipelineEvent]:
-        rows = self.db.execute(
-            "SELECT data FROM events WHERE claim_id = ? AND sequence > ? "
-            "ORDER BY sequence",
-            (claim_id, sequence),
-        ).fetchall()
+        with self.lock:
+            rows = self.db.execute(
+                "SELECT data FROM events WHERE claim_id = ? AND sequence > ? "
+                "ORDER BY sequence",
+                (claim_id, sequence),
+            ).fetchall()
         return [PipelineEvent.model_validate_json(r[0]) for r in rows]
 
     def get_claim(self, claim_id: str) -> Claim | None:
-        row = self.db.execute(
-            "SELECT data FROM claims WHERE id = ?", (claim_id,)
-        ).fetchone()
+        with self.lock:
+            row = self.db.execute(
+                "SELECT data FROM claims WHERE id = ?", (claim_id,)
+            ).fetchone()
         return Claim.model_validate_json(row[0]) if row else None
