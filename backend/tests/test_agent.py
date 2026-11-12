@@ -290,3 +290,32 @@ def test_any_other_text_keeps_the_documents_step_open(
     reply = say(client, cid, text)
     assert "type done" in reply and "validated" not in reply
     assert state(client, cid) == "ask_documents"
+
+
+def test_the_scripted_agent_writes_the_node_events_of_the_graph(
+    client: TestClient,
+) -> None:
+    """Same nodes at the same moments as the LangGraph agent: the graph view of the
+    pipeline panel reads these events and works in `local` mode."""
+    cid = start(client)
+    store = client.app.state.store  # type: ignore[attr-defined]
+
+    def nodes() -> list[str]:
+        return [e.stage for e in store.events_since(cid, 0) if e.actor == "workflow"]
+
+    assert nodes() == ["intake"]
+    say(client, cid, "My trip was cancelled because I was ill.")
+    say(client, cid, "3 August 2026")
+    assert nodes() == ["intake"] * 3
+    say(client, cid, "CHF 1500")  # the third fact: the documents node asks
+    assert nodes() == ["intake"] * 3 + ["intake", "documents"]
+    upload(client, cid, (CLAIM1 / "booking-confirmation.pdf").read_bytes())
+    assert nodes()[-1] == "documents"
+    say(client, cid, "hello")
+    assert nodes()[-1] == "documents"
+    say(client, cid, "done")
+    assert nodes()[-5:] == ["documents", "documents", "checks", "route", "answer"]
+    say(client, cid, "and now?")
+    assert nodes()[-1] == "answer"
+    last = [e for e in store.events_since(cid, 0) if e.actor == "workflow"][-1]
+    assert (last.stage, last.title) == ("answer", "Node: answer")

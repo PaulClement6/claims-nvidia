@@ -441,10 +441,12 @@ td {
 }
 .chat-form {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
+/* the message box takes its own row: four buttons left it 20px wide */
 .chat-form > input:not([type='file']) {
-  flex: 1;
+  flex: 1 1 100%;
   min-width: 0;
 }
 .chat-upload {
@@ -461,4 +463,61 @@ td {
 .chat-upload[aria-disabled='true'] {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Graph strip of the pipeline panel: one box per node of the agent graph. */
+
+.graph-strip {
+  display: flex;
+  flex-wrap: wrap; /* wraps when the panel is narrow, always below 900px */
+  gap: 8px 6px;
+  margin: -12px 0 8px;
+  padding: 26px 0 8px; /* the top 18px cover the padding of the panel when stuck */
+  list-style: none;
+  /* stays in view while the list of events scrolls under it */
+  position: sticky;
+  top: -18px;
+  z-index: 1;
+  background: var(--surface);
+}
+.graph-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.graph-node {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-2);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.graph-node[data-state='done'],
+.graph-node[data-state='current'] {
+  background: var(--accent-surface);
+  border-color: var(--accent-surface);
+  color: var(--accent);
+}
+.graph-node[data-state='current'] {
+  border-color: var(--highlight);
+}
+/* the highlight is yellow: on the light surface it needs a dark ring to be seen */
+:root[data-theme='light'] .graph-node[data-state='current'] {
+  box-shadow: 0 0 0 1px var(--primary);
+}
+.graph-arrow {
+  color: var(--text-2);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }

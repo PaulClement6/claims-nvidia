@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import GraphStrip from './GraphStrip'
 import { ChecksSection, ExtractedSection, FraudReportSection, OutcomeSection } from './PipelineSections'
 import type { PipelineClaim } from './PipelineSections'
 
@@ -53,6 +54,7 @@ function Events({ claimId }: { claimId: string | null }) {
     <section className="card panel panel-pipeline" aria-label="Pipeline">
       <h2>Pipeline</h2>
       {claimId && <p className="mono">Claim {claimId}</p>}
+      {claimId && <GraphStrip events={events} />}
       {claim?.fraud_report && <FraudReportSection report={claim.fraud_report} />}
       {claim && <OutcomeSection claim={claim} />}
       {claim && <ChecksSection claim={claim} ran={checksRan} />}

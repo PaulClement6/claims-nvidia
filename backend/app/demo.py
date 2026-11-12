@@ -74,6 +74,9 @@ def _safe_uploads(uploads: Path) -> Path:
 def reset(request: Request) -> dict[str, int]:
     store: Store = request.app.state.store
     root = _safe_uploads(request.app.state.uploads)
+    agent = request.app.state.agent
+    if hasattr(agent, "reset"):
+        agent.reset()  # the checkpoints of the LangGraph agent hold the conversations
     with store.lock:
         counts = store.reset()
         files = 0

@@ -284,3 +284,25 @@ test('no report, no Fraud report section', async () => {
   await screen.findByRole('heading', { name: 'Outcome' })
   expect(screen.queryByText('Fraud report')).not.toBeInTheDocument()
 })
+
+test('draws the graph strip from the workflow events of the claim', () => {
+  render(<PipelinePanel claimId="CL-1" />)
+  const nodes = () => screen.getAllByRole('listitem').filter((e) => e.querySelector('.graph-node'))
+  expect(nodes()).toHaveLength(5)
+  expect(screen.getByText('Intake').closest('.graph-node')).toHaveAttribute('data-state', 'todo')
+
+  const source = FakeEventSource.all[0]
+  source.emit(event(1, { actor: 'workflow', stage: 'intake', title: 'Node: intake', inputs: {}, outputs: {} }))
+  source.emit(event(2, { actor: 'workflow', stage: 'documents', title: 'Node: documents', inputs: {}, outputs: {} }))
+
+  expect(screen.getByText('Intake').closest('.graph-node')).toHaveAttribute('data-state', 'done')
+  expect(screen.getByText('Documents').closest('.graph-node')).toHaveAttribute('data-state', 'current')
+  expect(screen.getByText('Checks').closest('.graph-node')).toHaveAttribute('data-state', 'todo')
+  // the node events are in the list of events too
+  expect(screen.getByText('Node: documents')).toBeInTheDocument()
+})
+
+test('shows no graph strip without a claim', () => {
+  render(<PipelinePanel claimId={null} />)
+  expect(screen.queryByRole('list', { name: 'Agent graph' })).not.toBeInTheDocument()
+})

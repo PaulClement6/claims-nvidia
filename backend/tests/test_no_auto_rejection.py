@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 import app
-from app.agent import llm
+from app.agent import phrases
 from app.checks.rules import SIGNALS
 from app.fraud.routing import route
 from app.models import Outcome, Signal
@@ -91,10 +91,10 @@ def string_literals(tree: ast.AST) -> list[str]:
     "path", sorted(Path(app.__file__).parent.rglob("*.py")), ids=lambda p: p.name
 )
 def test_the_backend_source_has_no_rejection_outcome(path: Path) -> None:
-    # the output filter of the LLM agent lists these words to block them
+    # the output filter of the agent lists these words to block them
     found = [
         s
         for s in string_literals(ast.parse(path.read_text()))
-        if FORBIDDEN.search(s) and s != llm.FORBIDDEN.pattern
+        if FORBIDDEN.search(s) and s != phrases.FORBIDDEN.pattern
     ]
     assert found == []

@@ -13,6 +13,7 @@ import re
 from datetime import date, datetime
 from typing import Any
 
+from app.agent.phrases import is_done, next_state
 from app.tools.gateway import Gateway
 from app.workflows import WORKFLOWS
 
@@ -36,10 +37,6 @@ DATE_FORMATS = [
 NUM = r"\d[\d'’,.]*"
 AMOUNT_RE = re.compile(rf"(?:CHF|Fr\.?)\s*({NUM})|({NUM})\s*(?:CHF|francs)", re.I)
 
-# What a customer types to say "I have nothing more to add", without case, spaces,
-# apostrophes and punctuation. The Done button of the chat sends "done".
-DONE = {"done", "no", "no more", "thats all", "nothing else", "finish"}
-
 TYPE_NAMES = {
     "medical_invoice": "a medical invoice",
     "medical_report": "a medical report",
@@ -52,11 +49,6 @@ TYPE_NAMES = {
     "damage_photo": "a damage photo",
     "police_report": "a police report",
 }
-
-
-def is_done(text: str) -> bool:
-    words = re.sub(r"[^\w\s]", "", text.replace("'", "").replace("’", ""))
-    return " ".join(words.lower().split()) in DONE
 
 
 def parse_date(text: str) -> date | None:
@@ -102,6 +94,11 @@ class ScriptedAgent:
     def _call(self, claim_id: str, tool: str, **inputs: Any) -> dict[str, Any]:
         return self.gateway.call(claim_id, tool, {"claim_id": claim_id, **inputs})
 
+    def _node(self, claim_id: str, name: str) -> None:
+        """The same node events as the LangGraph agent, so the graph view of the
+        pipeline panel works in `local` mode too."""
+        self.gateway.store.append_event(claim_id, "workflow", name, f"Node: {name}")
+
     def handle(
         self, claim_id: str, text: str | None, document_id: str | None
     ) -> list[str]:
@@ -109,19 +106,24 @@ class ScriptedAgent:
         out: list[str] = []
         changes: dict[str, Any] = {}
         if document_id:
+            self._node(claim_id, "documents")
             out.append(self._read_document(claim_id, document_id))
             s = self._call(claim_id, "get_claim_summary")
         elif text is None:
+            self._node(claim_id, "intake")
             out.append(
                 f"Hello {s['customer_name']}. I will help you with your claim on "
                 f"policy {s['policy_number']}."
             )
         elif s["agent_state"] == "closed":
+            self._node(claim_id, "answer")
             return ["Thank you. I have your claim and I will come back to you."]
         elif s["agent_state"] == "ask_documents" and is_done(text):
+            self._node(claim_id, "documents")
             return ["Thank you. " + self._close(claim_id)]
         elif s["agent_state"] != "ready_for_checks":
             asked = s["agent_state"]
+            self._node(claim_id, "documents" if asked == "ask_documents" else "intake")
             changes = self._fill(s, text)
             if asked == "ask_date" and "incident_date" not in changes:
                 out.append("I could not read the date.")
@@ -130,11 +132,13 @@ class ScriptedAgent:
             if changes:
                 self._call(claim_id, "update_claim", **changes)
             s = {**s, **changes}
+            if asked != "ask_documents" and next_state(s) == "ask_documents":
+                self._node(claim_id, "documents")  # the three facts are known
         else:  # ready_for_checks: an earlier turn stopped before the result
             return [self._close(claim_id)]
 
         missing = self._missing(claim_id, s)
-        state = self._state(s)
+        state = next_state(s)
         if state != s["agent_state"]:
             self._call(claim_id, "update_claim", agent_state=state)
         out.append(self._question(state, missing))
@@ -142,11 +146,14 @@ class ScriptedAgent:
 
     def _close(self, claim_id: str) -> str:
         """Checks, routing, the result text for the customer, then the state closed."""
+        self._node(claim_id, "checks")
         self._call(claim_id, "update_claim", agent_state="ready_for_checks")
         self._call(claim_id, "run_checks")
         self._call(claim_id, "check_tampering")
         self._call(claim_id, "check_consistency")
+        self._node(claim_id, "route")
         message = self._call(claim_id, "assess_and_route")["customer_message"]
+        self._node(claim_id, "answer")
         self._call(claim_id, "update_claim", agent_state="closed")
         return str(message)
 
@@ -177,16 +184,6 @@ class ScriptedAgent:
         required = self._call(claim_id, "required_documents")["documents"]
         have = set(s["document_types"])
         return [r["label"] for r in required if not have & set(r["any_of"])]
-
-    def _state(self, s: dict[str, Any]) -> str:
-        for slot, state in (
-            ("description", "ask_story"),
-            ("incident_date", "ask_date"),
-            ("claimed_amount", "ask_amount"),
-        ):
-            if not s[slot]:
-                return state
-        return "ask_documents"
 
     def _question(self, state: str, missing: list[str]) -> str:
         if state == "ask_story":
