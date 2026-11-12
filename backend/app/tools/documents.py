@@ -23,6 +23,9 @@ def register(gateway: Gateway, reader: Reader, uploads: Path) -> None:
     def extract_document(document_id: str) -> dict[str, Any]:
         claim, doc, data = load(document_id)
         result = reader.extract(doc, data, claim.type or "unknown")
+        doc.document_type = result.document_type.value
+        doc.fields, doc.line_items = result.fields, result.line_items
+        gateway.store.save_document(claim.id, doc)
         return result.model_dump(mode="json")
 
     gateway.register("classify_document", classify_document, model=reader.name)

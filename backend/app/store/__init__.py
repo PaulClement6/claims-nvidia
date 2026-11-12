@@ -15,6 +15,7 @@ from app.models import (
     Customer,
     Document,
     LineOfBusiness,
+    Message,
     PipelineEvent,
     Policy,
 )
@@ -47,6 +48,9 @@ class Store:
             CREATE TABLE IF NOT EXISTS events (
                 claim_id TEXT NOT NULL, sequence INTEGER NOT NULL, data TEXT NOT NULL,
                 PRIMARY KEY (claim_id, sequence));
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                claim_id TEXT NOT NULL, data TEXT NOT NULL);
             """
         )
         if not self.db.execute("SELECT 1 FROM customers").fetchone():
@@ -125,6 +129,31 @@ class Store:
         claim.documents = docs if document in docs else [*docs, document]
         self._save_claim(claim)
         return claim
+
+    def update_claim(self, claim_id: str, fields: dict[str, Any]) -> Claim | None:
+        claim = self.get_claim(claim_id)
+        if claim is None:
+            return None
+        claim = Claim.model_validate({**claim.model_dump(mode="json"), **fields})
+        self._save_claim(claim)
+        return claim
+
+    def add_message(
+        self, claim_id: str, role: Literal["customer", "agent"], text: str
+    ) -> Message:
+        message = Message(role=role, text=text, time=datetime.now(UTC))
+        with self.lock, self.db:
+            self.db.execute(
+                "INSERT INTO messages (claim_id, data) VALUES (?, ?)",
+                (claim_id, message.model_dump_json()),
+            )
+        return message
+
+    def get_messages(self, claim_id: str) -> list[Message]:
+        rows = self.db.execute(
+            "SELECT data FROM messages WHERE claim_id = ? ORDER BY id", (claim_id,)
+        )
+        return [Message.model_validate_json(r[0]) for r in rows]
 
     def _save_claim(self, claim: Claim) -> None:
         with self.lock, self.db:

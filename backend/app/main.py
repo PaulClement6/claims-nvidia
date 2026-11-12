@@ -7,15 +7,18 @@ from pathlib import Path
 
 from fastapi import FastAPI, Header, HTTPException, Query, Request, UploadFile
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pypdf import PdfReader
 
+from app.agent.scripted import ScriptedAgent
 from app.docintel.reader import get_reader
-from app.models import Claim, Customer, Document, Extraction, Policy
+from app.models import Claim, Customer, Document, Message, Policy
 from app.store import Store
 from app.stream import event_stream
+from app.tools import claims as claims_tool
 from app.tools import documents as documents_tool
 from app.tools import policies as policies_tool
+from app.tools import requirements as requirements_tool
 from app.tools.gateway import Gateway
 
 MAX_UPLOAD = 10 * 1024 * 1024
@@ -25,6 +28,10 @@ MAGIC = {b"%PDF-": ".pdf", b"\x89PNG\r\n\x1a\n": ".png", b"\xff\xd8\xff": ".jpg"
 
 class NewClaim(BaseModel):
     customer_id: str
+
+
+class NewMessage(BaseModel):
+    text: str = Field(min_length=1, max_length=2000)
 
 
 class ClaimPolicy(BaseModel):
@@ -39,6 +46,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     reader = get_reader()  # unknown CLAIMS_READER stops the startup
     uploads = Path(os.environ.get("CLAIMS_UPLOADS", "uploads"))
     documents_tool.register(gateway, reader, uploads)
+    claims_tool.register(gateway)
+    requirements_tool.register(gateway)
+    app.state.agent = ScriptedAgent(gateway)
     app.state.uploads = uploads
     app.state.store = store
     app.state.gateway = gateway
@@ -57,6 +67,19 @@ def create_app() -> FastAPI:
         if claim is None:
             raise HTTPException(404, "unknown claim")
         return claim
+
+    def run_agent(
+        request: Request, claim_id: str, text: str | None, document_id: str | None
+    ) -> list[Message]:
+        """The agent answers; each answer is stored and shown in the pipeline."""
+        agent: ScriptedAgent = request.app.state.agent
+        out = []
+        for reply in agent.handle(claim_id, text, document_id):
+            store(request).append_event(
+                claim_id, "agent", "message", reply[:80], outputs={"text": reply}
+            )
+            out.append(store(request).add_message(claim_id, "agent", reply))
+        return out
 
     @app.get("/health")
     def health() -> dict[str, str]:
@@ -92,7 +115,27 @@ def create_app() -> FastAPI:
         claim = store(request).set_claim_policy(claim_id, body.policy_number)
         if claim is None:
             raise HTTPException(404, "policy not found for this customer")
+        if not store(request).get_messages(claim_id):
+            run_agent(request, claim_id, None, None)  # the greeting
+            claim = claim_or_404(request, claim_id)
         return claim
+
+    @app.get("/claims/{claim_id}/messages")
+    def get_messages(claim_id: str, request: Request) -> list[Message]:
+        claim_or_404(request, claim_id)
+        return store(request).get_messages(claim_id)
+
+    @app.post("/claims/{claim_id}/messages")
+    def post_message(
+        claim_id: str, body: NewMessage, request: Request
+    ) -> list[Message]:
+        if claim_or_404(request, claim_id).policy is None:
+            raise HTTPException(409, "pick a policy first")
+        text = body.text.strip()
+        if not text:
+            raise HTTPException(422, "empty message")
+        store(request).add_message(claim_id, "customer", text)
+        return run_agent(request, claim_id, text, None)
 
     @app.post("/claims/{claim_id}/documents", status_code=201)
     def upload_document(claim_id: str, request: Request, file: UploadFile) -> Document:
@@ -120,17 +163,11 @@ def create_app() -> FastAPI:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
         store(request).save_document(claim_id, doc)
-        gateway: Gateway = request.app.state.gateway
-        doc.document_type = gateway.call(
-            claim_id, "classify_document", {"document_id": doc.id}
-        )["document_type"]
-        out = Extraction.model_validate(
-            gateway.call(claim_id, "extract_document", {"document_id": doc.id})
-        )
-        doc.document_type = out.document_type.value
-        doc.fields, doc.line_items = out.fields, out.line_items
-        store(request).save_document(claim_id, doc)
-        return doc
+        name = doc.file_metadata["original_name"] or "a file"
+        store(request).add_message(claim_id, "customer", f"Uploaded {name}")
+        run_agent(request, claim_id, None, doc.id)
+        found = store(request).find_document(doc.id)
+        return found[1] if found else doc
 
     @app.get("/claims/{claim_id}/events")
     def events(
