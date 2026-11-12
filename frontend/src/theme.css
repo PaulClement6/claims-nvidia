@@ -449,6 +449,12 @@ td {
   flex: 1 1 100%;
   min-width: 0;
 }
+/* under the buttons: when Done works */
+.chat-help {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 12px;
+}
 .chat-upload {
   display: inline-flex;
   align-items: center;

@@ -9,6 +9,26 @@ type KitFile = { folder: string; file: string; document_type: string | null; siz
 const uploadError = (e: Error) =>
   e.message === '415' ? 'Only PDF, PNG or JPEG files.' : e.message === '413' ? 'The file is larger than 10 MB.' : 'The upload failed.'
 
+// the agent is typing: used in the chat, and while the first message of a new claim is made
+export function Typing() {
+  return (
+    <p className="bubble bubble-agent typing">
+      <span className="sr-only">The agent is typing</span>
+      <span className="typing-dots" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </span>
+      <span className="typing-still" aria-hidden="true">
+        …
+      </span>
+    </p>
+  )
+}
+
+const BEFORE_DOCUMENTS = ['ask_story', 'ask_date', 'ask_amount']
+const DONE_HELP = 'Press Done when you have uploaded your documents.'
+
 export default function Chat({ claimId }: { claimId: string }) {
   const [messages, setMessages] = useState<Message[]>([])
   const [text, setText] = useState('')
@@ -97,6 +117,8 @@ export default function Chat({ claimId }: { claimId: string }) {
     upload(e.dataTransfer.files[0])
   }
 
+  const before = BEFORE_DOCUMENTS.includes(step) // Done does not work yet: say when it will
+
   return (
     <div
       className={`chat${over ? ' chat-over' : ''}`}
@@ -114,19 +136,7 @@ export default function Chat({ claimId }: { claimId: string }) {
             {m.text}
           </p>
         ))}
-        {busy && (
-          <p className="bubble bubble-agent typing">
-            <span className="sr-only">The agent is typing</span>
-            <span className="typing-dots" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </span>
-            <span className="typing-still" aria-hidden="true">
-              …
-            </span>
-          </p>
-        )}
+        {busy && <Typing />}
       </div>
       <form
         className="chat-form"
@@ -156,9 +166,20 @@ export default function Chat({ claimId }: { claimId: string }) {
         <button type="button" disabled={busy} aria-expanded={kit !== null} onClick={openKit}>
           Use a sample document
         </button>
-        <button type="button" disabled={busy || step !== 'ask_documents'} onClick={() => say('done')}>
+        <button
+          type="button"
+          disabled={busy || step !== 'ask_documents'}
+          title={before ? DONE_HELP : undefined}
+          aria-describedby={before ? 'done-help' : undefined}
+          onClick={() => say('done')}
+        >
           Done
         </button>
+        {before && (
+          <p id="done-help" className="muted chat-help">
+            {DONE_HELP}
+          </p>
+        )}
       </form>
       {kit && (
         <div className="stack" role="group" aria-label="Sample documents">

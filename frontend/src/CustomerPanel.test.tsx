@@ -153,10 +153,16 @@ test('the Done button is on only in the documents step and sends "done"', async 
   const { rerender } = render(<CustomerPanel claimId="CL-1" onClaim={() => {}} />)
   const done = await screen.findByRole('button', { name: 'Done' })
   expect(done).toBeDisabled()
+  // a disabled Done says when it works: in a title and in text under the buttons
+  const help = 'Press Done when you have uploaded your documents.'
+  expect(await screen.findByText(help)).toBeVisible()
+  expect(done).toHaveAttribute('title', help)
 
   step = 'ask_documents'
   rerender(<CustomerPanel claimId="CL-1" onClaim={() => {}} key="again" />)
   await vi.waitFor(() => expect(screen.getByRole('button', { name: 'Done' })).toBeEnabled())
+  expect(screen.queryByText(help)).not.toBeInTheDocument() // only before the documents step
+  expect(screen.getByRole('button', { name: 'Done' })).not.toHaveAttribute('title')
 
   fireEvent.click(screen.getByRole('button', { name: 'Done' }))
   const post = fetchMock.mock.calls.find(([, i]) => i?.method === 'POST')!
