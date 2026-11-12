@@ -284,7 +284,46 @@ def test_all_the_facts_in_one_message_go_from_intake_to_documents_in_one_turn(
         "extract_document",
         "get_claim_summary",
         "customer_is_done",
+        "update_claim",
     ]
+
+
+def test_the_customer_can_correct_the_date_and_the_amount_in_the_documents_node(
+    rig: Rig,
+) -> None:
+    rig.start()
+    rig.fake.replies += [
+        story(),
+        calls(("required_documents", {})),
+        text("Please upload a booking confirmation."),
+        # the model sends the state and the cause too: the graph drops them
+        calls(
+            (
+                "update_claim",
+                {
+                    "claimed_amount": 1400,
+                    "incident_date": "2026-08-04",
+                    "agent_state": "closed",
+                    "cause": "other",
+                    "claim_id": "CL-other",
+                },
+            )
+        ),
+        text("Thank you, I saved that."),
+    ]
+    rig.say("I was ill on 3 August 2026, I claim CHF 1500.")
+    assert rig.say("Sorry, it was 4 August and CHF 1400.") == "Thank you, I saved that."
+    c = rig.claim()
+    assert (c["claimed_amount"], c["incident_date"]) == (1400, "2026-08-04")
+    assert c["agent_state"] == "ask_documents" and c["cause"] == "illness"
+    [saved] = [
+        e
+        for e in tool_events(rig)
+        if e.stage == "update_claim"
+        and "claimed_amount" in e.inputs
+        and e.inputs["claimed_amount"] == 1400
+    ]
+    assert set(saved.inputs) == {"claim_id", "claimed_amount", "incident_date"}
 
 
 def test_the_story_alone_stays_in_intake_and_the_model_asks(rig: Rig) -> None:

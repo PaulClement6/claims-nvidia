@@ -7,7 +7,8 @@ Five nodes. The order of the steps is code, not a prompt:
 - `intake` (model): story, date, amount. Tools: `get_claim_summary`, `update_claim`.
 - `documents` (model): asks for the required documents and reads each upload. Tools:
   `required_documents`, `classify_document`, `extract_document`, `get_claim_summary`,
-  and `customer_is_done`, a signal that sets a flag in the graph and changes nothing.
+  `update_claim` (only incident_date, claimed_amount, description) and
+  `customer_is_done`, a signal that sets a flag in the graph and changes nothing.
 - `checks` (code): reads what the model left unread, then the three checks.
 - `route` (code): `assess_and_route`.
 - `answer` (code): sends the `customer_message` word for word and closes the claim.
@@ -74,8 +75,12 @@ NODE_TOOLS = {
         "extract_document",
         "get_claim_summary",
         "customer_is_done",
+        "update_claim",
     ),
 }
+# What the documents node may save with update_claim: the customer corrects a fact.
+# Any other field the model sends (the state, the cause) is dropped.
+DOCUMENTS_UPDATE = ("incident_date", "claimed_amount", "description")
 # What the code nodes call, with the `agent_state` argument that the model never sees.
 CODE_TOOLS = (
     "get_claim_summary",
@@ -159,6 +164,8 @@ before the customer says so.
 5. If the claim summary below has no description, date or amount, only read the \
 document, then ask the customer for what is missing (what happened, the date, the \
 amount in CHF).
+6. If the customer corrects the date, the amount or the story, save it with \
+update_claim (incident_date as YYYY-MM-DD, claimed_amount, description).
 """
 )
 
@@ -321,6 +328,12 @@ def build_graph(
         params = by_name[name]["function"]["parameters"]
         allowed = set(params.get("properties", {}))
         args = {k: v for k, v in args.items() if k != "claim_id"}  # the claim is bound
+        if node == "documents" and name == "update_claim":
+            args = {k: v for k, v in args.items() if k in DOCUMENTS_UPDATE}
+            if not args:
+                return refuse(
+                    call, f"nothing to save. Allowed: {', '.join(DOCUMENTS_UPDATE)}"
+                ), None
         if unknown := sorted(set(args) - allowed):
             return refuse(
                 call,
