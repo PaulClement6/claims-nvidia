@@ -29,7 +29,11 @@ def upload(client: TestClient, cid: str, name: str, data: bytes, mime: str = "x/
 
 
 def events(client: TestClient, cid: str):  # type: ignore[no-untyped-def]
-    return client.app.state.store.events_since(cid, 0)  # type: ignore[attr-defined]
+    """The reader events only; the agent also reads the claim and answers."""
+    all_events = client.app.state.store.events_since(cid, 0)  # type: ignore[attr-defined]
+    return [
+        e for e in all_events if e.stage in ("classify_document", "extract_document")
+    ]
 
 
 def test_booking_confirmation_gives_two_events_and_fields_with_sources(

@@ -393,3 +393,68 @@ td {
   margin: 4px 0;
   font-size: 12px;
 }
+
+/* Chat */
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 4px;
+  border: 1px dashed transparent;
+  border-radius: var(--radius);
+}
+.chat-over {
+  border-color: var(--accent);
+  background: var(--accent-surface);
+}
+.chat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 240px;
+  max-height: calc(100vh - 360px);
+  overflow-y: auto;
+}
+.bubble {
+  max-width: 85%;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: var(--radius-lg);
+  overflow-wrap: anywhere;
+}
+.bubble-customer {
+  align-self: flex-end;
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.bubble-agent {
+  align-self: flex-start;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text);
+}
+.chat-form {
+  display: flex;
+  gap: 8px;
+}
+.chat-form > input:not([type='file']) {
+  flex: 1;
+  min-width: 0;
+}
+.chat-upload {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+}
+.chat-upload[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

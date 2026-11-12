@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { json, send } from './api'
+import Chat from './Chat'
 
 type Customer = { id: string; name: string }
 type Policy = { number: string; line_of_business: string }
@@ -11,26 +13,21 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
   const [claim, setClaim] = useState<Claim | null>(null)
   const [error, setError] = useState('')
 
-  const send = <T,>(url: string, init?: RequestInit) =>
-    fetch(url, init).then((r) => (r.ok ? (r.json() as Promise<T>) : Promise.reject(new Error(String(r.status)))))
-  const load = <T,>(url: string, set: (v: T) => void) =>
-    send<T>(url)
-      .then(set)
+  useEffect(() => {
+    send<Customer[]>('/customers')
+      .then(setCustomers)
       .catch(() => setError('The server did not answer.'))
-  const json = (method: string, body: object): RequestInit => ({
-    method,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
-
-  useEffect(() => void load('/customers', setCustomers), [])
+  }, [])
   useEffect(() => {
     if (!claimId) return
-    void load<Claim>(`/claims/${claimId}`, (c) => {
-      setClaim(c)
-      // the policy list goes through the gateway: it is the first event of the claim
-      if (!c.policy) void load<Policy[]>(`/claims/${claimId}/policies`, setPolicies)
-    })
+    const fail = () => setError('The server did not answer.')
+    send<Claim>(`/claims/${claimId}`)
+      .then((c) => {
+        setClaim(c)
+        // the policy list goes through the gateway: it is the first event of the claim
+        if (!c.policy) send<Policy[]>(`/claims/${claimId}/policies`).then(setPolicies).catch(fail)
+      })
+      .catch(fail)
   }, [claimId])
 
   // the claim is created when the customer picks an account, before any policy
@@ -46,24 +43,6 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
         setFilter('')
       })
       .catch(() => setError('The policy was not set.'))
-
-  // plain upload, one file at a time; the pipeline panel shows the result
-  const upload = (file: File | undefined) => {
-    if (!file) return
-    const body = new FormData()
-    body.append('file', file)
-    send(`/claims/${claimId}/documents`, { method: 'POST', body })
-      .then(() => setError(''))
-      .catch((e: Error) =>
-        setError(
-          e.message === '415'
-            ? 'Only PDF, PNG or JPEG files.'
-            : e.message === '413'
-              ? 'The file is larger than 10 MB.'
-              : 'The upload failed.',
-        ),
-      )
-  }
 
   const q = filter.trim().toLowerCase()
   const shown = policies.filter((p) => `${p.number} ${p.line_of_business}`.toLowerCase().includes(q))
@@ -85,18 +64,7 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
       ) : claim?.policy ? (
         <>
           <p className="mono">{`Claim ${claim.id} · ${claim.policy.number} · ${claim.type}`}</p>
-          <label className="stack">
-            Upload a document (PDF, PNG or JPEG)
-            <input
-              type="file"
-              accept="application/pdf,image/png,image/jpeg"
-              onChange={(e) => {
-                upload(e.target.files?.[0])
-                e.target.value = ''
-              }}
-            />
-          </label>
-          <p className="muted">The chat comes next.</p>
+          <Chat claimId={claim.id} />
         </>
       ) : claim ? (
         <div className="stack">

@@ -123,9 +123,17 @@ class Claim(BaseModel):
     description: str | None = None
     incident_date: date | None = None
     claimed_amount: float | None = None
+    cause: str | None = None  # travel: illness, luggage or cancellation
+    agent_state: str = "ask_story"
     documents: list[Document] = []
     signals: list[Signal] = []
     score: int | None = None
     outcome: Outcome | None = None
     fraud_report: FraudReport | None = None
     status: str = "open"
+
+
+class Message(BaseModel):
+    role: Literal["customer", "agent"]
+    text: str
+    time: datetime
