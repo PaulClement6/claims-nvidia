@@ -12,7 +12,7 @@ from typing import Any
 
 from fastapi.testclient import TestClient
 
-from app.agent.llm import FALLBACK
+from app.agent.phrases import FALLBACK
 from app.views import TO_A_PERSON, VALIDATED
 from tests.reader_contract import MOCK
 

@@ -1,6 +1,6 @@
-"""Measure the LLM agent: the three claim files, N runs each, one backend per model.
+"""Measure the LangGraph agent: the three claim files, N runs each, per model.
 
-    cd backend && uv run python ../scripts/measure_agent.py            # both models
+    cd backend && uv run python ../scripts/measure_agent.py          # the default model
     cd backend && uv run python ../scripts/measure_agent.py --models nvidia/x --runs 1
 
 It starts the backend in `nim` mode in this process (TestClient, a temporary database),
@@ -28,10 +28,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 from app.main import create_app  # noqa: E402
 from tests.live_claims import CLAIM_FILES, Run, load_env, play  # noqa: E402
 
-MODELS = [
-    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-    "nvidia/nemotron-3.5-lightning-30b-a3b",
-]
+MODELS = ["nvidia/nemotron-3.5-lightning-30b-a3b"]  # D17
 
 
 def measure(model: str, runs: int, pause: float, thinking: str) -> list[Run]:
@@ -43,6 +40,7 @@ def measure(model: str, runs: int, pause: float, thinking: str) -> list[Run]:
     with tempfile.TemporaryDirectory() as tmp:
         os.environ["CLAIMS_DB"] = f"{tmp}/claims.db"
         os.environ["CLAIMS_UPLOADS"] = f"{tmp}/uploads"
+        os.environ["CLAIMS_CHECKPOINTS"] = f"{tmp}/checkpoints.sqlite"
         with TestClient(create_app()) as client:
             for variant in range(runs):
                 for kind in CLAIM_FILES:
@@ -70,6 +68,7 @@ def table(model: str, runs: list[Run]) -> str:
             f"{statistics.median(turns):.1f} / {max(turns):.1f}",
             f"{sum(r.prompt_tokens + r.completion_tokens for r in rs) / n:,.0f}",
             str(sum(r.rate_limited for r in rs)),
+            str(sum(r.fallbacks for r in rs)),
         ]
         return "| " + " | ".join(cells) + " |"
 
@@ -82,6 +81,7 @@ def table(model: str, runs: list[Run]) -> str:
         "Seconds per turn (median / worst)",
         "Tokens",
         "429",
+        "Fallback messages",
     ]
     head = ["| " + " | ".join(titles) + " |", "|" + "---|" * len(titles)]
     rows = [row(k, [r for r in runs if r.kind == k]) for k in CLAIM_FILES]

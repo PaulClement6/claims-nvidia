@@ -1,12 +1,14 @@
-"""The claim agents and the mode switch: `get_agent` is the only place that picks."""
+"""The claim agents and the mode switch: `get_agent` is the only place that picks.
+
+Nothing is imported at the top: `local` mode must not import LangChain or LangGraph,
+and the graph module must not import the store (it also runs in the sandbox).
+"""
 
 import os
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
-from app.agent.chat import HttpChat
-from app.agent.llm import LlmAgent
-from app.agent.scripted import ScriptedAgent
-from app.tools.gateway import Gateway
+if TYPE_CHECKING:
+    from app.tools.gateway import Gateway
 
 
 class Agent(Protocol):
@@ -18,10 +20,14 @@ class Agent(Protocol):
         ...
 
 
-def get_agent(gateway: Gateway) -> Agent:
+def get_agent(gateway: "Gateway") -> Agent:
     mode = os.environ.get("CLAIMS_MODE", "local")
     if mode == "local":
+        from app.agent.scripted import ScriptedAgent
+
         return ScriptedAgent(gateway)  # no key, no network: CI runs this
     if mode == "nim":
-        return LlmAgent(gateway, HttpChat.from_env())  # no key stops the startup
+        from app.agent.graph_agent import GraphAgent
+
+        return GraphAgent.from_env(gateway)  # no key stops the startup
     raise ValueError(f"unknown CLAIMS_MODE {mode!r} (known: local, nim)")

@@ -15,7 +15,7 @@ from fastapi.testclient import TestClient
 from app.main import create_app
 from app.views import TO_A_PERSON, VALIDATED
 from tests import test_health_api, test_property_api, test_travel_api
-from tests.fake_chat import use_fake_model
+from tests.fake_model import use_fake_model
 
 
 @pytest.fixture

@@ -5,6 +5,7 @@ the environment). Mock data only. Each test is one claim file with a customer's 
 words, and the exact outcome and customer text it must end with.
 """
 
+import os
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -21,7 +22,7 @@ pytestmark = pytest.mark.live
 def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
     env = load_env()
     for name in ("NVIDIA_KEY", "AGENT_BASE_URL", "AGENT_MODEL", "AGENT_THINKING"):
-        if name in env:
+        if name in env and name not in os.environ:  # the shell wins over `.env`
             monkeypatch.setenv(name, env[name])
     monkeypatch.setenv("CLAIMS_MODE", "nim")
     monkeypatch.setenv("CLAIMS_DB", str(tmp_path / "claims.db"))

@@ -13,7 +13,7 @@ from app.models import Claim, FraudReport, Outcome
 from app.views import CustomerView, customer_view
 from tests import test_health_api, test_property_api
 from tests.builders import signal, travel_claim
-from tests.fake_chat import use_fake_model
+from tests.fake_model import use_fake_model
 
 VALIDATED = "Your claim is validated. You will receive a confirmation by e-mail."
 REVIEW = "A claims specialist will review your case and contact you."

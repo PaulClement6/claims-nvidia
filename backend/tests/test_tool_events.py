@@ -9,7 +9,7 @@ from app.main import create_app
 from app.store import Store
 from app.tools.gateway import Gateway
 from tests import test_travel_api
-from tests.fake_chat import use_fake_model
+from tests.fake_model import use_fake_model
 
 
 @pytest.fixture
