@@ -6,7 +6,7 @@ This is a demo claims platform for insurance, built on the NVIDIA stack.
 A customer talks to a claim agent and uploads documents. This is the first panel.
 The second panel shows the full pipeline live: reading, checks, fraud signals and routing.
 The system never rejects a claim. A claim has three possible outcomes:
-`straight_through` (paid without review), `handler_review` and `investigation`.
+`straight_through` (validated with no review by a person), `handler_review` and `investigation`.
 
 ## Run it in `local` mode
 
