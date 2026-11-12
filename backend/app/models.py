@@ -129,6 +129,7 @@ class Claim(BaseModel):
     signals: list[Signal] = []
     score: int | None = None
     outcome: Outcome | None = None
+    outcome_reasons: list[str] = []
     fraud_report: FraudReport | None = None
     status: str = "open"
 

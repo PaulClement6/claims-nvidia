@@ -1,7 +1,9 @@
 """The scripted claim agent: a state machine that reaches data only through the gateway.
 
 It imports no store (tested). State, kept on the claim:
-ask_story -> ask_date -> ask_amount -> ask_documents -> ready_for_checks.
+ask_story -> ask_date -> ask_amount -> ask_documents -> ready_for_checks -> closed.
+At ready_for_checks, in the same turn, it runs the checks and the routing, gives the
+customer the text the routing tool returns, and closes.
 """
 
 import re
@@ -99,11 +101,12 @@ class ScriptedAgent:
                 f"Hello {s['customer_name']}. I will help you with your claim on "
                 f"policy {s['policy_number']}."
             )
+        elif s["agent_state"] == "closed":
+            return ["Thank you. I have your claim and I will come back to you."]
         elif (
             s["agent_state"] == "ask_documents" and text.strip(" .!").lower() == "done"
         ):
-            self._call(claim_id, "update_claim", agent_state="ready_for_checks")
-            return ["Thank you. I have what I need from you."]
+            return ["Thank you. " + self._close(claim_id)]
         elif s["agent_state"] != "ready_for_checks":
             asked = s["agent_state"]
             changes = self._fill(s, text)
@@ -114,15 +117,26 @@ class ScriptedAgent:
             if changes:
                 self._call(claim_id, "update_claim", **changes)
             s = {**s, **changes}
-        else:
-            return ["Thank you. I have your claim and I will come back to you."]
+        else:  # ready_for_checks: an earlier turn stopped before the result
+            return [self._close(claim_id)]
 
         missing = self._missing(claim_id, s)
         state = self._state(s, missing)
+        if state == "ready_for_checks":
+            out.append(self._close(claim_id))
+            return [" ".join(out)]
         if state != s["agent_state"]:
             self._call(claim_id, "update_claim", agent_state=state)
         out.append(self._question(state, missing))
         return [" ".join(out)]  # one chat message per turn
+
+    def _close(self, claim_id: str) -> str:
+        """Checks, routing, the result text for the customer, then the state closed."""
+        self._call(claim_id, "update_claim", agent_state="ready_for_checks")
+        self._call(claim_id, "run_checks")
+        message = self._call(claim_id, "assess_and_route")["customer_message"]
+        self._call(claim_id, "update_claim", agent_state="closed")
+        return str(message)
 
     def _fill(self, s: dict[str, Any], text: str) -> dict[str, Any]:
         changes: dict[str, Any] = {}
@@ -153,8 +167,6 @@ class ScriptedAgent:
         return [r["label"] for r in required if not have & set(r["any_of"])]
 
     def _state(self, s: dict[str, Any], missing: list[str]) -> str:
-        if s["agent_state"] == "ready_for_checks":
-            return "ready_for_checks"
         for slot, state in (
             ("description", "ask_story"),
             ("incident_date", "ask_date"),
@@ -171,9 +183,7 @@ class ScriptedAgent:
             return "On what date did it happen? For example: 3 August 2026."
         if state == "ask_amount":
             return "What amount do you claim, in CHF? For example: CHF 1,500."
-        if state == "ask_documents":
-            return (
-                f"Please upload the documents I still need: {', and '.join(missing)}. "
-                "You can add them one by one. If you have nothing more, type done."
-            )
-        return "I have everything I need from you."
+        return (
+            f"Please upload the documents I still need: {', and '.join(missing)}. "
+            "You can add them one by one. If you have nothing more, type done."
+        )

@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { ChecksSection, ExtractedSection, OutcomeSection } from './PipelineSections'
+import type { PipelineClaim } from './PipelineSections'
 
 type PipelineEvent = {
   sequence: number
@@ -11,8 +13,7 @@ type PipelineEvent = {
   duration: number | null // seconds
 }
 
-type Field = { name: string; value: unknown; source: { page: number; snippet: string | null } }
-type Doc = { id: string; file: string; document_type: string; fields: Field[]; file_metadata: { original_name?: string } }
+const RELOAD = ['extract_document', 'run_checks', 'assess_and_route']
 
 // a new claim remounts the list, so the old events never show under it
 export default function PipelinePanel({ claimId }: { claimId: string | null }) {
@@ -21,7 +22,7 @@ export default function PipelinePanel({ claimId }: { claimId: string | null }) {
 
 function Events({ claimId }: { claimId: string | null }) {
   const [events, setEvents] = useState<PipelineEvent[]>([])
-  const [docs, setDocs] = useState<Doc[]>([])
+  const [claim, setClaim] = useState<PipelineClaim | null>(null)
   const end = useRef<HTMLLIElement>(null)
 
   useEffect(() => {
@@ -31,11 +32,11 @@ function Events({ claimId }: { claimId: string | null }) {
       const e = JSON.parse(m.data) as PipelineEvent
       // the browser reconnects with Last-Event-ID, but a repeat must never show twice
       setEvents((all) => (all.some((x) => x.sequence === e.sequence) ? all : [...all, e]))
-      // the extracted fields live in the claim: reload it when a document was read
-      if (e.stage === 'extract_document')
+      // the fields, signals and outcome live in the claim: reload it when one of them changed
+      if (RELOAD.includes(e.stage))
         void fetch(`/claims/${claimId}`)
-          .then((r) => r.json() as Promise<{ documents: Doc[] }>)
-          .then((c) => setDocs(c.documents))
+          .then((r) => r.json() as Promise<PipelineClaim>)
+          .then(setClaim)
           .catch(() => undefined)
     }
     return () => source.close()
@@ -45,45 +46,17 @@ function Events({ claimId }: { claimId: string | null }) {
     end.current?.scrollIntoView?.({ block: 'end' }) // no return: an effect must return a function or nothing
   }, [events])
 
+  // the checks ran when their event arrived without an error
+  const checksRan = events.some((e) => e.stage === 'run_checks' && !(e.outputs as { error?: string }).error)
+
   return (
     <section className="card panel panel-pipeline" aria-label="Pipeline">
       <h2>Pipeline</h2>
       {claimId && <p className="mono">Claim {claimId}</p>}
-      {docs.length > 0 && (
-        <div className="stack" aria-label="Extracted data">
-          <h3>Extracted data</h3>
-          {docs.map((d) => (
-            <div className="card" key={d.id}>
-              <p>
-                <span className="mono">{d.file_metadata.original_name || d.file}</span>{' '}
-                <span className="pill pill-idle">{d.document_type}</span>
-              </p>
-              {d.fields.length === 0 ? (
-                <p className="muted">No field read.</p>
-              ) : (
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Field</th>
-                      <th>Value</th>
-                      <th>Source</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {d.fields.map((f) => (
-                      <tr key={f.name}>
-                        <td>{f.name}</td>
-                        <td className="mono">{String(f.value)}</td>
-                        <td className="muted">{`page ${f.source.page} · “${f.source.snippet ?? ''}”`}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+      {claim && <OutcomeSection claim={claim} />}
+      {claim && <ChecksSection claim={claim} ran={checksRan} />}
+      {claim && <ExtractedSection docs={claim.documents} />}
+      <h3>Events</h3>
       {events.length === 0 ? (
         <p className="muted">No event yet. Start a claim in the customer panel.</p>
       ) : (

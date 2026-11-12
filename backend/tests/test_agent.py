@@ -51,7 +51,7 @@ def test_policy_gives_a_greeting_that_names_the_policy(client: TestClient) -> No
     assert state(client, cid) == "ask_story"
 
 
-def test_claim_file_1_ends_in_ready_for_checks(client: TestClient) -> None:
+def test_claim_file_1_ends_closed_with_the_result(client: TestClient) -> None:
     cid = start(client)
     assert "date" in say(client, cid, "My trip was cancelled because I was ill.")
     assert state(client, cid) == "ask_date"
@@ -73,9 +73,12 @@ def test_claim_file_1_ends_in_ready_for_checks(client: TestClient) -> None:
         if i < 2:
             assert state(client, cid) == "ask_documents"
             assert "still" in last[-1]["text"].lower()
+        else:
+            assert "validated" in last[-1]["text"]
 
     claim = client.get(f"/claims/{cid}").json()
-    assert claim["agent_state"] == "ready_for_checks"
+    assert claim["agent_state"] == "closed"
+    assert "validated" in last[-1]["text"]
     assert claim["cause"] == "illness"
     assert claim["incident_date"] == "2026-08-03" and claim["claimed_amount"] == 1500
     assert [d["document_type"] for d in claim["documents"]] == [
@@ -166,8 +169,9 @@ def test_unknown_document_is_not_counted(client: TestClient) -> None:
 def test_done_goes_on_with_documents_missing(client: TestClient) -> None:
     cid = start(client)
     say(client, cid, "The trip was cancelled on 3 August 2026, I claim CHF 900")
-    say(client, cid, "Done.")
-    assert state(client, cid) == "ready_for_checks"
+    reply = say(client, cid, "Done.")
+    assert state(client, cid) == "closed"
+    assert "claims specialist will review your case" in reply
 
 
 def test_messages_errors(client: TestClient) -> None:
@@ -232,3 +236,9 @@ def test_every_data_access_is_a_gateway_event(
     assert [e.stage for e in events if e.actor == "tool"] == calls
     assert {"get_claim_summary", "update_claim", "required_documents"} <= set(calls)
     assert {"classify_document", "extract_document"} <= set(calls)
+    assert calls[-4:] == [
+        "update_claim",  # ready_for_checks
+        "run_checks",
+        "assess_and_route",
+        "update_claim",  # closed
+    ]

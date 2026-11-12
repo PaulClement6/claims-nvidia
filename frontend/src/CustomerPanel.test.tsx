@@ -7,6 +7,8 @@ afterEach(() => vi.unstubAllGlobals())
 
 const policy = (number: string, line: string) => ({ number, line_of_business: line })
 
+// what the customer endpoint gives: nothing else
+const view = (policy_number: string | null) => ({ claim_id: 'CL-1', policy_number, status: 'open', message: null })
 const claim = (policy: { number: string } | null, type: string | null = null) => ({
   id: 'CL-1',
   type,
@@ -16,13 +18,15 @@ const claim = (policy: { number: string } | null, type: string | null = null) =>
 
 test('pick an account to create the claim, then pick a policy to set it', async () => {
   let current = claim(null)
+  let picked = false
   const fetchMock = vi.fn((url: string, init?: RequestInit) => {
     if (url === '/customers') return Promise.resolve(Response.json([{ id: 'C-1001', name: 'Anna Keller' }]))
     if (url === '/claims' && init?.method === 'POST') return Promise.resolve(Response.json(current, { status: 201 }))
-    if (url === '/claims/CL-1' && !init) return Promise.resolve(Response.json(current))
+    if (url === '/claims/CL-1/customer') return Promise.resolve(Response.json(view(picked ? 'TRV-2026-0417' : null)))
     if (url === '/claims/CL-1/policies')
       return Promise.resolve(Response.json([policy('TRV-2026-0417', 'Travel'), policy('HH-2025-1182', 'Household')]))
     if (url === '/claims/CL-1/policy' && init?.method === 'PUT') {
+      picked = true
       current = claim({ number: 'TRV-2026-0417' }, 'travel')
       return Promise.resolve(Response.json(current))
     }
@@ -45,7 +49,7 @@ test('pick an account to create the claim, then pick a policy to set it', async 
   expect(screen.queryByRole('button', { name: /HH-2025-1182/ })).not.toBeInTheDocument()
 
   fireEvent.click(screen.getByRole('button', { name: /TRV-2026-0417/ }))
-  expect(await screen.findByText('Claim CL-1 · TRV-2026-0417 · travel')).toBeInTheDocument()
+  expect(await screen.findByText('Claim CL-1 · TRV-2026-0417')).toBeInTheDocument()
   const put = fetchMock.mock.calls.find(([, i]) => i?.method === 'PUT')![1]!
   expect(JSON.parse(put.body as string)).toEqual({ policy_number: 'TRV-2026-0417' })
 })
@@ -54,8 +58,8 @@ const withChat = (extra?: (url: string, init?: RequestInit) => Response | undefi
   vi.fn((url: string, init?: RequestInit) =>
     Promise.resolve(
       extra?.(url, init) ??
-        (url === '/claims/CL-1'
-          ? Response.json(claim({ number: 'TRV-2026-0417' }, 'travel'))
+        (url === '/claims/CL-1/customer'
+          ? Response.json(view('TRV-2026-0417'))
           : url === '/claims/CL-1/messages'
             ? Response.json([{ role: 'agent', text: 'Hello. What happened?', time: '2026-11-12T10:00:00Z' }])
             : Response.json([])),
@@ -65,7 +69,7 @@ const withChat = (extra?: (url: string, init?: RequestInit) => Response | undefi
 test('shows the claim line, the notice and the greeting once the claim has a policy', async () => {
   vi.stubGlobal('fetch', withChat())
   render(<CustomerPanel claimId="CL-1" onClaim={() => {}} />)
-  expect(await screen.findByText('Claim CL-1 · TRV-2026-0417 · travel')).toBeInTheDocument()
+  expect(await screen.findByText('Claim CL-1 · TRV-2026-0417')).toBeInTheDocument()
   expect(await screen.findByText('Hello. What happened?')).toHaveClass('bubble-agent')
   expect(screen.getByText('Demo. Do not upload a real document.')).toBeInTheDocument()
 })
@@ -123,4 +127,23 @@ test('uploads a file with the button and with drag and drop', async () => {
   expect(posts.map(([u]) => u)).toEqual(['/claims/CL-1/documents', '/claims/CL-1/documents'])
   expect((posts[0][1]!.body as FormData).get('file')).toBe(file)
   expect((posts[1][1]!.body as FormData).get('file')).toBe(second)
+})
+
+test('the customer panel never asks for the pipeline view or the events', async () => {
+  const fetchMock = withChat((_, init) => (init?.method === 'POST' ? Response.json({ id: 'D-1' }, { status: 201 }) : undefined))
+  vi.stubGlobal('fetch', fetchMock)
+  render(<CustomerPanel claimId="CL-1" onClaim={() => {}} />)
+  const input = await screen.findByRole('textbox', { name: 'Message' })
+  fireEvent.change(input, { target: { value: 'I was ill' } })
+  fireEvent.submit(input.closest('form')!)
+  await vi.waitFor(() => expect(input).toBeEnabled())
+  fireEvent.change(screen.getByLabelText('Upload a document'), {
+    target: { files: [new File(['%PDF-'], 'a.pdf', { type: 'application/pdf' })] },
+  })
+  await vi.waitFor(() => expect(input).toBeEnabled())
+
+  const urls = fetchMock.mock.calls.map(([u]) => u)
+  expect(urls).toContain('/claims/CL-1/customer')
+  expect(urls).toContain('/claims/CL-1/messages')
+  expect(urls.filter((u) => /^\/claims\/[^/]+$/.test(u) || u.endsWith('/events'))).toEqual([])
 })

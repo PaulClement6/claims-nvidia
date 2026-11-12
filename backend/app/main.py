@@ -1,7 +1,8 @@
 import os
+import threading
 import uuid
-from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
+from collections.abc import AsyncIterator, Iterator
+from contextlib import asynccontextmanager, contextmanager
 from io import BytesIO
 from pathlib import Path
 
@@ -19,7 +20,9 @@ from app.tools import claims as claims_tool
 from app.tools import documents as documents_tool
 from app.tools import policies as policies_tool
 from app.tools import requirements as requirements_tool
+from app.tools import routing as routing_tool
 from app.tools.gateway import Gateway
+from app.views import CustomerView, customer_view
 
 MAX_UPLOAD = 10 * 1024 * 1024
 # magic bytes -> extension; the client file name and content type are never trusted
@@ -48,10 +51,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     documents_tool.register(gateway, reader, uploads)
     claims_tool.register(gateway)
     requirements_tool.register(gateway)
+    routing_tool.register(gateway)
     app.state.agent = ScriptedAgent(gateway)
     app.state.uploads = uploads
     app.state.store = store
     app.state.gateway = gateway
+    app.state.locks = {}
     yield
 
 
@@ -67,6 +72,16 @@ def create_app() -> FastAPI:
         if claim is None:
             raise HTTPException(404, "unknown claim")
         return claim
+
+    @contextmanager
+    def claim_lock(request: Request, claim_id: str) -> Iterator[None]:
+        """One turn at a time per claim: a message, an upload or a policy change.
+
+        ponytail: one lock per claim id, never freed (a few bytes per claim).
+        """
+        locks: dict[str, threading.Lock] = request.app.state.locks
+        with locks.setdefault(claim_id, threading.Lock()):
+            yield
 
     def run_agent(
         request: Request, claim_id: str, text: str | None, document_id: str | None
@@ -98,7 +113,12 @@ def create_app() -> FastAPI:
 
     @app.get("/claims/{claim_id}")
     def get_claim(claim_id: str, request: Request) -> Claim:
+        """The pipeline view: everything. The customer panel never calls it."""
         return claim_or_404(request, claim_id)
+
+    @app.get("/claims/{claim_id}/customer")
+    def get_customer_view(claim_id: str, request: Request) -> CustomerView:
+        return customer_view(claim_or_404(request, claim_id))
 
     @app.get("/claims/{claim_id}/policies")
     def claim_policies(claim_id: str, request: Request) -> list[Policy]:
@@ -112,13 +132,14 @@ def create_app() -> FastAPI:
     @app.put("/claims/{claim_id}/policy")
     def set_policy(claim_id: str, body: ClaimPolicy, request: Request) -> Claim:
         claim_or_404(request, claim_id)
-        claim = store(request).set_claim_policy(claim_id, body.policy_number)
-        if claim is None:
-            raise HTTPException(404, "policy not found for this customer")
-        if not store(request).get_messages(claim_id):
-            run_agent(request, claim_id, None, None)  # the greeting
-            claim = claim_or_404(request, claim_id)
-        return claim
+        with claim_lock(request, claim_id):
+            claim = store(request).set_claim_policy(claim_id, body.policy_number)
+            if claim is None:
+                raise HTTPException(404, "policy not found for this customer")
+            if not store(request).get_messages(claim_id):
+                run_agent(request, claim_id, None, None)  # the greeting
+                claim = claim_or_404(request, claim_id)
+            return claim
 
     @app.get("/claims/{claim_id}/messages")
     def get_messages(claim_id: str, request: Request) -> list[Message]:
@@ -129,13 +150,14 @@ def create_app() -> FastAPI:
     def post_message(
         claim_id: str, body: NewMessage, request: Request
     ) -> list[Message]:
-        if claim_or_404(request, claim_id).policy is None:
-            raise HTTPException(409, "pick a policy first")
-        text = body.text.strip()
-        if not text:
-            raise HTTPException(422, "empty message")
-        store(request).add_message(claim_id, "customer", text)
-        return run_agent(request, claim_id, text, None)
+        with claim_lock(request, claim_id):
+            if claim_or_404(request, claim_id).policy is None:
+                raise HTTPException(409, "pick a policy first")
+            text = body.text.strip()
+            if not text:
+                raise HTTPException(422, "empty message")
+            store(request).add_message(claim_id, "customer", text)
+            return run_agent(request, claim_id, text, None)
 
     @app.post("/claims/{claim_id}/documents", status_code=201)
     def upload_document(claim_id: str, request: Request, file: UploadFile) -> Document:
@@ -159,15 +181,18 @@ def create_app() -> FastAPI:
             pages=pages,
             file_metadata={"original_name": (file.filename or "")[:200]},
         )
-        path: Path = request.app.state.uploads / doc.file
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(data)
-        store(request).save_document(claim_id, doc)
-        name = doc.file_metadata["original_name"] or "a file"
-        store(request).add_message(claim_id, "customer", f"Uploaded {name}")
-        run_agent(request, claim_id, None, doc.id)
-        found = store(request).find_document(doc.id)
-        return found[1] if found else doc
+        with claim_lock(request, claim_id):
+            if claim_or_404(request, claim_id).agent_state == "closed":
+                raise HTTPException(409, "the claim is closed")
+            path: Path = request.app.state.uploads / doc.file
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(data)
+            store(request).save_document(claim_id, doc)
+            name = doc.file_metadata["original_name"] or "a file"
+            store(request).add_message(claim_id, "customer", f"Uploaded {name}")
+            run_agent(request, claim_id, None, doc.id)
+            found = store(request).find_document(doc.id)
+            return found[1] if found else doc
 
     @app.get("/claims/{claim_id}/events")
     def events(

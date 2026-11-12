@@ -25,6 +25,8 @@ beforeEach(() => {
 })
 afterEach(() => vi.unstubAllGlobals())
 
+const emptyClaim = { documents: [], signals: [], score: null, outcome: null, outcome_reasons: [] }
+
 const event = (sequence: number, extra = {}) => ({
   sequence,
   time: '2026-11-12T10:00:00Z',
@@ -95,7 +97,7 @@ test('reloads the claim on an extract_document event and shows fields with their
     file_metadata: { original_name: 'booking.pdf' },
     fields: [{ name: 'trip_price', value: 1840, source: { document_id: 'D-1', page: 1, snippet: 'CHF 1,840.00' } }],
   }
-  const fetchMock = vi.fn(() => Promise.resolve(Response.json({ documents: [doc] })))
+  const fetchMock = vi.fn(() => Promise.resolve(Response.json({ ...emptyClaim, documents: [doc] })))
   vi.stubGlobal('fetch', fetchMock)
   render(<PipelinePanel claimId="CL-1" />)
 
@@ -109,4 +111,91 @@ test('reloads the claim on an extract_document event and shows fields with their
   expect(screen.getByText('trip_price')).toBeInTheDocument()
   expect(screen.getByText('1840')).toBeInTheDocument()
   expect(screen.getByText('page 1 · “CHF 1,840.00”')).toBeInTheDocument()
+})
+
+const booking = {
+  id: 'D-1',
+  file: 'CL-1/D-1.pdf',
+  document_type: 'booking_confirmation',
+  file_metadata: { original_name: 'booking-confirmation.pdf' },
+  fields: [],
+}
+const c003 = {
+  code: 'C003',
+  title: 'Claimed amount differs from the documented amount',
+  severity: 'medium',
+  points: 15,
+  detail: 'Claimed CHF 1800',
+  evidence: [{ document_id: 'D-1', page: 1, snippet: 'CHF 1,840.00' }],
+}
+const r001 = { ...c003, code: 'R001', title: 'A required document is missing', severity: 'low', points: 25, detail: 'Missing: a medical certificate.', evidence: [] }
+
+const serve = (claim: object) => {
+  const fetchMock = vi.fn(() => Promise.resolve(Response.json(claim)))
+  vi.stubGlobal('fetch', fetchMock)
+  return fetchMock
+}
+
+test('shows no checks and no outcome before the checks ran, and no fetch for other events', () => {
+  const fetchMock = serve(emptyClaim)
+  render(<PipelinePanel claimId="CL-1" />)
+  FakeEventSource.all[0].emit(event(1, { stage: 'get_claim_summary' }))
+  expect(fetchMock).not.toHaveBeenCalled()
+  expect(screen.queryByText('Checks and signals')).not.toBeInTheDocument()
+  expect(screen.queryByText('Outcome')).not.toBeInTheDocument()
+})
+
+test('a run_checks event loads the claim and shows the signals with their evidence', async () => {
+  const fetchMock = serve({ ...emptyClaim, documents: [booking], signals: [c003, r001] })
+  render(<PipelinePanel claimId="CL-1" />)
+  FakeEventSource.all[0].emit(event(1, { stage: 'run_checks' }))
+
+  expect(await screen.findByText('Checks and signals')).toBeInTheDocument()
+  expect(fetchMock).toHaveBeenCalledWith('/claims/CL-1')
+  const rows = screen.getAllByRole('row').map((r) => r.textContent)
+  expect(rows[1]).toContain('C003')
+  expect(rows[1]).toContain('Claimed amount differs from the documented amount')
+  expect(rows[1]).toContain('medium')
+  expect(rows[1]).toContain('15')
+  expect(rows[1]).toContain('booking-confirmation.pdf · page 1')
+  // R001 has no page: its detail names the missing document
+  expect(rows[2]).toContain('A required document is missing')
+  expect(rows[2]).toContain('Missing: a medical certificate.')
+  expect(screen.getByText('medium')).toHaveClass('pill-warn')
+  expect(screen.getByText('low')).toHaveClass('pill-idle')
+})
+
+test('checks that ran clean show "No signal."', async () => {
+  serve(emptyClaim)
+  render(<PipelinePanel claimId="CL-1" />)
+  FakeEventSource.all[0].emit(event(1, { stage: 'run_checks' }))
+  expect(await screen.findByText('No signal.')).toBeInTheDocument()
+})
+
+test.each([
+  ['straight_through', 'pill-ok'],
+  ['handler_review', 'pill-warn'],
+  ['investigation', 'pill-bad'],
+])('an assess_and_route event shows the score, the %s pill and the reasons', async (outcome, pill) => {
+  serve({ ...emptyClaim, score: 65, outcome, outcome_reasons: ['Score 65 is 60 or more.', 'A required document is missing.'] })
+  render(<PipelinePanel claimId="CL-1" />)
+  FakeEventSource.all[0].emit(event(1, { stage: 'assess_and_route' }))
+
+  expect(await screen.findByRole('heading', { name: 'Outcome' })).toBeInTheDocument()
+  expect(screen.getByText('Score 65')).toBeInTheDocument()
+  expect(screen.getByText(outcome)).toHaveClass(pill)
+  expect(screen.getAllByRole('listitem').map((l) => l.textContent)).toEqual(
+    expect.arrayContaining(['Score 65 is 60 or more.', 'A required document is missing.']),
+  )
+})
+
+test('the sections come in the order Outcome, Checks and signals, Extracted data, Events', async () => {
+  serve({ ...emptyClaim, documents: [{ ...booking, fields: [{ name: 'trip_price', value: 1, source: { page: 1, snippet: 'x' } }] }], signals: [c003], score: 15, outcome: 'straight_through' })
+  render(<PipelinePanel claimId="CL-1" />)
+  FakeEventSource.all[0].emit(event(1, { stage: 'extract_document' }))
+  FakeEventSource.all[0].emit(event(2, { stage: 'run_checks' }))
+  FakeEventSource.all[0].emit(event(3, { stage: 'assess_and_route' }))
+  await screen.findByText('Checks and signals')
+  const heads = screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)
+  expect(heads).toEqual(['Outcome', 'Checks and signals', 'Extracted data', 'Events'])
 })
