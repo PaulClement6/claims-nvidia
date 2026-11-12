@@ -4,7 +4,15 @@ import { json, send } from './api'
 
 type Message = { role: 'customer' | 'agent'; text: string; time: string }
 
-type KitFile = { folder: string; file: string; document_type: string | null; size: number }
+type Sample = { folder: string; file: string; document_type: string | null }
+type Hard = Sample & { variant: string }
+type Case = {
+  folder: string
+  title: string
+  stories: { text: string }[]
+  documents: (Sample & { hard: Hard[] })[]
+}
+const VARIANT: Record<string, string> = { scan: 'scan', photo: 'phone photo' }
 
 const uploadError = (e: Error) =>
   e.message === '415' ? 'Only PDF, PNG or JPEG files.' : e.message === '413' ? 'The file is larger than 10 MB.' : 'The upload failed.'
@@ -29,13 +37,15 @@ export function Typing() {
 const BEFORE_DOCUMENTS = ['ask_story', 'ask_date', 'ask_amount']
 const DONE_HELP = 'Press Done when you have uploaded your documents.'
 
-export default function Chat({ claimId }: { claimId: string }) {
+export default function Chat({ claimId, policy }: { claimId: string; policy: string }) {
   const [messages, setMessages] = useState<Message[]>([])
   const [text, setText] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [over, setOver] = useState(false)
-  const [kit, setKit] = useState<KitFile[] | null>(null) // null: list closed
+  const [cases, setCases] = useState<Case[]>([])
+  const [open, setOpen] = useState(false)
+  const [sent, setSent] = useState<string[]>([]) // sample documents uploaded in this claim
   const [step, setStep] = useState('') // the chat step of the customer view; Done needs it
   const list = useRef<HTMLDivElement>(null)
   const field = useRef<HTMLInputElement>(null)
@@ -51,6 +61,11 @@ export default function Chat({ claimId }: { claimId: string }) {
       .catch(() => undefined)
   }, [claimId])
   useEffect(() => {
+    send<Case[]>(`/demo/scenarios?policy=${encodeURIComponent(policy)}`)
+      .then(setCases)
+      .catch(() => setCases([]))
+  }, [policy])
+  useEffect(() => {
     if (list.current) list.current.scrollTop = list.current.scrollHeight
   }, [messages, busy])
   useEffect(() => {
@@ -62,9 +77,11 @@ export default function Chat({ claimId }: { claimId: string }) {
     setBusy(true)
     setError('')
     setMessages((m) => [...m, { role: 'customer', text: shown, time: new Date().toISOString() }])
+    let ok = true
     try {
       await request
     } catch (e) {
+      ok = false
       setError(failed(e as Error))
     }
     try {
@@ -74,6 +91,7 @@ export default function Chat({ claimId }: { claimId: string }) {
       setError('The server did not answer.')
     }
     setBusy(false)
+    return ok
   }
 
   const say = (t: string) =>
@@ -87,25 +105,17 @@ export default function Chat({ claimId }: { claimId: string }) {
   }
 
   const upload = (file: File | undefined) => {
-    if (!file || busy) return
+    if (!file || busy) return Promise.resolve(false)
     const body = new FormData()
     body.append('file', file)
-    void run(send(`/claims/${claimId}/documents`, { method: 'POST', body }), `Uploaded ${file.name}`, uploadError)
+    return run(send(`/claims/${claimId}/documents`, { method: 'POST', body }), `Uploaded ${file.name}`, uploadError)
   }
 
-  const openKit = () =>
-    kit
-      ? setKit(null)
-      : void send<KitFile[]>('/demo/kit')
-          .then(setKit)
-          .catch(() => setError('The sample documents did not load.'))
-
   // the sample goes through the normal upload endpoint, like a file from the device
-  const pickSample = async (f: KitFile) => {
-    setKit(null)
+  const pickSample = async (f: Sample) => {
     try {
       const blob = await fetch(`/demo/kit/${f.folder}/${f.file}`).then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
-      upload(new File([blob], f.file, { type: blob.type }))
+      if (await upload(new File([blob], f.file, { type: blob.type }))) setSent((s) => [...s, `${f.folder}/${f.file}`])
     } catch {
       setError('The sample document did not load.')
     }
@@ -116,6 +126,19 @@ export default function Chat({ claimId }: { claimId: string }) {
     setOver(false)
     upload(e.dataTransfer.files[0])
   }
+
+  const putStory = (t: string) => {
+    setText(t)
+    field.current?.focus()
+  }
+  const locked = busy || step === 'closed'
+  const sample = (f: Sample, className?: string, label?: string) => (
+    <button key={`${f.folder}/${f.file}`} type="button" className={className} disabled={locked} onClick={() => void pickSample(f)}>
+      {sent.includes(`${f.folder}/${f.file}`) && <span aria-label="uploaded">✓ </span>}
+      {label ?? f.file}
+      {!className && <span className="pill pill-idle">{f.document_type ?? 'document'}</span>}
+    </button>
+  )
 
   const before = BEFORE_DOCUMENTS.includes(step) // Done does not work yet: say when it will
 
@@ -163,9 +186,6 @@ export default function Chat({ claimId }: { claimId: string }) {
             }}
           />
         </label>
-        <button type="button" disabled={busy} aria-expanded={kit !== null} onClick={openKit}>
-          Use a sample document
-        </button>
         <button
           type="button"
           disabled={busy || step !== 'ask_documents'}
@@ -181,20 +201,34 @@ export default function Chat({ claimId }: { claimId: string }) {
           </p>
         )}
       </form>
-      {kit && (
-        <div className="stack" role="group" aria-label="Sample documents">
-          {[...new Set(kit.map((f) => f.folder))].map((folder) => (
-            <div key={folder}>
-              <h3>{folder}</h3>
-              {kit
-                .filter((f) => f.folder === folder)
-                .map((f) => (
-                  <button key={f.file} type="button" disabled={busy} onClick={() => void pickSample(f)}>
-                    {f.file} · {f.document_type ?? 'document'} · {Math.max(1, Math.round(f.size / 1024))} KB
-                  </button>
-                ))}
+      {cases.length > 0 && (
+        <div className="cases">
+          <button type="button" aria-expanded={open} onClick={() => setOpen(!open)}>
+            Sample cases ({cases.length})
+          </button>
+          {open && (
+            <div className="cases-list" role="group" aria-label="Sample cases">
+              {cases.map((c) => (
+                <div key={c.folder} className="card case">
+                  <h3>{c.title}</h3>
+                  {c.stories.map((st) => (
+                    <blockquote key={st.text}>
+                      {st.text}
+                      <button type="button" onClick={() => putStory(st.text)}>
+                        Use this text
+                      </button>
+                    </blockquote>
+                  ))}
+                  {c.documents.map((d) => (
+                    <div key={d.file} className="case-doc">
+                      {sample({ ...d, folder: c.folder })}
+                      {d.hard.map((h) => sample(h, 'case-hard', VARIANT[h.variant] ?? h.variant))}
+                    </div>
+                  ))}
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
       )}
       <p className="muted">Drop a PDF, PNG or JPEG here, or press Upload.</p>

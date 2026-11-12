@@ -100,3 +100,34 @@ def test_kit_serves_listed_files_only(client: TestClient) -> None:
         "/demo/kit/claim-1-travel/nope.pdf",
     ):
         assert client.get(bad).status_code == 404
+
+
+def test_scenarios_of_a_policy_for_the_customer_panel(client: TestClient) -> None:
+    rows = client.get("/demo/scenarios", params={"policy": "HH-2024-0933"}).json()
+    assert {r["folder"] for r in rows} == {"claim-2-property", "kit-marco-bathroom"}
+    row = next(r for r in rows if r["folder"] == "claim-2-property")
+    assert set(row) == {"folder", "title", "stories", "documents"}
+    assert all(set(s) == {"text"} for s in row["stories"])
+    invoice = next(d for d in row["documents"] if d["file"] == "repair-invoice.pdf")
+    assert invoice["document_type"] == "repair_invoice"
+    assert {h["variant"] for h in invoice["hard"]} == {"scan", "photo"}
+    assert all(h["folder"] == "hard" for h in invoice["hard"])
+    assert client.get("/demo/scenarios", params={"policy": "NONE"}).json() == []
+
+
+# non-negotiable 2: the customer panel reads these two endpoints
+FORBIDDEN = re.compile(
+    r"straight_through|handler_review|investigat|[CRT]\d{3}\b|signal|fraud|tamper|inflated",
+    re.IGNORECASE,
+)
+
+
+def test_customer_endpoints_hold_no_expected_result(client: TestClient) -> None:
+    index = json.loads((demo._data() / "mock" / "index.json").read_text())
+    policies = {s["policy"] for s in index["scenarios"]}
+    bodies = [client.get("/demo/kit").text] + [
+        client.get("/demo/scenarios", params={"policy": p}).text for p in policies
+    ]
+    assert len(policies) >= 6
+    for body in bodies:
+        assert FORBIDDEN.search(body) is None

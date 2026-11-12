@@ -76,6 +76,42 @@ def kit() -> list[dict[str, object]]:
     return out
 
 
+@router.get("/scenarios")
+def scenarios(policy: str) -> list[dict[str, object]]:
+    """The sample cases of one policy for the customer panel: titles, stories (text
+    only) and documents. No signal, no outcome, no cause: the customer must not see
+    what the checks find."""
+    index = _index()
+    hard: dict[str, list[dict[str, str]]] = {}
+    for h in index.get("hard", []):
+        folder, name = h["file"].split("/", 1)
+        hard.setdefault(h["source_document"], []).append(
+            {
+                "folder": folder,
+                "file": name,
+                "document_type": h["document_type"],
+                "variant": h["variant"],
+            }
+        )
+    return [
+        {
+            "folder": s["folder"],
+            "title": s["title"],
+            "stories": [{"text": st["text"]} for st in s["stories"]],
+            "documents": [
+                {
+                    "file": d["file"],
+                    "document_type": d["document_type"],
+                    "hard": hard.get(f"{s['folder']}/{d['file']}", []),
+                }
+                for d in s["documents"]
+            ],
+        }
+        for s in index.get("scenarios", [])
+        if s["policy"] == policy
+    ]
+
+
 @router.get("/kit/{folder}/{file}")
 def kit_file(folder: str, file: str) -> FileResponse:
     # the path comes from the listing, never from the request

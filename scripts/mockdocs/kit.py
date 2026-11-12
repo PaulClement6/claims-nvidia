@@ -186,7 +186,7 @@ SCENARIOS = [
         ],
     ),
     Scenario(
-        "kit-marco-inflated",
+        "kit-marco-bathroom",
         "C-1002",
         "HH-2024-0933",
         "Bathroom flooded by a leaking pipe",

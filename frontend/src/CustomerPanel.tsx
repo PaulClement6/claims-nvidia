@@ -84,7 +84,7 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
       ) : claim?.policy_number ? (
         <>
           <p className="mono">{`Claim ${claim.claim_id} · ${claim.policy_number}`}</p>
-          <Chat claimId={claim.claim_id} />
+          <Chat claimId={claim.claim_id} policy={claim.policy_number} />
         </>
       ) : claim && starting ? (
         <div className="chat-list" role="log" aria-label="Conversation">
