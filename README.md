@@ -18,6 +18,18 @@ The system never rejects a claim. A claim has three possible outcomes:
    `cd frontend && npm install && npm run dev`
 3. Open http://localhost:5173.
 
+## Run it in `sandbox` mode
+
+`sandbox` mode runs the same agent graph in an OpenShell sandbox, one per claim. It needs OpenShell 0.1.5 with a connected gateway, Docker (Colima on a Mac), and `NVIDIA_KEY` in `.env`.
+
+1. Once: `infra/sandbox/setup.sh`. It builds the image `claims-agent:1`, and creates the provider `claims-nim` that holds the key. The key never enters a sandbox.
+2. Start the backend on the loopback, with the model settings of `.env`:
+   `cd backend && CLAIMS_MODE=sandbox BACKEND_PORT=8000 uv run uvicorn app.main:app --host 127.0.0.1 --port 8000`
+   (`BACKEND_PORT` must be the port of uvicorn: the sandbox reaches the backend as `host.openshell.internal:<port>`.)
+3. Start the frontend as in `local` mode. The pipeline panel shows the `sandbox` events: created, each turn with its seconds, deleted.
+
+If a piece is missing, the backend stops at startup and names `infra/sandbox/setup.sh`. The demo reset deletes the sandboxes of this app. The tests that need OpenShell: `cd backend && uv run pytest -m sandbox` (the three claim files with the real model, and the confinement checks).
+
 Checks (run each one before you open a pull request):
 
 | Check | Backend (`cd backend`) | Frontend (`cd frontend`) |
