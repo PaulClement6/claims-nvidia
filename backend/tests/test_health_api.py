@@ -69,10 +69,12 @@ def test_every_signal_of_claim_file_3_has_a_document_and_page_as_evidence(
     c = claim(client, run_claim(client))
     names = {d["id"]: d["file_metadata"]["original_name"] for d in c["documents"]}
     by_code = {s["code"]: s for s in c["signals"]}
-    for code in ("R005", "T001", "T002", "T003", "C001"):
+    for code in ("R004", "R005", "T001", "T002", "T003", "C001"):
         [e] = by_code[code]["evidence"]
         assert names[e["document_id"]] == "medical-invoice.pdf" and e["page"] == 1
-    assert by_code["R003"]["evidence"] == by_code["R004"]["evidence"] == []
+    # R003: the report holds the incident date; R004: the invoice holds the total
+    [e] = by_code["R003"]["evidence"]
+    assert names[e["document_id"]] == "medical-report.pdf" and e["page"] == 1
 
 
 def test_the_customer_gets_the_review_text_and_nothing_else(client: TestClient) -> None:
@@ -88,10 +90,11 @@ def test_the_two_new_checks_are_two_events_between_the_checks_and_the_routing(
     events = client.app.state.store.events_since(cid, 0)  # type: ignore[attr-defined]
     stages = [e.stage for e in events if e.actor == "tool"]
     tail = stages[stages.index("run_checks") :]
-    assert tail[:4] == [
+    assert tail[:5] == [
         "run_checks",
         "check_tampering",
         "check_consistency",
+        "write_fraud_report",  # nested in the routing: its event is written first
         "assess_and_route",
     ]
     for name in ("check_tampering", "check_consistency"):

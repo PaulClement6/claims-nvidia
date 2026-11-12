@@ -1,19 +1,78 @@
-// The claim sections of the pipeline panel: outcome, checks and signals, extracted data.
+// The claim sections of the pipeline panel: fraud report, outcome, checks and signals, extracted data.
 
 export type Source = { document_id: string; page: number; snippet: string | null }
 export type Field = { name: string; value: unknown; source: { page: number; snippet: string | null; box?: number[] | null } }
 export type Doc = { id: string; file: string; document_type: string; fields: Field[]; file_metadata: { original_name?: string } }
 export type Signal = { code: string; title: string; severity: string; points: number; detail: string; evidence: Source[] }
+export type Finding = { code: string; title: string; saw: string; where: string[]; expected: string }
+export type FraudReport = {
+  outcome: string
+  score: number
+  summary: string
+  findings: Finding[]
+  not_checked: string[]
+  next_steps: string[]
+}
 export type PipelineClaim = {
   documents: Doc[]
   signals: Signal[]
   score: number | null
   outcome: string | null
   outcome_reasons: string[]
+  fraud_report?: FraudReport | null
 }
 
 const OUTCOME_PILL: Record<string, string> = { straight_through: 'pill-ok', handler_review: 'pill-warn', investigation: 'pill-bad' }
 const SEVERITY_PILL: Record<string, string> = { low: 'pill-idle', medium: 'pill-warn', high: 'pill-bad' }
+
+// Shown only when a report exists (outcome investigation). Readable in one minute.
+export function FraudReportSection({ report }: { report: FraudReport }) {
+  return (
+    <div className="stack" aria-label="Fraud report">
+      <h3>Fraud report</h3>
+      <p>
+        <span className="pill pill-bad">{`${report.outcome} · score ${report.score}`}</span>
+      </p>
+      <p className="report-summary">{report.summary}</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>What the system saw</th>
+            <th>Where</th>
+            <th>Expected</th>
+          </tr>
+        </thead>
+        <tbody>
+          {report.findings.map((f) => (
+            <tr key={f.code}>
+              <td className="mono">{f.code}</td>
+              <td>{f.saw}</td>
+              <td className="muted">
+                {f.where.map((w) => (
+                  <div key={w}>{w}</div>
+                ))}
+              </td>
+              <td className="muted">{f.expected}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <h4>Not checked</h4>
+      <ul>
+        {report.not_checked.map((t) => (
+          <li key={t}>{t}</li>
+        ))}
+      </ul>
+      <h4>Next steps</h4>
+      <ul>
+        {report.next_steps.map((t) => (
+          <li key={t}>{t}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 export function OutcomeSection({ claim }: { claim: PipelineClaim }) {
   if (!claim.outcome) return null

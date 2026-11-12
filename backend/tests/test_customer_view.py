@@ -1,7 +1,16 @@
 """Non-negotiable 2: the customer never sees a score, a flag or the word "fraud"."""
 
+from collections.abc import Iterator
+from pathlib import Path
+from typing import Any
+
+import pytest
+from fastapi.testclient import TestClient
+
+from app.main import create_app
 from app.models import Claim, FraudReport, Outcome
 from app.views import CustomerView, customer_view
+from tests import test_health_api, test_property_api
 from tests.builders import signal, travel_claim
 
 VALIDATED = "Your claim is validated. You will receive a confirmation by e-mail."
@@ -15,7 +24,9 @@ def routed(outcome: Outcome | None) -> Claim:
         score=80,
         outcome=outcome,
         outcome_reasons=["Score 80 is 60 or more."],
-        fraud_report=FraudReport(summary="fraud: edited invoice", signals=signals),
+        fraud_report=FraudReport(
+            outcome=Outcome.investigation, score=80, summary="fraud: edited invoice"
+        ),
         status="in_review",
     )
 
@@ -57,3 +68,67 @@ def test_handler_review_and_investigation_give_the_same_text() -> None:
 def test_no_message_before_the_result() -> None:
     view = customer_view(travel_claim())
     assert view.message is None and view.status == "open"
+
+
+@pytest.fixture
+def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
+    monkeypatch.setenv("CLAIMS_DB", str(tmp_path / "claims.db"))
+    monkeypatch.setenv("CLAIMS_UPLOADS", str(tmp_path / "uploads"))
+    with TestClient(create_app()) as c:
+        yield c
+
+
+def customer_texts(client: TestClient, cid: str) -> list[str]:
+    """Every answer the customer panel can get for this claim."""
+    gateway_policies = client.get(f"/claims/{cid}/policies")
+    return [
+        client.get(f"/claims/{cid}/customer").text,
+        client.get(f"/claims/{cid}/messages").text,
+        client.put(
+            f"/claims/{cid}/policy", json={"policy_number": "ACC-2026-2210"}
+        ).text,
+        client.post(f"/claims/{cid}/messages", json={"text": "hello"}).text,
+        gateway_policies.text,
+    ]
+
+
+def test_the_customer_endpoints_of_claim_file_3_hold_nothing_of_the_report(
+    client: TestClient,
+) -> None:
+    cid = test_health_api.run_claim(client)
+    full: dict[str, Any] = client.get(f"/claims/{cid}").json()
+    assert full["fraud_report"] is not None  # the pipeline view has it
+    report = full["fraud_report"]
+    secrets = [
+        report["summary"],
+        *(f["saw"] for f in report["findings"]),
+        *(f["expected"] for f in report["findings"]),
+        *report["not_checked"],
+        *report["next_steps"],
+    ]
+    body = "\n".join(customer_texts(client, cid))
+    low = body.lower()
+    for text in secrets:
+        assert text not in body
+    for word in ("fraud", "score", "130", "signal", "finding", "evidence", "tamper",
+                 "investigation", "handler_review", "straight_through",
+                 "r003", "r004", "r005", "t001", "t002", "t003", "c001",
+                 "not_checked", "next_steps", "edited", "jonas"):  # fmt: skip
+        assert word not in low, word
+
+
+def test_the_customer_view_of_claim_file_3_equals_the_one_of_claim_file_2(
+    client: TestClient,
+) -> None:
+    two = test_property_api.run_claim(client)
+    three = test_health_api.run_claim(client)
+    a = client.get(f"/claims/{two}/customer").json()
+    b = client.get(f"/claims/{three}/customer").json()
+    assert a["message"] == REVIEW and a["status"] == "in_review"
+    ids = {"claim_id", "policy_number"}
+    assert {k: v for k, v in a.items() if k not in ids} == {
+        k: v for k, v in b.items() if k not in ids
+    }
+    assert (
+        a["policy_number"] == "HH-2024-0933" and b["policy_number"] == "ACC-2026-2210"
+    )

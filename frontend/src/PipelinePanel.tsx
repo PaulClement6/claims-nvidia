@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChecksSection, ExtractedSection, OutcomeSection } from './PipelineSections'
+import { ChecksSection, ExtractedSection, FraudReportSection, OutcomeSection } from './PipelineSections'
 import type { PipelineClaim } from './PipelineSections'
 
 type PipelineEvent = {
@@ -13,7 +13,7 @@ type PipelineEvent = {
   duration: number | null // seconds
 }
 
-const RELOAD = ['extract_document', 'run_checks', 'check_tampering', 'check_consistency', 'assess_and_route']
+const RELOAD = ['extract_document', 'run_checks', 'check_tampering', 'check_consistency', 'assess_and_route', 'write_fraud_report']
 
 // a new claim remounts the list, so the old events never show under it
 export default function PipelinePanel({ claimId }: { claimId: string | null }) {
@@ -53,6 +53,7 @@ function Events({ claimId }: { claimId: string | null }) {
     <section className="card panel panel-pipeline" aria-label="Pipeline">
       <h2>Pipeline</h2>
       {claimId && <p className="mono">Claim {claimId}</p>}
+      {claim?.fraud_report && <FraudReportSection report={claim.fraud_report} />}
       {claim && <OutcomeSection claim={claim} />}
       {claim && <ChecksSection claim={claim} ran={checksRan} />}
       {claim && <ExtractedSection docs={claim.documents} claimId={claimId!} />}

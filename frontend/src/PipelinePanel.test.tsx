@@ -228,3 +228,59 @@ test('the sections come in the order Outcome, Checks and signals, Extracted data
   const heads = screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)
   expect(heads).toEqual(['Outcome', 'Checks and signals', 'Extracted data', 'Events'])
 })
+
+const report = {
+  outcome: 'investigation',
+  score: 130,
+  summary: 'The medical invoice was edited after it was issued, its total does not match its lines, and a name on it is not the insured person.',
+  findings: [
+    {
+      code: 'T003',
+      title: 'Line items do not add up to the total',
+      saw: 'The lines of medical-invoice.pdf add up to CHF 1450; its total says CHF 4450.',
+      where: ['medical-invoice.pdf, page 1'],
+      expected: 'Line items that add up to the total (tolerance CHF 0.05).',
+    },
+    {
+      code: 'R003',
+      title: 'Incident within 14 days of the policy start',
+      saw: 'Incident 5 days after the start of policy ACC-2026-2210 (2026-10-20).',
+      where: ['medical-report.pdf, page 1'],
+      expected: 'An incident more than 14 days after the policy start.',
+    },
+  ],
+  not_checked: ['Duplicate invoices across claims.', 'Handwriting and stamps.'],
+  next_steps: ['Ask the provider for the original invoice.'],
+}
+
+test('a write_fraud_report event loads the claim and shows the report first', async () => {
+  const fetchMock = serve({ ...emptyClaim, score: 130, outcome: 'investigation', fraud_report: report })
+  render(<PipelinePanel claimId="CL-1" />)
+  FakeEventSource.all[0].emit(event(1, { stage: 'write_fraud_report' }))
+
+  expect(await screen.findByRole('heading', { name: 'Fraud report' })).toBeInTheDocument()
+  expect(fetchMock).toHaveBeenCalledWith('/claims/CL-1')
+  expect(screen.getByText('investigation · score 130')).toHaveClass('pill-bad')
+  expect(screen.getByText(report.summary)).toHaveClass('report-summary')
+  const rows = screen.getAllByRole('row').map((r) => r.textContent)
+  expect(rows[0]).toBe('CodeWhat the system sawWhereExpected')
+  expect(rows[1]).toContain('T003')
+  expect(rows[1]).toContain('add up to CHF 1450')
+  expect(rows[1]).toContain('medical-invoice.pdf, page 1')
+  expect(rows[1]).toContain('Line items that add up to the total')
+  expect(rows[2]).toContain('medical-report.pdf, page 1')
+  expect(screen.getByRole('heading', { name: 'Not checked' })).toBeInTheDocument()
+  expect(screen.getByText('Handwriting and stamps.')).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: 'Next steps' })).toBeInTheDocument()
+  expect(screen.getByText('Ask the provider for the original invoice.')).toBeInTheDocument()
+  const heads = screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)
+  expect(heads).toEqual(['Fraud report', 'Outcome', 'Events'])
+})
+
+test('no report, no Fraud report section', async () => {
+  serve({ ...emptyClaim, score: 20, outcome: 'handler_review', fraud_report: null })
+  render(<PipelinePanel claimId="CL-1" />)
+  FakeEventSource.all[0].emit(event(1, { stage: 'assess_and_route' }))
+  await screen.findByRole('heading', { name: 'Outcome' })
+  expect(screen.queryByText('Fraud report')).not.toBeInTheDocument()
+})

@@ -94,13 +94,30 @@ class Signal(BaseModel):
     severity: Literal["low", "medium", "high"]
     points: int
     title: str
-    detail: str
+    detail: str  # what the system saw
+    expected: str = ""  # what it expected: the same text for every signal of a code
     evidence: list[Source] = []
 
 
+class FraudFinding(BaseModel):
+    """One signal in the report: what was seen, where, and what was expected."""
+
+    code: str
+    title: str
+    saw: str
+    where: list[str]  # "file name, page N"; a plain note when no document holds it
+    expected: str
+
+
 class FraudReport(BaseModel):
-    summary: str
-    signals: list[Signal]
+    """Written for every `investigation` (docs/FRAUD.md), from the signals only."""
+
+    outcome: Outcome
+    score: int
+    summary: str  # one plain sentence that says why
+    findings: list[FraudFinding] = []
+    not_checked: list[str] = []
+    next_steps: list[str] = []
 
 
 class PipelineEvent(BaseModel):

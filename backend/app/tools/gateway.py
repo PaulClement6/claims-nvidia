@@ -15,7 +15,12 @@ class Gateway:
         self.store = store
         self._tools: dict[
             str,
-            tuple[Callable[..., dict[str, Any]], str | None, Collection[str] | None],
+            tuple[
+                Callable[..., dict[str, Any]],
+                str | None,
+                Collection[str] | None,
+                str | None,
+            ],
         ] = {}
 
     def register(
@@ -24,14 +29,16 @@ class Gateway:
         fn: Callable[..., dict[str, Any]],
         model: str | None = None,
         visible: Collection[str] | None = None,
+        title: str | None = None,
     ) -> None:
-        """`visible`: the output keys the caller gets back. The event holds them all."""
-        self._tools[name] = (fn, model, visible)
+        """`visible`: the output keys the caller gets back. The event holds them all.
+        `title`: the event title, when "Tool name" is not enough."""
+        self._tools[name] = (fn, model, visible, title)
 
     def call(
         self, claim_id: str, tool_name: str, inputs: dict[str, Any]
     ) -> dict[str, Any]:
-        fn, model, visible = self._tools.get(tool_name, (None, None, None))
+        fn, model, visible, title = self._tools.get(tool_name, (None, None, None, None))
         outputs: dict[str, Any] = {}
         start = time.perf_counter()
         try:
@@ -49,7 +56,7 @@ class Gateway:
                 claim_id,
                 "tool",
                 tool_name,
-                tool_name.replace("_", " ").capitalize(),
+                title or tool_name.replace("_", " ").capitalize(),
                 inputs,
                 outputs,
                 model,

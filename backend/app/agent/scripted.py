@@ -5,7 +5,8 @@ ask_story -> ask_date -> ask_amount -> ask_documents -> ready_for_checks -> clos
 In ask_documents it says what is still missing. When all the required documents are
 there it says so and asks for another one: the checks start only when the customer
 says they are done. Then, in the same turn, it runs the checks and the routing,
-gives the customer the text the routing tool returns, and closes.
+gives the customer the text the routing tool returns, and closes. The agent never
+sees the outcome: the routing tool writes the fraud report itself when it is needed.
 """
 
 import re
