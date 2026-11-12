@@ -16,6 +16,7 @@ from app.docintel.reader import get_reader
 from app.models import Claim, Customer, Document, Message, Policy
 from app.store import Store
 from app.stream import event_stream
+from app.tools import checks as checks_tool
 from app.tools import claims as claims_tool
 from app.tools import documents as documents_tool
 from app.tools import policies as policies_tool
@@ -51,6 +52,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     uploads = Path(os.environ.get("CLAIMS_UPLOADS", "uploads"))
     documents_tool.register(gateway, reader, uploads)
     claims_tool.register(gateway)
+    checks_tool.register(gateway, uploads)
     requirements_tool.register(gateway)
     routing_tool.register(gateway)
     app.state.agent = ScriptedAgent(gateway)

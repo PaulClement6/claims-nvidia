@@ -139,3 +139,29 @@ test('the customer panel never asks for the pipeline view or the events', async 
   expect(urls).toContain('/claims/CL-1/messages')
   expect(urls.filter((u) => /^\/claims\/[^/]+$/.test(u) || u.endsWith('/events'))).toEqual([])
 })
+
+test('the Done button is on only in the documents step and sends "done"', async () => {
+  let step = 'ask_amount'
+  const fetchMock = withChat((url, init) =>
+    url === '/claims/CL-1/customer'
+      ? Response.json({ ...view('TRV-2026-0417'), step })
+      : init?.method === 'POST'
+        ? ((step = 'closed'), Response.json([]))
+        : undefined,
+  )
+  vi.stubGlobal('fetch', fetchMock)
+  const { rerender } = render(<CustomerPanel claimId="CL-1" onClaim={() => {}} />)
+  const done = await screen.findByRole('button', { name: 'Done' })
+  expect(done).toBeDisabled()
+
+  step = 'ask_documents'
+  rerender(<CustomerPanel claimId="CL-1" onClaim={() => {}} key="again" />)
+  await vi.waitFor(() => expect(screen.getByRole('button', { name: 'Done' })).toBeEnabled())
+
+  fireEvent.click(screen.getByRole('button', { name: 'Done' }))
+  const post = fetchMock.mock.calls.find(([, i]) => i?.method === 'POST')!
+  expect(post[0]).toBe('/claims/CL-1/messages')
+  expect(JSON.parse(post[1]!.body as string)).toEqual({ text: 'done' })
+  expect(await screen.findByText('done')).toHaveClass('bubble-customer')
+  await vi.waitFor(() => expect(screen.getByRole('button', { name: 'Done' })).toBeDisabled())
+})

@@ -20,13 +20,14 @@ def routed(outcome: Outcome | None) -> Claim:
     )
 
 
-def test_the_view_holds_four_things_and_nothing_else() -> None:
+def test_the_view_holds_five_things_and_nothing_else() -> None:
     view = customer_view(routed(Outcome.investigation))
     assert set(CustomerView.model_fields) == {
         "claim_id",
         "policy_number",
         "status",
         "message",
+        "step",
     }
     assert view.claim_id == "CL-test" and view.policy_number == "TRV-2026-0417"
 

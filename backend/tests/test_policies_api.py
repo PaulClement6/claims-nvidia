@@ -46,6 +46,7 @@ def test_new_claim_is_open_with_no_policy_and_no_type(client: TestClient) -> Non
         "policy_number": None,
         "status": "open",
         "message": None,
+        "step": "ask_story",
     }
 
 
@@ -98,6 +99,7 @@ def test_set_policy_gives_type_from_line(
         "policy_number": policy,
         "status": "open",
         "message": None,
+        "step": "ask_story",
     }
     full = client.get(f"/claims/{claim['claim_id']}").json()
     assert full["type"] == claim_type and full["policy"]["number"] == policy

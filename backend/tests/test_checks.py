@@ -154,5 +154,5 @@ def test_every_signal_with_a_field_carries_evidence() -> None:
 
 
 def test_claim_type_with_no_workflow_runs_the_shared_rules_only() -> None:
-    claim = travel_claim(type="health", incident_date=date(2025, 1, 1))
+    claim = travel_claim(type=None, incident_date=date(2025, 1, 1))
     assert [s.code for s in run_rules(claim, None)] == ["R002"]

@@ -1,0 +1,72 @@
+{
+  "document_type": "medical_invoice",
+  "fields": [
+    {
+      "name": "invoice_number",
+      "value": "MZS-2026-3317",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "MZS-2026-3317"
+    },
+    {
+      "name": "invoice_date",
+      "value": "2026-10-18",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-10-18"
+    },
+    {
+      "name": "provider",
+      "value": "Medizinzentrum Seeblick AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Medizinzentrum Seeblick AG"
+    },
+    {
+      "name": "patient_name",
+      "value": "Jonas Meier",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Jonas Meier"
+    },
+    {
+      "name": "total",
+      "value": 4450.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 4,450.00"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Consultation, first visit, 30 min",
+      "quantity": 1,
+      "unit_price": 180.0,
+      "amount": 180.0
+    },
+    {
+      "description": "X-ray of the ankle, 3 views",
+      "quantity": 1,
+      "unit_price": 220.0,
+      "amount": 220.0
+    },
+    {
+      "description": "Ultrasound of the ankle",
+      "quantity": 1,
+      "unit_price": 150.0,
+      "amount": 150.0
+    },
+    {
+      "description": "Functional ankle brace, incl. fitting",
+      "quantity": 1,
+      "unit_price": 180.0,
+      "amount": 180.0
+    },
+    {
+      "description": "Physiotherapy session, 30 min",
+      "quantity": 6,
+      "unit_price": 120.0,
+      "amount": 720.0
+    }
+  ]
+}

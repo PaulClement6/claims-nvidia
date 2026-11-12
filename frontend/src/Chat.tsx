@@ -13,6 +13,7 @@ export default function Chat({ claimId }: { claimId: string }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [over, setOver] = useState(false)
+  const [step, setStep] = useState('') // the chat step of the customer view; Done needs it
   const list = useRef<HTMLDivElement>(null)
   const field = useRef<HTMLInputElement>(null)
 
@@ -20,6 +21,11 @@ export default function Chat({ claimId }: { claimId: string }) {
     send<Message[]>(`/claims/${claimId}/messages`)
       .then(setMessages)
       .catch(() => setError('The server did not answer.'))
+  }, [claimId])
+  useEffect(() => {
+    send<{ step?: string }>(`/claims/${claimId}/customer`)
+      .then((v) => setStep(v.step ?? ''))
+      .catch(() => undefined)
   }, [claimId])
   useEffect(() => {
     if (list.current) list.current.scrollTop = list.current.scrollHeight
@@ -40,17 +46,21 @@ export default function Chat({ claimId }: { claimId: string }) {
     }
     try {
       setMessages(await send<Message[]>(`/claims/${claimId}/messages`))
+      setStep((await send<{ step?: string }>(`/claims/${claimId}/customer`)).step ?? '')
     } catch {
       setError('The server did not answer.')
     }
     setBusy(false)
   }
 
+  const say = (t: string) =>
+    void run(send(`/claims/${claimId}/messages`, json('POST', { text: t })), t, () => 'The message was not sent.')
+
   const submit = () => {
     const t = text.trim()
     if (!t || busy) return
     setText('')
-    void run(send(`/claims/${claimId}/messages`, json('POST', { text: t })), t, () => 'The message was not sent.')
+    say(t)
   }
 
   const upload = (file: File | undefined) => {
@@ -109,6 +119,9 @@ export default function Chat({ claimId }: { claimId: string }) {
             }}
           />
         </label>
+        <button type="button" disabled={busy || step !== 'ask_documents'} onClick={() => say('done')}>
+          Done
+        </button>
       </form>
       <p className="muted">Drop a PDF, PNG or JPEG here, or press Upload.</p>
     </div>
