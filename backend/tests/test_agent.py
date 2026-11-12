@@ -319,3 +319,30 @@ def test_the_scripted_agent_writes_the_node_events_of_the_graph(
     assert nodes()[-1] == "answer"
     last = [e for e in store.events_since(cid, 0) if e.actor == "workflow"][-1]
     assert (last.stage, last.title) == ("answer", "Node: answer")
+
+
+def test_the_node_event_comes_before_the_first_tool_event_of_a_turn(
+    client: TestClient,
+) -> None:
+    """Like the graph: the node starts, then it calls its tools."""
+    cid = start(client)
+    store = client.app.state.store  # type: ignore[attr-defined]
+
+    def first_new(turn: str) -> tuple[str, str]:
+        before = len(store.events_since(cid, 0))
+        if turn == "upload":
+            upload(client, cid, (CLAIM1 / "booking-confirmation.pdf").read_bytes())
+        else:
+            say(client, cid, turn)
+        e = store.events_since(cid, 0)[before]
+        return e.actor, e.stage
+
+    assert first_new("My trip was cancelled because I was ill.") == (
+        "workflow",
+        "intake",
+    )
+    assert first_new("3 August 2026") == ("workflow", "intake")
+    assert first_new("CHF 1500") == ("workflow", "intake")
+    assert first_new("upload") == ("workflow", "documents")
+    assert first_new("done") == ("workflow", "documents")
+    assert first_new("and now?") == ("workflow", "answer")

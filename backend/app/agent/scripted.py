@@ -102,28 +102,36 @@ class ScriptedAgent:
     def handle(
         self, claim_id: str, text: str | None, document_id: str | None
     ) -> list[str]:
+        claim = self.gateway.store.get_claim(claim_id)
+        asked = claim.agent_state if claim else "ask_story"
+        # the node event comes first, as in the graph; the state is read from the
+        # claim, because a tool call would write its event before it
+        if document_id or (asked == "ask_documents" and text and is_done(text)):
+            self._node(claim_id, "documents")
+        elif text is None:
+            self._node(claim_id, "intake")
+        elif asked == "closed":
+            self._node(claim_id, "answer")
+        elif asked == "ready_for_checks":
+            self._node(claim_id, "checks")
+        else:
+            self._node(claim_id, "documents" if asked == "ask_documents" else "intake")
         s = self._call(claim_id, "get_claim_summary")
         out: list[str] = []
         changes: dict[str, Any] = {}
         if document_id:
-            self._node(claim_id, "documents")
             out.append(self._read_document(claim_id, document_id))
             s = self._call(claim_id, "get_claim_summary")
         elif text is None:
-            self._node(claim_id, "intake")
             out.append(
                 f"Hello {s['customer_name']}. I will help you with your claim on "
                 f"policy {s['policy_number']}."
             )
         elif s["agent_state"] == "closed":
-            self._node(claim_id, "answer")
             return ["Thank you. I have your claim and I will come back to you."]
         elif s["agent_state"] == "ask_documents" and is_done(text):
-            self._node(claim_id, "documents")
             return ["Thank you. " + self._close(claim_id)]
         elif s["agent_state"] != "ready_for_checks":
-            asked = s["agent_state"]
-            self._node(claim_id, "documents" if asked == "ask_documents" else "intake")
             changes = self._fill(s, text)
             if asked == "ask_date" and "incident_date" not in changes:
                 out.append("I could not read the date.")
@@ -135,7 +143,7 @@ class ScriptedAgent:
             if asked != "ask_documents" and next_state(s) == "ask_documents":
                 self._node(claim_id, "documents")  # the three facts are known
         else:  # ready_for_checks: an earlier turn stopped before the result
-            return [self._close(claim_id)]
+            return [self._close(claim_id, node=False)]
 
         missing = self._missing(claim_id, s)
         state = next_state(s)
@@ -144,9 +152,10 @@ class ScriptedAgent:
         out.append(self._question(state, missing))
         return [" ".join(out)]  # one chat message per turn
 
-    def _close(self, claim_id: str) -> str:
+    def _close(self, claim_id: str, node: bool = True) -> str:
         """Checks, routing, the result text for the customer, then the state closed."""
-        self._node(claim_id, "checks")
+        if node:
+            self._node(claim_id, "checks")
         self._call(claim_id, "update_claim", agent_state="ready_for_checks")
         self._call(claim_id, "run_checks")
         self._call(claim_id, "check_tampering")
