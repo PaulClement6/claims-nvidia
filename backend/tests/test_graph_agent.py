@@ -284,7 +284,46 @@ def test_all_the_facts_in_one_message_go_from_intake_to_documents_in_one_turn(
         "extract_document",
         "get_claim_summary",
         "customer_is_done",
+        "update_claim",
     ]
+
+
+def test_the_customer_can_correct_the_date_and_the_amount_in_the_documents_node(
+    rig: Rig,
+) -> None:
+    rig.start()
+    rig.fake.replies += [
+        story(),
+        calls(("required_documents", {})),
+        text("Please upload a booking confirmation."),
+        # the model sends the state and the cause too: the graph drops them
+        calls(
+            (
+                "update_claim",
+                {
+                    "claimed_amount": 1400,
+                    "incident_date": "2026-08-04",
+                    "agent_state": "closed",
+                    "cause": "other",
+                    "claim_id": "CL-other",
+                },
+            )
+        ),
+        text("Thank you, I saved that."),
+    ]
+    rig.say("I was ill on 3 August 2026, I claim CHF 1500.")
+    assert rig.say("Sorry, it was 4 August and CHF 1400.") == "Thank you, I saved that."
+    c = rig.claim()
+    assert (c["claimed_amount"], c["incident_date"]) == (1400, "2026-08-04")
+    assert c["agent_state"] == "ask_documents" and c["cause"] == "illness"
+    [saved] = [
+        e
+        for e in tool_events(rig)
+        if e.stage == "update_claim"
+        and "claimed_amount" in e.inputs
+        and e.inputs["claimed_amount"] == 1400
+    ]
+    assert set(saved.inputs) == {"claim_id", "claimed_amount", "incident_date"}
 
 
 def test_the_story_alone_stays_in_intake_and_the_model_asks(rig: Rig) -> None:
@@ -715,6 +754,76 @@ def test_a_failure_in_the_checks_is_the_fallback_and_the_next_turn_resumes(
     # the step is saved in the checkpoint: the next message resumes at the checks
     assert rig.say("hello?") == VALIDATED
     assert rig.claim()["outcome"] == "straight_through"
+
+
+def test_a_code_node_that_fails_twice_in_a_row_hands_the_claim_to_a_person(
+    rig: Rig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.agent.handover import HANDOVER
+    from app.agent.phrases import check_message
+
+    assert check_message(HANDOVER, "fake-model") is None  # the output filter
+    prepare_for_done(rig)
+    gateway = rig.client.app.state.gateway  # type: ignore[attr-defined]
+    real = gateway._tools["check_consistency"]
+
+    def down(**kw: Any) -> Any:
+        raise RuntimeError("the reader is down")
+
+    monkeypatch.setitem(
+        gateway._tools,
+        "check_consistency",
+        type(real)(
+            down,
+            real.model,
+            real.visible,
+            real.title,
+            real.description,
+            real.parameters,
+        ),
+    )
+    assert rig.say("done") == FALLBACK  # first failure: the usual fallback
+    assert rig.claim()["status"] == "open"
+    assert rig.say("hello?") == HANDOVER  # second one in a row: said once
+    c = rig.claim()
+    assert c["status"] == "in_review" and c["outcome"] is None
+    [failed] = [e for e in rig.events() if e.stage == "failed"]
+    assert (failed.actor, failed.outputs["outcome"]) == ("workflow", None)
+    assert "no outcome set" in failed.outputs["why"]
+    calls_before = len(tool_events(rig))
+    assert rig.say("anyone there?") == CLOSED  # not the fallback, not the handover
+    assert len(tool_events(rig)) == calls_before  # and no tool call
+    view = rig.client.get(f"/claims/{rig.cid}/customer").json()
+    assert view["status"] == "in_review" and view["message"] is None
+
+
+def test_two_failures_in_different_code_nodes_are_not_a_handover(
+    rig: Rig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    prepare_for_done(rig)
+    gateway = rig.client.app.state.gateway  # type: ignore[attr-defined]
+    for tool in ("check_consistency", "assess_and_route"):
+        real = gateway._tools[tool]
+        count = [0]
+
+        def flaky(real: Any = real, count: list[int] = count, **kw: Any) -> Any:
+            count[0] += 1
+            if count[0] == 1:
+                raise RuntimeError("down")
+            return real.fn(**kw)
+
+        monkeypatch.setitem(
+            gateway._tools,
+            tool,
+            type(real)(
+                flaky, real.model, real.visible, real.title, real.description,
+                real.parameters,
+            ),
+        )  # fmt: skip
+    assert rig.say("done") == FALLBACK  # checks fails once, then passes
+    assert rig.say("again") == FALLBACK  # route fails once: another node
+    assert rig.claim()["status"] == "open"
+    assert rig.say("once more") == VALIDATED
 
 
 def test_the_step_survives_a_restart_of_the_backend(

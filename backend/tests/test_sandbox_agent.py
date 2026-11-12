@@ -113,6 +113,32 @@ def test_the_claim_closes_the_sandbox_and_a_later_message_needs_none(
     assert len(rig.shell.names("create")) == 1
 
 
+def test_two_failures_in_the_same_code_node_hand_the_claim_to_a_person(
+    make: Any,
+) -> None:
+    from app.agent.handover import HANDOVER
+
+    rig = make()
+    failure = [
+        {
+            "actor": "agent", "stage": "fallback", "title": "Fallback message",
+            "inputs": {},
+            "outputs": {"reason": "the graph stopped: X", "node": "checks"},
+            "model": None, "duration": None,
+        }
+    ]  # fmt: skip
+    rig.shell.turn = lambda s, n, a, i: line(FALLBACK, failure)
+    assert rig.say("done") == FALLBACK
+    assert rig.say("again") == HANDOVER
+    claim = rig.store.get_claim(rig.cid)
+    assert claim.status == "in_review" and claim.outcome is None
+    assert [e.stage for e in rig.events("workflow") if e.stage == "failed"] == [
+        "failed"
+    ]
+    assert rig.shell.sandboxes == {}  # closed with the claim
+    assert rig.say("hello?") == CLOSED
+
+
 # ---- the customer text -----------------------------------------------------------
 
 

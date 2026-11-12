@@ -8,6 +8,7 @@ import re
 from typing import Any
 
 FALLBACK = "Sorry, I could not answer just now. Please send your message again."
+CODE_NODES = ("checks", "route", "answer")  # the nodes of the graph without a model
 CLOSED = "Thank you. I have your claim and I will come back to you."
 CORRECTION = (
     "Your last message is not allowed. Write it again for the customer: short and "
@@ -56,3 +57,12 @@ def next_state(s: dict[str, Any]) -> str:
         if not s[slot]:
             return state
     return "ask_documents"
+
+
+def failed_node(graph: Any, config: Any) -> str | None:
+    """The code node due on this thread (the step in the checkpoint), or None."""
+    try:
+        step = graph.get_state(config).values.get("step")
+    except Exception:  # only used to count failures: never hide the real error
+        return None
+    return step if step in CODE_NODES else None

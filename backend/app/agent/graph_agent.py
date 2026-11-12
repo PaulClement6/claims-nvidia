@@ -20,8 +20,9 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.sqlite import SqliteSaver
 
 from app.agent.graph import CallTool, Model, build_graph, turn_input
+from app.agent.handover import hand_over_if_stuck, is_handed_over
 from app.agent.model import make_model
-from app.agent.phrases import FALLBACK
+from app.agent.phrases import CLOSED, FALLBACK, failed_node
 from app.tools.gateway import Gateway
 from app.tools.guard import Refused as Refused  # re-export: tests import it here
 from app.tools.guard import guarded_call
@@ -77,17 +78,24 @@ class GraphAgent:
                 claim_id, actor, stage, title, inputs, outputs, model, duration
             )
 
+        if is_handed_over(store.get_claim(claim_id)):
+            return [CLOSED]  # a person has the case: no graph, no tool call
         graph = build_graph(
             self.model, self.caller(claim_id), self.checkpointer,
             self.gateway.tool_specs(), emit,
         )  # fmt: skip
+        config: RunnableConfig = {"configurable": {"thread_id": claim_id}}
         try:
-            config: RunnableConfig = {"configurable": {"thread_id": claim_id}}
             out = graph.invoke(turn_input(text, document_id), config)
         except Exception as e:
             # a tool failed in a code node: the step is in the checkpoint, so the
-            # next message of the customer resumes there
+            # next message of the customer resumes there. Twice in a row in the same
+            # node: the claim goes to a person.
             reason = f"the graph stopped: {type(e).__name__}"
-            emit("agent", "fallback", "Fallback message", {}, {"reason": reason})
-            return [FALLBACK]
+            node = failed_node(graph, config)
+            emit(
+                "agent", "fallback", "Fallback message", {},
+                {"reason": reason, "node": node},
+            )  # fmt: skip
+            return [hand_over_if_stuck(store, claim_id) or FALLBACK]
         return [out.get("reply") or FALLBACK]
