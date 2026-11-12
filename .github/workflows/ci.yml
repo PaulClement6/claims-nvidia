@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+      - name: Backend install
+        working-directory: backend
+        run: uv sync --frozen
+      - name: Backend lint
+        working-directory: backend
+        run: uv run ruff check . && uv run ruff format --check .
+      - name: Backend types
+        working-directory: backend
+        run: uv run mypy .
+      - name: Backend tests
+        working-directory: backend
+        run: uv run pytest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Frontend install
+        working-directory: frontend
+        run: npm ci
+      - name: Frontend lint
+        working-directory: frontend
+        run: npm run lint
+      - name: Frontend types
+        working-directory: frontend
+        run: npm run typecheck
+      - name: Frontend tests
+        working-directory: frontend
+        run: npm test
+      - name: Frontend build
+        working-directory: frontend
+        run: npm run build
