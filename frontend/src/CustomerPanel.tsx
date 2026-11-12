@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { json, send } from './api'
-import Chat from './Chat'
+import Chat, { Typing } from './Chat'
 
 type Customer = { id: string; name: string }
 type Policy = { number: string; line_of_business: string }
@@ -14,6 +14,7 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
   const [claim, setClaim] = useState<View | null>(null)
   const [name, setName] = useState('')
   const [error, setError] = useState('')
+  const [starting, setStarting] = useState(false) // the policy is being set: the agent writes its first message
 
   useEffect(() => {
     send<Customer[]>('/customers')
@@ -41,13 +42,16 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
       })
       .catch(() => setError('The claim was not created.'))
 
-  const pickPolicy = (p: Policy) =>
-    send<View>(`/claims/${claimId}/policy`, json('PUT', { policy_number: p.number }))
+  const pickPolicy = (p: Policy) => {
+    setStarting(true) // nim and sandbox mode: the first message takes 5 to 10 seconds
+    return send<View>(`/claims/${claimId}/policy`, json('PUT', { policy_number: p.number }))
       .then((c) => {
         setClaim(c)
         setFilter('')
       })
       .catch(() => setError('The policy was not set.'))
+      .finally(() => setStarting(false))
+  }
 
   const newClaim = () => {
     setClaim(null)
@@ -82,6 +86,10 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
           <p className="mono">{`Claim ${claim.claim_id} · ${claim.policy_number}`}</p>
           <Chat claimId={claim.claim_id} />
         </>
+      ) : claim && starting ? (
+        <div className="chat-list" role="log" aria-label="Conversation">
+          <Typing />
+        </div>
       ) : claim ? (
         <div className="stack">
           <h3>{name ? `2. Pick a policy of ${name}` : '2. Pick a policy'}</h3>

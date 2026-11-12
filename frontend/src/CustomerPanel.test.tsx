@@ -206,3 +206,48 @@ test('an agent bubble with three dots shows while a request runs, and goes when 
   expect(await screen.findByText('The message was not sent.')).toBeInTheDocument()
   expect(screen.queryByText('The agent is typing')).not.toBeInTheDocument()
 })
+
+test('the typing dots show while the policy is being set, then the chat takes over', async () => {
+  let release: () => void = () => {}
+  const gate = new Promise<void>((r) => (release = r))
+  let picked = false
+  const base = withChat()
+  vi.stubGlobal(
+    'fetch',
+    vi.fn((url: string, init?: RequestInit) => {
+      if (url === '/claims/CL-1/customer') return Promise.resolve(Response.json(view(picked ? 'TRV-2026-0417' : null)))
+      if (url === '/claims/CL-1/policies') return Promise.resolve(Response.json([policy('TRV-2026-0417', 'Travel')]))
+      if (url === '/claims/CL-1/policy' && init?.method === 'PUT') return gate.then(() => ((picked = true), Response.json(view('TRV-2026-0417'))))
+      return base(url, init)
+    }),
+  )
+  render(<CustomerPanel claimId="CL-1" onClaim={() => {}} />)
+  fireEvent.click(await screen.findByRole('button', { name: /TRV-2026-0417/ }))
+
+  const typing = (await screen.findByText('The agent is typing')).closest('p')!
+  expect(typing).toHaveClass('bubble', 'bubble-agent', 'typing')
+  expect(typing.querySelectorAll('.typing-dots i')).toHaveLength(3)
+  expect(screen.queryByRole('button', { name: /TRV-2026-0417/ })).not.toBeInTheDocument()
+
+  release()
+  expect(await screen.findByText('Hello. What happened?')).toBeInTheDocument()
+  expect(screen.queryByText('The agent is typing')).not.toBeInTheDocument()
+})
+
+test('the typing dots go and the list comes back when the policy is not set', async () => {
+  const base = withChat()
+  vi.stubGlobal(
+    'fetch',
+    vi.fn((url: string, init?: RequestInit) => {
+      if (url === '/claims/CL-1/customer') return Promise.resolve(Response.json(view(null)))
+      if (url === '/claims/CL-1/policies') return Promise.resolve(Response.json([policy('TRV-2026-0417', 'Travel')]))
+      if (url === '/claims/CL-1/policy' && init?.method === 'PUT') return Promise.reject(new Error('down'))
+      return base(url, init)
+    }),
+  )
+  render(<CustomerPanel claimId="CL-1" onClaim={() => {}} />)
+  fireEvent.click(await screen.findByRole('button', { name: /TRV-2026-0417/ }))
+  expect(await screen.findByText('The policy was not set.')).toBeInTheDocument()
+  expect(screen.queryByText('The agent is typing')).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /TRV-2026-0417/ })).toBeInTheDocument()
+})
