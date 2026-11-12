@@ -20,6 +20,7 @@ function useTheme() {
 
 export default function App() {
   const [theme, toggleTheme] = useTheme()
+  const [claimId, setClaimId] = useState<string | null>(null)
   return (
     <div className="shell">
       <aside className="sidebar">
@@ -32,8 +33,8 @@ export default function App() {
         </div>
       </aside>
       <main className="content panels">
-        <CustomerPanel />
-        <PipelinePanel />
+        <CustomerPanel claimId={claimId} onClaim={setClaimId} />
+        <PipelinePanel claimId={claimId} />
       </main>
     </div>
   )
