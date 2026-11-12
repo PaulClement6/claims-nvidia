@@ -11,6 +11,7 @@ from datetime import date, datetime
 from typing import Any
 
 from app.tools.gateway import Gateway
+from app.workflows import WORKFLOWS
 
 DATE_RE = re.compile(
     r"\d{4}-\d{2}-\d{2}"
@@ -31,14 +32,16 @@ DATE_FORMATS = [
 ]
 NUM = r"\d[\d'’,.]*"
 AMOUNT_RE = re.compile(rf"(?:CHF|Fr\.?)\s*({NUM})|({NUM})\s*(?:CHF|francs)", re.I)
-ILL_RE = re.compile(r"\b(ill|sick|illness)\b", re.I)
-LUGGAGE_RE = re.compile(r"\b(luggage|baggage)\b", re.I)
 
 TYPE_NAMES = {
     "booking_confirmation": "a booking confirmation",
     "cancellation_confirmation": "a cancellation confirmation",
     "medical_certificate": "a medical certificate",
     "receipt": "a receipt",
+    "repair_invoice": "a repair invoice",
+    "repair_quote": "a repair quote",
+    "damage_photo": "a damage photo",
+    "police_report": "a police report",
 }
 
 
@@ -72,12 +75,10 @@ def parse_amount(text: str, bare_ok: bool) -> float | None:
         return None
 
 
-def parse_cause(story: str) -> str:
-    if ILL_RE.search(story):
-        return "illness"
-    if LUGGAGE_RE.search(story):
-        return "luggage"
-    return "cancellation"
+def parse_cause(story: str, claim_type: str | None) -> str:
+    """The keywords live in the workflow of the claim type, not here."""
+    workflow = WORKFLOWS.get(claim_type or "")
+    return workflow.cause_of(story) if workflow else "other"
 
 
 class ScriptedAgent:
@@ -142,7 +143,7 @@ class ScriptedAgent:
         changes: dict[str, Any] = {}
         if not s["description"]:
             changes["description"] = text.strip()
-            changes["cause"] = parse_cause(text)
+            changes["cause"] = parse_cause(text, s["type"])
         if not s["incident_date"] and (d := parse_date(text)):
             changes["incident_date"] = d.isoformat()
         known = changes.get("incident_date") or s["incident_date"]

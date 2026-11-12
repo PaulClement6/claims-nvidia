@@ -247,6 +247,7 @@ dependencies = [
 dev = [
     { name = "httpx2" },
     { name = "mypy" },
+    { name = "pillow" },
     { name = "pytest" },
     { name = "reportlab" },
     { name = "ruff" },
@@ -264,6 +265,7 @@ requires-dist = [
 dev = [
     { name = "httpx2", specifier = ">=2.16.0" },
     { name = "mypy" },
+    { name = "pillow", specifier = ">=13.0.0" },
     { name = "pytest" },
     { name = "reportlab", specifier = ">=5.1.0" },
     { name = "ruff" },

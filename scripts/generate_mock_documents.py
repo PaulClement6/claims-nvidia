@@ -1,19 +1,22 @@
 """Writes the mock claim files to data/mock/<claim>/ (PDF + expected.json each).
 
 Run: cd backend && uv run python ../scripts/generate_mock_documents.py [out_dir]
-Same bytes on every run (reportlab invariant mode, fixed dates, no random id).
+Same bytes on every run (reportlab invariant mode, fixed dates, no random id;
+Pillow photos with a fixed random seed and no EXIF).
 All names, companies and addresses are invented (non-negotiable 7).
 
-To add a claim file: write one function per document (see the three below) and
+To add a claim file: write one function per document (see the ones below) and
 add the claim folder with its documents to CLAIM_FILES.
 """
 
 import json
+import random
 import sys
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
+from PIL import Image, ImageChops, ImageDraw, ImageFilter
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen.canvas import Canvas
@@ -47,7 +50,9 @@ class Doc:
         self.c.drawRightString(x, y, s)
         self.printed.append(s)
 
-    def letterhead(self, name: str, lines: list[str], rgb: tuple[float, float, float]) -> None:
+    def letterhead(
+        self, name: str, lines: list[str], rgb: tuple[float, float, float]
+    ) -> None:
         self.c.setFillColorRGB(*rgb)
         self.c.rect(0, H - 18, W, 18, stroke=0, fill=1)
         self.c.setFillColorRGB(0, 0, 0)
@@ -87,7 +92,13 @@ class Doc:
     def field(self, name: str, value: Any, snippet: str) -> None:
         assert any(snippet in s for s in self.printed), f"{snippet!r} is not printed"
         self.fields.append(
-            {"name": name, "value": value, "confidence": 1.0, "page": 1, "snippet": snippet}
+            {
+                "name": name,
+                "value": value,
+                "confidence": 1.0,
+                "page": 1,
+                "snippet": snippet,
+            }
         )
 
     def save(self) -> dict[str, Any]:
@@ -101,7 +112,14 @@ class Doc:
 
 
 ANNA = ["Anna Keller", "Rosenweg 7", "3011 Bern", "Switzerland"]
-AGENCY = ("Wolkenpfad Reisen AG", ["Bahnhofplatz 4, 8001 Zurich", "Tel. +41 44 555 01 20  |  info@wolkenpfad.example", "UID CHE-000.000.000  |  IBAN CH00 0000 0000 0000 0000 0"])
+AGENCY = (
+    "Wolkenpfad Reisen AG",
+    [
+        "Bahnhofplatz 4, 8001 Zurich",
+        "Tel. +41 44 555 01 20  |  info@wolkenpfad.example",
+        "UID CHE-000.000.000  |  IBAN CH00 0000 0000 0000 0000 0",
+    ],
+)
 BLUE = (0.10, 0.30, 0.55)
 
 
@@ -109,7 +127,13 @@ def booking_confirmation(path: Path) -> dict[str, Any]:
     d = Doc(path, "Booking confirmation", "booking_confirmation")
     d.letterhead(AGENCY[0], AGENCY[1], BLUE)
     d.address(ANNA)
-    d.meta([("Date:", "2026-06-02"), ("Customer no.:", "K-30418"), ("Agent:", "S. Lindner")])
+    d.meta(
+        [
+            ("Date:", "2026-06-02"),
+            ("Customer no.:", "K-30418"),
+            ("Agent:", "S. Lindner"),
+        ]
+    )
     d.text(MARGIN, H - 240, "Booking confirmation", "Helvetica-Bold", 16)
     d.text(MARGIN, H - 262, "Booking reference:", "Helvetica-Bold")
     d.text(170, H - 262, "WPR-482913")
@@ -133,13 +157,28 @@ def booking_confirmation(path: Path) -> dict[str, Any]:
         [MARGIN, 330, 400],
     )
     d.line_items = [
-        {"description": a, "quantity": int(q), "unit_price": float(u), "amount": float(m)}
+        {
+            "description": a,
+            "quantity": int(q),
+            "unit_price": float(u),
+            "amount": float(m),
+        }
         for a, q, u, m in items
     ]
     d.text(330, y - 6, "Total trip price", "Helvetica-Bold")
     d.right(W - MARGIN, y - 6, "CHF 1,840.00", "Helvetica-Bold")
-    d.text(MARGIN, y - 50, "Payment received in full on 2026-06-02 by card. Free cancellation is not included.", size=9)
-    d.text(MARGIN, y - 64, "Cancellation fees apply according to our general terms, article 7.", size=9)
+    d.text(
+        MARGIN,
+        y - 50,
+        "Payment received in full on 2026-06-02 by card. Free cancellation is not included.",
+        size=9,
+    )
+    d.text(
+        MARGIN,
+        y - 64,
+        "Cancellation fees apply according to our general terms, article 7.",
+        size=9,
+    )
     d.text(MARGIN, 110, "Wolkenpfad Reisen AG, Bahnhofplatz 4, 8001 Zurich", size=8)
     d.text(MARGIN, 98, "This confirmation is valid without signature.", size=8)
     d.field("booking_reference", "WPR-482913", "WPR-482913")
@@ -153,7 +192,13 @@ def cancellation_confirmation(path: Path) -> dict[str, Any]:
     d = Doc(path, "Cancellation confirmation", "cancellation_confirmation")
     d.letterhead(AGENCY[0], AGENCY[1], BLUE)
     d.address(ANNA)
-    d.meta([("Date:", "2026-08-04"), ("Customer no.:", "K-30418"), ("Agent:", "S. Lindner")])
+    d.meta(
+        [
+            ("Date:", "2026-08-04"),
+            ("Customer no.:", "K-30418"),
+            ("Agent:", "S. Lindner"),
+        ]
+    )
     d.text(MARGIN, H - 240, "Cancellation confirmation", "Helvetica-Bold", 16)
     d.text(MARGIN, H - 262, "Booking reference:", "Helvetica-Bold")
     d.text(170, H - 262, "WPR-482913")
@@ -161,16 +206,30 @@ def cancellation_confirmation(path: Path) -> dict[str, Any]:
     d.text(170, H - 278, "2026-08-04")
     d.text(MARGIN, H - 294, "Reason given:", "Helvetica-Bold")
     d.text(170, H - 294, "Illness of the traveller")
-    d.text(MARGIN, H - 322, "Dear Ms Keller, we confirm the cancellation of the trip above.", size=10)
+    d.text(
+        MARGIN,
+        H - 322,
+        "Dear Ms Keller, we confirm the cancellation of the trip above.",
+        size=10,
+    )
     rows = [
         ("Trip price paid", "1,840.00"),
         ("Cancellation fees (terms, art. 7)", "-1,500.00"),
         ("Refund to your card", "340.00"),
     ]
     y = d.table(H - 360, ["Item", "Amount (CHF)"], [list(r) for r in rows], [MARGIN])
-    d.line_items = [{"description": a, "amount": float(m.replace(",", ""))} for a, m in rows]
-    d.text(MARGIN, y - 40, "The refund of CHF 340.00 will be credited within 10 working days.", size=9)
-    d.text(MARGIN, y - 54, "Please keep this document for your travel insurance.", size=9)
+    d.line_items = [
+        {"description": a, "amount": float(m.replace(",", ""))} for a, m in rows
+    ]
+    d.text(
+        MARGIN,
+        y - 40,
+        "The refund of CHF 340.00 will be credited within 10 working days.",
+        size=9,
+    )
+    d.text(
+        MARGIN, y - 54, "Please keep this document for your travel insurance.", size=9
+    )
     d.text(MARGIN, 130, "Kind regards,", size=10)
     d.text(MARGIN, 100, "S. Lindner", "Helvetica-Oblique", 12)
     d.text(MARGIN, 86, "Wolkenpfad Reisen AG, customer service", size=8)
@@ -195,10 +254,31 @@ def medical_certificate(path: Path) -> dict[str, Any]:
     d.address(["Anna Keller", "Rosenweg 7", "3011 Bern"])
     d.meta([("Bern,", "2026-08-03"), ("File no.:", "P-2026-1187")])
     d.text(MARGIN, H - 240, "Medical certificate", "Helvetica-Bold", 16)
-    d.text(MARGIN, H - 270, "I certify that I examined the patient Anna Keller (born 1988-04-12)", size=11)
-    d.text(MARGIN, H - 286, "on 2026-08-03 and found an acute illness (gastroenteritis with fever).", size=11)
-    d.text(MARGIN, H - 312, "The patient is unfit to travel from 2026-08-03 until at least 2026-08-17.", "Helvetica-Bold", 11)
-    d.text(MARGIN, H - 338, "Rest and treatment at home are required. This certificate is issued", size=11)
+    d.text(
+        MARGIN,
+        H - 270,
+        "I certify that I examined the patient Anna Keller (born 1988-04-12)",
+        size=11,
+    )
+    d.text(
+        MARGIN,
+        H - 286,
+        "on 2026-08-03 and found an acute illness (gastroenteritis with fever).",
+        size=11,
+    )
+    d.text(
+        MARGIN,
+        H - 312,
+        "The patient is unfit to travel from 2026-08-03 until at least 2026-08-17.",
+        "Helvetica-Bold",
+        11,
+    )
+    d.text(
+        MARGIN,
+        H - 338,
+        "Rest and treatment at home are required. This certificate is issued",
+        size=11,
+    )
     d.text(MARGIN, H - 354, "at the request of the patient for her insurer.", size=11)
     d.text(MARGIN, 150, "Bern, 2026-08-03", size=10)
     d.text(MARGIN, 110, "Dr. med. B. Zingg", "Helvetica-Oblique", 13)
@@ -213,12 +293,165 @@ def medical_certificate(path: Path) -> dict[str, Any]:
     return d.save()
 
 
-# One entry per claim file: folder -> (file name, function). Claim files 2 and 3 come later.
+def repair_invoice(path: Path) -> dict[str, Any]:
+    d = Doc(path, "Invoice BSU-2026-1187", "repair_invoice")
+    d.letterhead(
+        "Blaubach Sanitaer & Umbau AG",
+        [
+            "Industriestrasse 22, 6003 Lucerne",
+            "Tel. +41 41 555 03 10  |  office@blaubach.example",
+            "UID CHE-000.000.000  |  IBAN CH00 0000 0000 0000 0000 0",
+        ],
+        (0.05, 0.40, 0.45),
+    )
+    d.address(["Marco Bianchi", "Via Nassa 18", "6900 Lugano", "Switzerland"])
+    d.meta(
+        [
+            ("Date:", "2026-09-22"),
+            ("Invoice no.:", "BSU-2026-1187"),
+            ("Site visits:", "2026-09-15 to 2026-09-21"),
+        ]
+    )
+    d.text(MARGIN, H - 240, "Invoice", "Helvetica-Bold", 16)
+    d.text(
+        MARGIN,
+        H - 262,
+        "Job: water damage in the kitchen, Via Nassa 18, 6900 Lugano",
+        size=10,
+    )
+    items = [
+        ("Emergency call-out and leak detection", "1", "380.00", "380.00"),
+        ("Replace damaged supply pipe under the sink", "1", "720.00", "720.00"),
+        ("Dry-out of floor and cabinets (dehumidifier, days)", "6", "95.00", "570.00"),
+        (
+            "Replace lower kitchen cabinets and floor covering",
+            "1",
+            "1,530.00",
+            "1,530.00",
+        ),
+    ]
+    y = d.table(
+        H - 300,
+        ["Description", "Qty", "Unit (CHF)", "Amount (CHF)"],
+        [list(i) for i in items],
+        [MARGIN, 350, 410],
+    )
+    d.line_items = [
+        {
+            "description": a,
+            "quantity": int(q),
+            "unit_price": float(u.replace(",", "")),
+            "amount": float(m.replace(",", "")),
+        }
+        for a, q, u, m in items
+    ]
+    assert sum(i["amount"] for i in d.line_items) == 3200.0
+    d.text(330, y - 6, "Total (VAT included)", "Helvetica-Bold")
+    d.right(W - MARGIN, y - 6, "CHF 3,200.00", "Helvetica-Bold")
+    d.text(330, y - 22, "of which VAT 8.1%", size=9)
+    d.right(W - MARGIN, y - 22, "CHF 239.78")
+    d.text(
+        MARGIN,
+        y - 60,
+        "Payable within 30 days, without deduction. Thank you for your trust.",
+        size=9,
+    )
+    d.text(
+        MARGIN,
+        110,
+        "Blaubach Sanitaer & Umbau AG, Industriestrasse 22, 6003 Lucerne",
+        size=8,
+    )
+    d.field("invoice_number", "BSU-2026-1187", "BSU-2026-1187")
+    d.field("invoice_date", "2026-09-22", "2026-09-22")
+    d.field(
+        "repair_company", "Blaubach Sanitaer & Umbau AG", "Blaubach Sanitaer & Umbau AG"
+    )
+    d.field("total", 3200.0, "CHF 3,200.00")
+    d.field("customer_name", "Marco Bianchi", "Marco Bianchi")
+    return d.save()
+
+
+PHOTO_SIZE = (800, 600)
+
+
+def kitchen_photo(
+    path: Path, seed: int, stain: tuple[int, int, int, int]
+) -> dict[str, Any]:
+    """A rough kitchen: wall, lower cabinets, tiled floor and a water stain at `stain`.
+
+    Fixed seed for the noise, a slight blur, no EXIF: the same bytes on every run.
+    """
+    w, h = PHOTO_SIZE
+    img = Image.new("RGB", PHOTO_SIZE, (214, 208, 196))  # wall
+    g = ImageDraw.Draw(img)
+    floor_y = 440
+    g.rectangle((0, floor_y, w, h), fill=(168, 150, 128))  # floor
+    for x in range(-200, w + 200, 90):  # floor tile joints, in perspective
+        g.line(
+            (x + (x - w // 2) // 3, h, x + (x - w // 2) // 8, floor_y),
+            fill=(140, 124, 104),
+            width=2,
+        )
+    for y in (480, 535):
+        g.line((0, y, w, y), fill=(140, 124, 104), width=2)
+    g.rectangle((60, 90, 740, 110), fill=(120, 100, 80))  # worktop
+    g.rectangle((60, 110, 740, floor_y - 20), fill=(186, 160, 120))  # lower cabinets
+    for x0 in (60, 290, 520):  # doors and handles
+        g.rectangle(
+            (x0 + 6, 120, x0 + 214, floor_y - 30), outline=(120, 100, 76), width=3
+        )
+        g.rectangle((x0 + 170, 200, x0 + 178, 250), fill=(90, 90, 90))
+    g.rectangle((60, floor_y - 20, 740, floor_y), fill=(90, 74, 58))  # plinth
+    # the water damage: a dark stain on the floor and a damp band at the foot of the cabinets
+    x0, y0, x1, y1 = stain
+    g.ellipse((x0, y0, x1, y1), fill=(112, 92, 72))
+    g.ellipse((x0 + 25, y0 + 12, x1 - 25, y1 - 12), fill=(92, 74, 58))
+    for i in range(70):  # damp cabinet foot: dark at the floor, fading upwards
+        t = i / 70
+        rgb = tuple(
+            int(a + (b - a) * t) for a, b in zip((128, 102, 74), (186, 160, 120))
+        )
+        g.line((x0 + 20, floor_y - 21 - i, x1 - 20, floor_y - 21 - i), fill=rgb)
+    img = img.filter(ImageFilter.GaussianBlur(1.2))
+    noise = Image.frombytes("L", PHOTO_SIZE, random.Random(seed).randbytes(w * h))
+    noise = noise.point(lambda v: 118 + v // 10).convert("RGB")  # grey around 118..143
+    img = ImageChops.add(img, noise, scale=1.0, offset=-130)
+    img.save(path, "JPEG", quality=88)  # no exif argument: none is written
+    return {
+        "document_type": "damage_photo",
+        "fields": [
+            {
+                "name": "damage_description",
+                "value": "water stain on the kitchen floor and the lower cabinets",
+                "confidence": 1.0,
+                "page": 1,
+                "box": [float(v) for v in (x0, floor_y - 70, x1, y1)],
+            }
+        ],
+        "line_items": [],
+    }
+
+
+def damage_photo_1(path: Path) -> dict[str, Any]:
+    return kitchen_photo(path, 1, (150, 455, 560, 570))
+
+
+def damage_photo_2(path: Path) -> dict[str, Any]:
+    return kitchen_photo(path, 2, (320, 470, 700, 585))
+
+
+# One entry per claim file: folder -> (file name, function). Claim file 3 comes later.
 CLAIM_FILES: dict[str, list[tuple[str, Callable[[Path], dict[str, Any]]]]] = {
     "claim-1-travel": [
-        ("booking-confirmation", booking_confirmation),
-        ("cancellation-confirmation", cancellation_confirmation),
-        ("medical-certificate", medical_certificate),
+        ("booking-confirmation.pdf", booking_confirmation),
+        ("cancellation-confirmation.pdf", cancellation_confirmation),
+        ("medical-certificate.pdf", medical_certificate),
+    ],
+    "claim-2-property": [
+        ("repair-invoice.pdf", repair_invoice),
+        ("damage-photo-1.jpg", damage_photo_1),
+        ("damage-photo-2.jpg", damage_photo_2),
     ],
 }
 
@@ -227,11 +460,15 @@ def generate(out: Path) -> None:
     for folder, docs in CLAIM_FILES.items():
         (out / folder).mkdir(parents=True, exist_ok=True)
         for name, fn in docs:
-            expected = fn(out / folder / f"{name}.pdf")
-            (out / folder / f"{name}.expected.json").write_text(
+            expected = fn(out / folder / name)
+            (out / folder / f"{Path(name).stem}.expected.json").write_text(
                 json.dumps(expected, indent=2, ensure_ascii=False) + "\n"
             )
 
 
 if __name__ == "__main__":
-    generate(Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parents[1] / "data" / "mock")
+    generate(
+        Path(sys.argv[1])
+        if len(sys.argv) > 1
+        else Path(__file__).resolve().parents[1] / "data" / "mock"
+    )

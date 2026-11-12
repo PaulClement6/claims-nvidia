@@ -16,6 +16,7 @@ dev = [
     "mypy",
     "httpx2>=2.16.0",
     "reportlab>=5.1.0",
+    "pillow>=13.0.0",
 ]
 
 [tool.mypy]

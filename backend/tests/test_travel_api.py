@@ -32,7 +32,7 @@ def run_claim(
     date: str = "3 August 2026",
     done: bool = False,
 ) -> str:
-    cid = str(client.post("/claims", json={"customer_id": "C-1001"}).json()["id"])
+    cid = str(client.post("/claims", json={"customer_id": "C-1001"}).json()["claim_id"])
     client.put(f"/claims/{cid}/policy", json={"policy_number": "TRV-2026-0417"})
     for text in (STORY, date, amount):
         assert (
@@ -165,11 +165,11 @@ def test_a_closed_claim_takes_no_more_documents(client: TestClient) -> None:
 
 
 def test_a_claim_type_with_no_workflow_goes_to_a_person(client: TestClient) -> None:
-    cid = str(client.post("/claims", json={"customer_id": "C-1002"}).json()["id"])
-    client.put(f"/claims/{cid}/policy", json={"policy_number": "HH-2024-0933"})
+    cid = str(client.post("/claims", json={"customer_id": "C-1003"}).json()["claim_id"])
+    client.put(f"/claims/{cid}/policy", json={"policy_number": "ACC-2026-2210"})
     client.post(
         f"/claims/{cid}/messages",
-        json={"text": "Water damage on 14 September 2026, CHF 3,200"},
+        json={"text": "I fell on 1 December 2026, CHF 3,200"},
     )
     c = claim(client, cid)
     assert c["outcome"] == "handler_review" and c["agent_state"] == "closed"

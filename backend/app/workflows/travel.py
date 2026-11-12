@@ -63,6 +63,11 @@ WORKFLOW = Workflow(
     claim_type="travel",
     required_documents=required_documents,
     straight_through_limit=2500,
+    causes=(
+        ("illness", r"\b(ill|sick|illness)\b"),
+        ("luggage", r"\b(luggage|baggage)\b"),
+    ),
+    default_cause="cancellation",
     rules=[
         Rule("C002", cancellation_between_incident_and_departure),
         Rule("C003", amount_is_price_minus_refund),

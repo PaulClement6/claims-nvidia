@@ -93,7 +93,7 @@ def read_ids(
 
 def test_endpoint_streams_with_last_event_id_and_after(live_url: str) -> None:
     claim = httpx.post(f"{live_url}/claims", json={"customer_id": "C-1001"}).json()
-    cid = claim["id"]
+    cid = claim["claim_id"]
     for _ in range(2):
         httpx.get(f"{live_url}/claims/{cid}/policies")
     url = f"{live_url}/claims/{cid}/events"

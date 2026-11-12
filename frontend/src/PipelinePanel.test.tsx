@@ -78,6 +78,25 @@ test('an event that arrives twice is shown once', () => {
   expect(screen.getAllByText('Get customer policies 1')).toHaveLength(1)
 })
 
+test('shows a small thumbnail for an image document and none for a PDF', async () => {
+  const photo = {
+    id: 'D-2',
+    file: 'CL-1/D-2.jpg',
+    document_type: 'damage_photo',
+    file_metadata: { original_name: 'damage-photo-1.jpg' },
+    fields: [{ name: 'damage_description', value: 'water stain', source: { document_id: 'D-2', page: 1, snippet: null, box: [1, 2, 3, 4] } }],
+  }
+  const pdf = { ...photo, id: 'D-1', file: 'CL-1/D-1.pdf', document_type: 'repair_invoice', file_metadata: { original_name: 'repair-invoice.pdf' }, fields: [] }
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(Response.json({ ...emptyClaim, documents: [pdf, photo] }))))
+  render(<PipelinePanel claimId="CL-1" />)
+  FakeEventSource.all[0].emit(event(1, { stage: 'extract_document' }))
+
+  const img = await screen.findByRole('img', { name: 'damage-photo-1.jpg' })
+  expect(img).toHaveAttribute('src', '/claims/CL-1/documents/D-2/file')
+  expect(img).toHaveStyle({ maxHeight: '96px' })
+  expect(screen.getAllByRole('img')).toHaveLength(1)
+})
+
 test('closes the stream when the claim changes or the panel goes away', () => {
   const { rerender, unmount } = render(<PipelinePanel claimId="CL-1" />)
   FakeEventSource.all[0].emit(event(1))

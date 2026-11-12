@@ -38,10 +38,15 @@ def new_claim(client: TestClient, customer: str = "C-1001") -> dict[str, object]
 
 def test_new_claim_is_open_with_no_policy_and_no_type(client: TestClient) -> None:
     claim = new_claim(client)
-    assert claim["policy"] is None
-    assert claim["type"] is None
-    assert claim["status"] == "open"
-    assert client.get(f"/claims/{claim['id']}").json() == claim
+    full = client.get(f"/claims/{claim['claim_id']}").json()
+    assert full["policy"] is None and full["type"] is None
+    assert full["status"] == "open"
+    assert claim == {
+        "claim_id": full["id"],
+        "policy_number": None,
+        "status": "open",
+        "message": None,
+    }
 
 
 def test_claim_for_unknown_customer_is_404(client: TestClient) -> None:
@@ -55,11 +60,11 @@ def test_six_policies_through_the_gateway_with_one_event_each(
     numbers: list[str] = []
     for customer in ["C-1001", "C-1002", "C-1003"]:
         claim = new_claim(client, customer)
-        res = client.get(f"/claims/{claim['id']}/policies")
+        res = client.get(f"/claims/{claim['claim_id']}/policies")
         assert res.status_code == 200
         numbers += [p["number"] for p in res.json()]
         store: Store = client.app.state.store  # type: ignore[attr-defined]
-        [event] = store.events_since(str(claim["id"]), 0)
+        [event] = store.events_since(str(claim["claim_id"]), 0)
         assert event.stage == "get_customer_policies"
         assert event.inputs == {"customer_id": customer}
         assert len(event.outputs["policies"]) == len(res.json())
@@ -83,21 +88,28 @@ def test_set_policy_gives_type_from_line(
     client: TestClient, customer: str, policy: str, claim_type: str
 ) -> None:
     claim = new_claim(client, customer)
-    res = client.put(f"/claims/{claim['id']}/policy", json={"policy_number": policy})
+    res = client.put(
+        f"/claims/{claim['claim_id']}/policy", json={"policy_number": policy}
+    )
     assert res.status_code == 200
-    body = res.json()
-    assert body["type"] == claim_type
-    assert body["policy"]["number"] == policy
-    assert client.get(f"/claims/{claim['id']}").json() == body
+    # the customer view: no type, no signal, no score
+    assert res.json() == {
+        "claim_id": claim["claim_id"],
+        "policy_number": policy,
+        "status": "open",
+        "message": None,
+    }
+    full = client.get(f"/claims/{claim['claim_id']}").json()
+    assert full["type"] == claim_type and full["policy"]["number"] == policy
 
 
 def test_policy_of_another_customer_is_404(client: TestClient) -> None:
     claim = new_claim(client, "C-1002")
     res = client.put(
-        f"/claims/{claim['id']}/policy", json={"policy_number": "TRV-2026-0417"}
+        f"/claims/{claim['claim_id']}/policy", json={"policy_number": "TRV-2026-0417"}
     )
     assert res.status_code == 404
-    assert client.get(f"/claims/{claim['id']}").json()["policy"] is None
+    assert client.get(f"/claims/{claim['claim_id']}").json()["policy"] is None
 
 
 def test_set_policy_of_an_unknown_claim_is_404(client: TestClient) -> None:

@@ -55,7 +55,7 @@ function Events({ claimId }: { claimId: string | null }) {
       {claimId && <p className="mono">Claim {claimId}</p>}
       {claim && <OutcomeSection claim={claim} />}
       {claim && <ChecksSection claim={claim} ran={checksRan} />}
-      {claim && <ExtractedSection docs={claim.documents} />}
+      {claim && <ExtractedSection docs={claim.documents} claimId={claimId!} />}
       <h3>Events</h3>
       {events.length === 0 ? (
         <p className="muted">No event yet. Start a claim in the customer panel.</p>
