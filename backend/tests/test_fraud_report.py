@@ -12,6 +12,7 @@ from app.fraud.report import NOT_CHECKED, write_report
 from app.main import create_app
 from app.models import FraudReport, Outcome, Source
 from app.store import InvestigationWithoutReport, Store
+from tests import test_travel_api
 from tests.builders import travel_claim
 from tests.test_health_api import FILES, run_claim
 
@@ -152,18 +153,33 @@ def test_claim_file_3_has_a_report_that_names_all_seven_signals(
     assert len(r["not_checked"]) == 4 and r["next_steps"]
 
 
-def test_the_report_is_written_in_the_same_turn_before_the_customer_message(
+def test_the_report_has_its_own_event_inside_the_routing_before_the_message(
     client: TestClient,
 ) -> None:
     cid = run_claim(client)
     events = client.app.state.store.events_since(cid, 0)  # type: ignore[attr-defined]
     tools = [e.stage for e in events if e.actor == "tool"]
-    assert tools.index("assess_and_route") + 1 == tools.index("write_fraud_report")
+    # nested call: the report event ends, and is written, just before the routing event
+    assert tools.index("write_fraud_report") + 1 == tools.index("assess_and_route")
+    assert tools.count("write_fraud_report") == tools.count("assess_and_route") == 1
     [write] = [e for e in events if e.stage == "write_fraud_report"]
     assert write.model is None and "template" in write.title
+    assert write.inputs == {"claim_id": cid}
     assert write.outputs["outcome"] == "investigation"
+    [route] = [e for e in events if e.stage == "assess_and_route"]
+    assert route.outputs["outcome"] == "investigation"
     last = [e for e in events if e.actor == "agent"][-1]
-    assert write.sequence < last.sequence  # before the customer message
+    assert route.sequence < last.sequence
+
+
+def test_the_agent_gets_nothing_but_the_customer_message_for_claim_file_3(
+    client: TestClient,
+) -> None:
+    cid = run_claim(client)
+    gateway = client.app.state.gateway  # type: ignore[attr-defined]
+    out = gateway.call(cid, "assess_and_route", {"claim_id": cid})
+    assert list(out) == ["customer_message"]
+    assert gateway.call(cid, "write_fraud_report", {"claim_id": cid}) == {}
 
 
 def test_a_claim_with_no_investigation_has_no_report_and_no_report_event(
@@ -176,19 +192,19 @@ def test_a_claim_with_no_investigation_has_no_report_and_no_report_event(
     assert "write_fraud_report" not in [e.stage for e in events]
 
 
-def test_the_tool_refuses_a_wrong_outcome(client: TestClient) -> None:
-    cid = run_claim(client)
+def test_a_direct_call_on_a_claim_that_is_not_an_investigation_is_refused(
+    client: TestClient,
+) -> None:
+    cid = test_travel_api.run_claim(client)
     gateway = client.app.state.gateway  # type: ignore[attr-defined]
-    c = client.get(f"/claims/{cid}").json()
-    for bad in (
-        {"outcome": "handler_review", "score": 130},
-        {"outcome": "investigation", "score": 5},
-    ):
-        with pytest.raises(ValueError):
-            gateway.call(
-                cid, "write_fraud_report", {"claim_id": cid, "reasons": [], **bad}
-            )
-    assert client.get(f"/claims/{cid}").json() == c  # nothing changed
+    before = client.get(f"/claims/{cid}").json()
+    with pytest.raises(ValueError, match="only for a claim routed to investigation"):
+        gateway.call(cid, "write_fraud_report", {"claim_id": cid})
+    with pytest.raises(TypeError):  # no outcome or score from a caller
+        gateway.call(
+            cid, "write_fraud_report", {"claim_id": cid, "outcome": "investigation"}
+        )
+    assert client.get(f"/claims/{cid}").json() == before
 
 
 def test_a_failing_report_leaves_the_claim_open_not_investigated(

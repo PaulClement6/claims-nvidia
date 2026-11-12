@@ -103,16 +103,13 @@ def test_checks_and_routing_are_two_tool_events_without_a_model(
     assert routed.outputs["customer_message"] == VALIDATED
 
 
-def test_the_agent_gets_the_text_and_the_result_to_hand_on_and_nothing_else(
+def test_the_agent_gets_the_customer_message_and_nothing_else(
     client: TestClient,
 ) -> None:
     cid = run_claim(client)
     gateway = client.app.state.gateway  # type: ignore[attr-defined]
     assert gateway.call(cid, "assess_and_route", {"claim_id": cid}) == {
-        "customer_message": VALIDATED,
-        "outcome": "straight_through",
-        "score": 0,
-        "reasons": [],
+        "customer_message": VALIDATED
     }
     assert gateway.call(cid, "run_checks", {"claim_id": cid}) == {}
 

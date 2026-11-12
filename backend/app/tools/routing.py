@@ -1,9 +1,12 @@
 """Tools `run_checks`, `assess_and_route` and `write_fraud_report`: no model.
 
-`assess_and_route` is the only place that decides the outcome. For `investigation`
-it saves nothing yet: the claim must never be saved as an investigation with no
-report (non-negotiable 4). The agent then calls `write_fraud_report` with that
-result, and the tool saves the outcome and the report together, in one store call.
+`assess_and_route` is the only place that decides the outcome, and the agent gets
+the customer message from it, nothing else. For `investigation` it calls
+`write_fraud_report` itself (trusted code, not the agent), which computes the same
+outcome from the claim and saves outcome and report together, in one store call
+(non-negotiable 4). If the report fails, `assess_and_route` fails and nothing is
+saved. The report tool is called inside `assess_and_route`, so its event is written
+first (it ends first): "Write fraud report" comes right before "Assess and route".
 """
 
 from typing import Any
@@ -36,7 +39,10 @@ def register(gateway: Gateway) -> None:
         claim = load(claim_id)
         total = sum_points(claim.signals)
         outcome, reasons = route(claim, claim.signals, WORKFLOWS.get(claim.type or ""))
-        if outcome != Outcome.investigation:
+        if outcome == Outcome.investigation:
+            # its own event (rule 5); it saves the outcome and the report together
+            gateway.call(claim_id, "write_fraud_report", {"claim_id": claim_id})
+        else:
             gateway.store.save_routing(
                 claim_id, total, outcome, reasons, customer_status(outcome)
             )
@@ -47,35 +53,27 @@ def register(gateway: Gateway) -> None:
             "customer_message": customer_message(outcome),
         }
 
-    def write_fraud_report(
-        claim_id: str, outcome: str, score: int, reasons: list[str]
-    ) -> dict[str, Any]:
-        """Writes the report and saves it with the outcome of `assess_and_route`.
-        It refuses a result the routing would not give for the signals of the claim."""
+    def write_fraud_report(claim_id: str) -> dict[str, Any]:
+        """Writes the report and saves it with the outcome, score and reasons that
+        the routing gives for the signals of the claim. Nothing comes from a caller."""
         claim = load(claim_id)
-        given = Outcome(outcome)
-        want, _ = route(claim, claim.signals, WORKFLOWS.get(claim.type or ""))
-        if given != Outcome.investigation or want != given:
+        outcome, reasons = route(claim, claim.signals, WORKFLOWS.get(claim.type or ""))
+        if outcome != Outcome.investigation:
             raise ValueError(
                 "a fraud report is only for a claim routed to investigation"
             )
-        if score != sum_points(claim.signals):
-            raise ValueError("the score is not the score of the signals")
-        report = write_report(claim, claim.signals, given, score)
+        total = sum_points(claim.signals)
+        report = write_report(claim, claim.signals, outcome, total)
         gateway.store.save_routing(
-            claim_id, score, given, reasons, customer_status(given), report
+            claim_id, total, outcome, reasons, customer_status(outcome), report
         )
         return report.model_dump(mode="json")
 
     # The agent gets nothing from the checks, and only the customer text from the
     # routing. The event keeps the full result for the pipeline panel.
     gateway.register("run_checks", run_checks, visible=())
-    # The agent gets the result it needs to go on: the customer text, and the outcome,
-    # the score and the reasons to hand to `write_fraud_report`.
     gateway.register(
-        "assess_and_route",
-        assess_and_route,
-        visible=("customer_message", "outcome", "score", "reasons"),
+        "assess_and_route", assess_and_route, visible=("customer_message",)
     )
     gateway.register(
         "write_fraud_report",

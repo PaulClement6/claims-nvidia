@@ -28,7 +28,7 @@ MARGIN = 56
 
 
 class Doc:
-    """One page. Every printed text can become a field: the snippet is the text itself."""
+    """One page. Every printed text can become a field (the snippet is the text)."""
 
     def __init__(self, path: Path, title: str, document_type: str) -> None:
         self.c = Canvas(str(path), pagesize=A4, invariant=1, pageCompression=0)
@@ -172,7 +172,8 @@ def booking_confirmation(path: Path) -> dict[str, Any]:
     d.text(
         MARGIN,
         y - 50,
-        "Payment received in full on 2026-06-02 by card. Free cancellation is not included.",
+        "Payment received in full on 2026-06-02 by card. "
+        "Free cancellation is not included.",
         size=9,
     )
     d.text(
@@ -410,7 +411,7 @@ def tamper(path: Path) -> None:
 
 
 def medical_invoice(path: Path) -> dict[str, Any]:
-    """Claim file 3: the invoice is tampered. Lines add up to 1,450, the total says 4,450."""
+    """Claim file 3: tampered. The lines add up to 1,450, the total says 4,450."""
     d = Doc(path, "Invoice MZS-2026-3317", "medical_invoice")
     d.letterhead(CLINIC[0], CLINIC[1], GREEN)
     d.address(["Jonas Meier", "Hirschengasse 9", "8032 Zurich", "Switzerland"])
@@ -552,14 +553,15 @@ def kitchen_photo(
         )
         g.rectangle((x0 + 170, 200, x0 + 178, 250), fill=(90, 90, 90))
     g.rectangle((60, floor_y - 20, 740, floor_y), fill=(90, 74, 58))  # plinth
-    # the water damage: a dark stain on the floor and a damp band at the foot of the cabinets
+    # the water damage: a dark stain on the floor, a damp band at the cabinet foot
     x0, y0, x1, y1 = stain
     g.ellipse((x0, y0, x1, y1), fill=(112, 92, 72))
     g.ellipse((x0 + 25, y0 + 12, x1 - 25, y1 - 12), fill=(92, 74, 58))
     for i in range(70):  # damp cabinet foot: dark at the floor, fading upwards
         t = i / 70
         rgb = tuple(
-            int(a + (b - a) * t) for a, b in zip((128, 102, 74), (186, 160, 120))
+            int(a + (b - a) * t)
+            for a, b in zip((128, 102, 74), (186, 160, 120), strict=True)
         )
         g.line((x0 + 20, floor_y - 21 - i, x1 - 20, floor_y - 21 - i), fill=rgb)
     img = img.filter(ImageFilter.GaussianBlur(1.2))

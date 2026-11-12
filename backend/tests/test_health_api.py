@@ -90,10 +90,11 @@ def test_the_two_new_checks_are_two_events_between_the_checks_and_the_routing(
     events = client.app.state.store.events_since(cid, 0)  # type: ignore[attr-defined]
     stages = [e.stage for e in events if e.actor == "tool"]
     tail = stages[stages.index("run_checks") :]
-    assert tail[:4] == [
+    assert tail[:5] == [
         "run_checks",
         "check_tampering",
         "check_consistency",
+        "write_fraud_report",  # nested in the routing: its event is written first
         "assess_and_route",
     ]
     for name in ("check_tampering", "check_consistency"):
