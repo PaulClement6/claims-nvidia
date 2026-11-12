@@ -1,0 +1,339 @@
+/* Claims design system, copied from NemoForge. */
+
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0a0b0a;
+  --sidebar: #0f110f;
+  --surface: #141614;
+  --surface-raised: #1c1f1b;
+  --border: #2a2e28;
+  --text: #f3f4ef;
+  --text-2: #a9afa4;
+  --primary: #ffe600;
+  --on-primary: #0a0b0a;
+  --highlight: #ffe600;
+  --on-highlight: #0a0b0a;
+  --accent: #76b900;
+  --link: #a8d65c;
+  --accent-surface: #12200a;
+  --ok: #8fd12a;
+  --ok-bg: #1a2c08;
+  --warn: #ff9f1c;
+  --warn-bg: #3a2608;
+  --bad: #ff6b5e;
+  --bad-bg: #3a1512;
+  --idle: #a9afa4;
+  --idle-bg: #1c1f1b;
+  --font: 'IBM Plex Sans', 'Segoe UI', Arial, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f6f6f2;
+  --sidebar: #ffffff;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  /* Outlines of inputs, selects and buttons: 3:1 (WCAG 1.4.11). Dividers stay light.
+     Dark has no --divider: its rules fall back to --border. */
+  --border: #858a80;
+  --divider: #e2e3dc;
+  --text: #111311;
+  --text-2: #2b2f29;
+  --primary: #111311;
+  --on-primary: #ffffff;
+  --highlight: #ffe600;
+  --on-highlight: #111311;
+  --accent: #4b7a00;
+  --link: #2f5000;
+  --accent-surface: #f4fae8;
+  --ok: #2f5000;
+  --ok-bg: #eaf5d6;
+  --warn: #6b3800;
+  --warn-bg: #fff1dc;
+  --bad: #8f1d16;
+  --bad-bg: #fce8e6;
+  --idle: #2b2f29;
+  --idle-bg: #eff0ea;
+}
+
+/* Base elements */
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+h1 {
+  font-size: 22px;
+}
+h2 {
+  font-size: 18px;
+}
+h3 {
+  font-size: 15px;
+}
+
+a {
+  color: var(--link);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: var(--text);
+  box-sizing: border-box;
+  border-radius: var(--radius);
+}
+
+button {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  background: transparent;
+  font-weight: 500;
+  cursor: pointer;
+}
+button:hover:not(:disabled) {
+  background: var(--surface-raised);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+input,
+select,
+textarea {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+textarea {
+  padding: 10px 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+th,
+td {
+  padding: 10px 14px;
+  border-top: 1px solid var(--divider, var(--border));
+}
+
+:focus-visible {
+  outline: 2px solid var(--highlight);
+  outline-offset: 2px;
+}
+/* Yellow on white is about 1.3:1: in light theme, a dark ring with a yellow inner halo. */
+:root[data-theme='light'] :focus-visible {
+  outline-color: var(--text);
+  box-shadow: 0 0 0 2px var(--highlight);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* Shared classes */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--divider, var(--border));
+  border-radius: var(--radius-lg);
+  padding: 18px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.pill::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.pill-ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.pill-warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.pill-bad {
+  background: var(--bad-bg);
+  color: var(--bad);
+}
+.pill-idle {
+  background: var(--idle-bg);
+  color: var(--idle);
+}
+
+/* Any element can be a button (<a>, <label>): give it the button box too. */
+.btn-primary,
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  border: 0;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary);
+  filter: brightness(0.92);
+}
+
+.btn-danger {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+.btn-danger:hover:not(:disabled) {
+  background: var(--bad-bg);
+}
+
+.muted {
+  color: var(--text-2);
+}
+
+.mono {
+  font-family: var(--mono);
+}
+
+/* App shell */
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  flex: 0 0 232px;
+  box-sizing: border-box;
+  padding: 20px 14px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--divider, var(--border));
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.sidebar-foot {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 0 8px;
+  font-size: 13px;
+}
+.sidebar-foot .actions {
+  display: flex;
+  gap: 8px;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Panels: both fill the viewport height and scroll inside. */
+
+.shell {
+  height: 100vh;
+}
+.panels {
+  flex-direction: row;
+  min-height: 0;
+}
+.panel {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+.panel-customer {
+  flex: 0 0 440px;
+}
+.panel-pipeline {
+  flex: 1;
+}
+
+@media (max-width: 899px) {
+  .shell {
+    height: auto;
+    flex-direction: column;
+  }
+  .sidebar {
+    flex: none;
+  }
+  .panels {
+    flex-direction: column;
+  }
+  .panel,
+  .panel-customer,
+  .panel-pipeline {
+    flex: none;
+    height: calc(100vh - 48px);
+  }
+}
