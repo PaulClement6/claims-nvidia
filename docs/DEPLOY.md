@@ -107,7 +107,7 @@ Result on 2026-11-13: 9 of 9 pass. In the browser: claim file 3 gives `investiga
 3. Do not work in `~/claims-nvidia`: that folder is the demo. Work in your own copy, on other ports:
 
 ```sh
-git clone https://github.com/PaulClement6/claims-nvidia.git ~/work/claims-nvidia
+git clone https://github.com/<your GitHub name>/claims-nvidia.git ~/work/claims-nvidia   # your fork, see docs/NIKOLA.md
 cd ~/work/claims-nvidia/backend && uv sync && uv run uvicorn app.main:app --port 8001
 cd ~/work/claims-nvidia/frontend && npm ci && BACKEND_URL=http://localhost:8001 npm run dev -- --port 5174
 ```

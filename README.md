@@ -57,7 +57,7 @@ Checks (run each one before you open a pull request):
 |---|---|---|
 | Tests | `uv run pytest` | `npm test` |
 | Types | `uv run mypy .` | `npm run typecheck` |
-| Lint | `uv run ruff check .` | `npm run lint` |
+| Lint | `uv run ruff check . ../scripts && uv run ruff format --check . ../scripts` | `npm run lint` |
 
 ## Work on the VM
 
