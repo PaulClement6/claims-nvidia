@@ -73,7 +73,7 @@ On the demo instance, with the three mock claim files of `docs/MOCK-DATA.md`:
 3. **Health, fraud.** Lukas claims a medical invoice. The policy started five days before, the invoice total was changed, the PDF was edited, and the patient name is not his. Outcome: `investigation`. The customer panel shows the same message as in case 2. The pipeline panel shows a fraud report with every reason and its evidence.
 4. The pipeline panel shows every agent tool call live for the three cases, and the sandbox policy of the agent.
 5. A visitor can run a claim alone with the kit of mock documents, and the reset deletes what he uploaded.
-6. The metrics page shows accuracy per field, pass rate, time per claim and GPU usage per claim on the mock test set.
+6. The metrics page shows accuracy per field, pass rate, time per claim and GPU usage per claim on the mock test set. Not built: it is a task of the intern (M4, issue #19).
 
 ## Not in the first version
 
