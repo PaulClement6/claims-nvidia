@@ -1,8 +1,9 @@
-"""The fraud report of docs/FRAUD.md, as a template (`local` mode).
+"""The fraud report of docs/FRAUD.md, as a template.
 
 Built from the signals only: it adds no fact. Every text comes from a signal (what
-it saw, its sources, what it expected) or from a fixed table of this file. In `nim`
-mode an LLM writes the same fields from the same signals.
+it saw, its sources, what it expected) or from a fixed table of this file. This
+template runs in every mode. Issue #26 may have an LLM write the same fields from
+the same signals.
 
 The handler must read it in one minute: one sentence that says why, the findings
 (most points first), what was not checked, and the next steps.

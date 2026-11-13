@@ -7,7 +7,7 @@ Links checked on 2026-11-12. The NVIDIA stack changes every month: check the ver
 | Document | Take from it |
 |---|---|
 | [NemoClaw overview](https://docs.nvidia.com/nemoclaw/latest/about/overview) | What NemoClaw adds on top of OpenShell: onboarding, blueprint, routed inference, egress policy. |
-| [NemoClaw with Hermes](https://docs.nvidia.com/nemoclaw/latest/user-guide/hermes/about/overview) | How to run the Hermes agent in a sandbox. Our candidate harness (O2). |
+| [NemoClaw with Hermes](https://docs.nvidia.com/nemoclaw/latest/user-guide/hermes/about/overview) | How to run the Hermes agent in a sandbox. Not used: decision D36 replaced Hermes with our own LangGraph agent. Kept for reference. |
 | [OpenShell: sandbox policies](https://docs.nvidia.com/openshell/latest/sandboxes/policies) | The policy YAML: static parts (filesystem, process) and the network part that can change on a running sandbox. |
 | [OpenShell: security best practices](https://docs.nvidia.com/openshell/security/best-practices) | Every control, its default, and the risk if we relax it. |
 | [OpenShell repository](https://github.com/NVIDIA/OpenShell) | CLI commands, examples, custom containers, the agent skills in `.agents/skills/`. |

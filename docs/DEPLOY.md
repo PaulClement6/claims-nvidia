@@ -51,7 +51,7 @@ cd ~/claims-nvidia && infra/deploy/public.sh
 | Close the door | `sudo systemctl disable --now caddy` |
 | Open it again | `sudo systemctl enable --now caddy` |
 
-Checked on 2026-11-13 from outside, on `https://80-4nq5fm4sn.gobrev.dev`: 401 with no password and with a wrong one, the page and `/health` with the right one, and the events of one agent turn arrive live (at 0.2 s, 5.9 s and 9.9 s).
+Checked on 2026-11-13 from outside, on the public URL: 401 with no password and with a wrong one, the page and `/health` with the right one, and the events of one agent turn arrive live (at 0.2 s, 5.9 s and 9.9 s).
 
 The URL holds the id of the instance, not its IP: it stays the same after a stop and a start.
 
@@ -114,7 +114,7 @@ cd ~/work/claims-nvidia/frontend && npm ci && BACKEND_URL=http://localhost:8001 
 
 From your machine: `brev port-forward claims-nvidia -p 5174:5174`.
 
-4. For the Omni reader (task 26) you need a key: copy `.env.example` to `.env` in your copy and ask Paul for the key. Never commit `.env`.
+4. For the Omni reader (task 26, issue #18) you need a key: copy `.env.example` to `.env` in your copy and ask Paul for the key. Never commit `.env`.
 
 ## Costs and stop
 

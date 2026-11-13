@@ -1,6 +1,6 @@
 # Architecture
 
-Date: 2026-11-12. Status: **decided for version 1** (grill session). The decisions and the open points are in `docs/DECISIONS.md`.
+Date: 2026-11-12, checked against the code on 2026-11-13. Status: **decided for version 1** (grill session). M0 to M3 are built; the document reading pipeline (M4) is not. The decisions and the open points are in `docs/DECISIONS.md`.
 
 The rule of the model, taken from NemoForge: **a workflow decides, a tool acts, an agent reasons inside a sandbox.**
 
@@ -20,13 +20,16 @@ The rule of the model, taken from NemoForge: **a workflow decides, a tool acts, 
         │
         └─ Tool gateway (trusted code, outside the sandbox)
              ├─ get_customer_policies      mock policy DB
-             ├─ classify_document          fixture, then VLM
-             ├─ extract_document           fixture, then VLM → JSON with sources
+             ├─ get_claim_summary          the claim as the agent may see it
+             ├─ update_claim               save the story, the date, the amount
+             ├─ required_documents         documents the workflow asks for
+             ├─ classify_document          fixture reader (the VLM is M4)
+             ├─ extract_document           fixture reader → JSON with sources (the VLM is M4)
              ├─ run_checks                 rule engine (deterministic)
              ├─ check_tampering            file forensics (deterministic)
-             ├─ check_consistency          VLM over all documents
+             ├─ check_consistency          deterministic (a VLM check, C004, is M5)
              ├─ assess_and_route           score → outcome (deterministic)
-             └─ write_fraud_report         LLM, from the signals only
+             └─ write_fraud_report         template, from the signals only (an LLM is M5)
 ```
 
 - The **agent** is a LangGraph graph (decision D36). The model talks to the customer and, in two nodes, calls the tools of that node. The graph holds the order of the steps. The agent holds no rule and no score. It cannot change an outcome.
@@ -45,7 +48,7 @@ The claim flow is a graph of five nodes (`backend/app/agent/graph.py`). The orde
 | Node | Does | Tools |
 |---|---|---|
 | `intake` | Model. Asks for the story, the date and the amount, and saves them. | `get_claim_summary`, `update_claim` |
-| `documents` | Model. Asks for the required documents and reads each upload. | `required_documents`, `classify_document`, `extract_document`, `get_claim_summary`, `customer_is_done` |
+| `documents` | Model. Asks for the required documents and reads each upload. | `required_documents`, `classify_document`, `extract_document`, `get_claim_summary`, `update_claim`, `customer_is_done` |
 | `checks` | Code. Reads any document the model left unread, then `run_checks`, `check_tampering`, `check_consistency`. | none for the model |
 | `route` | Code. `assess_and_route`. For `investigation` it writes the fraud report. | none for the model |
 | `answer` | Code. Sends the `customer_message` word for word, closes the claim. | none for the model |
@@ -87,7 +90,7 @@ Checks, score, routing and the UI read only the output of this contract. They do
 | Mode | Agent | Document reading | Sandbox | Use |
 |---|---|---|---|---|
 | `local` | Scripted state machine | Fixture reader | None | Development, CI, tests. No GPU, no key. |
-| `nim` | The LangGraph graph, in the backend process. Model: `ChatOpenAI` on the hosted NVIDIA endpoint. | Fixture reader or Omni reader (hosted endpoint) | None | Work on the agent and on extraction quality. |
+| `nim` | The LangGraph graph, in the backend process. Model: `ChatOpenAI` on the hosted NVIDIA endpoint. | Fixture reader (the Omni reader is M4) | None | Work on the agent and on extraction quality. |
 | `sandbox` | The same graph, in OpenShell. The tools are MCP tools. | Same as `nim` | Enforced | The demo, on the Brev VM. |
 
 The three modes share the tool gateway, the schemas, the rules and the UI. Only the agent and the model clients change. `sandbox` mode runs the same `build_graph`: the spike of issue #13 proved the graph, the model key swap and the MCP tools in OpenShell. Issue #14 built it (section 7). `local` mode imports no LangChain and no LangGraph: the packages load only in `nim` mode. `local` mode must give the right outcome for the three mock claim files.
@@ -106,6 +109,10 @@ The three modes share the tool gateway, the schemas, the rules and the UI. Only 
 
 - **Customer view** of a claim: messages and status only. Built by one function that drops signals, score and report. It gives the same exact message for `handler_review` and `investigation`. Non-negotiable 2 tests this function.
 - **Pipeline / handler view**: everything.
+
+### 5a. Routes
+
+`GET /health`, `GET /customers`, `POST /claims`, `GET /claims/{id}` (the full claim, for the pipeline panel), `GET /claims/{id}/customer` (the customer view), `GET /claims/{id}/policies`, `PUT /claims/{id}/policy`, `GET` and `POST /claims/{id}/messages`, `POST /claims/{id}/documents`, `GET /claims/{id}/documents/{doc}/file`, `GET /claims/{id}/events` (the event stream), `GET /claims/{id}/sandbox`, `POST /claims/{id}/sandbox/probe`, and under `/demo`: `GET /kit`, `GET /scenarios`, `GET /kit/{folder}/{file}`, `POST /reset`. The MCP server of the sandbox is mounted at `/mcp/<token>`. The code is `backend/app/main.py` and `backend/app/demo.py`.
 
 ## 6. Workflows
 
@@ -141,7 +148,7 @@ The pipeline panel has a Sandbox section right under the graph strip. It shows o
 - **Confinement probe**: `POST /claims/{id}/sandbox/probe` (409 when the sandbox is not running, in the per-claim lock) runs a fixed script in the sandbox. The script is a constant of the backend (`PROBE` in `app/agent/sandbox_panel.py`), sent on stdin to `python -`: nothing of the request reaches the command. It tries five things, each with a timeout of 8 s: an HTTPS request to `example.com`; `tools/call` on the MCP path of a made-up other claim; a tool the policy does not allow (`write_fraud_report`) on its own path; reading the model key (the script reports only if it starts like a real key, and the placeholder text); listing `/Users` and `/host`. The backend decides from the answers, not the sandbox: a try is "denied" only when its answer proves it (HTTP 403, the supervisor refusing the connection, no key, no folder). One `probe` event per try (`Probe: other host → denied`), then the denials it caused. A try that is not denied is said plainly, and the endpoint returns `"confined": false`.
 - **Order of events**: the node and model events of the sandbox arrive in one batch after the turn. Each one carries `at`, the time it happened by the clock of the sandbox. The backend stores that as the display time, kept inside the turn (`display_time`), and the panel sorts by time. The tool events written by the gateway keep their own time and stay the trusted events.
 
-NemoForge runs OpenShell 0.1.5 with provider profiles (`inference.local` was removed in 0.1.x). This setup stays on 0.1.5. Later, test OpenShell 0.1.8: its gateway refuses to start without authentication, and static credentials go only in the `Authorization` header (table in `docs/DECISIONS.md`, spike section). NeMo Guardrails comes after the first demo. NemoForge notes: `../nemoforge-plateforme/docs/DECISIONS.md` and `docs/LESSONS.md`.
+NemoForge runs OpenShell 0.1.5 with provider profiles (`inference.local` was removed in 0.1.x). This setup stays on 0.1.5. Later, test OpenShell 0.1.8: its gateway refuses to start without authentication, and static credentials go only in the `Authorization` header (table in `docs/DECISIONS.md`, spike section). NeMo Guardrails is issue #62 (M4, decision D60). NemoForge notes: `../nemoforge-plateforme/docs/DECISIONS.md` and `docs/LESSONS.md`.
 
 ## 8. Stack
 
@@ -151,22 +158,27 @@ NemoForge runs OpenShell 0.1.5 with provider profiles (`inference.local` was rem
 - Model calls: OpenAI-compatible chat completions for the VLM and the agent LLM, on `integrate.api.nvidia.com`. Later: dedicated APIs for OCR, page elements, table structure and Parse.
 - UI: same look as NemoForge.
 
-## 9. Repository layout (target)
+## 9. Repository layout
 
 ```
 backend/app/
-  api/          claims, documents, events, views
-  agent/        graph (LangGraph, no store import), graph_agent (backend runner), scripted agent, phrases (shared words and rules), model, sandbox (runner), sandbox_turn (the turn process in the image), sandbox_image (image build context)
-  tools/        tool gateway, one module per tool, guard (rule 1 of the routing), mcp_server
-  docintel/     reader contract, fixture reader (base); Omni reader, evaluation (intern)
+  main.py       FastAPI app and the claims routes (section 5a)
+  demo.py       demo routes: kit, scenarios, reset
+  models.py     the Pydantic models of section 4
+  views.py      the customer view
+  stream.py     the event stream (server-sent events)
+  agent/        graph (LangGraph, no store import), graph_agent (backend runner), scripted agent, handover, phrases (shared words and rules), model, sandbox (runner), sandbox_turn (the turn process in the image), sandbox_image (image build context), sandbox_panel (policy, denials, probe)
+  tools/        tool gateway, one module per group of tools, guard (rule 1 of the routing), mcp_server
+  docintel/     reader contract, fixture reader (base); the Omni reader is the work of the intern
   workflows/    engine, property.py, health.py, travel.py
   checks/       rules, tampering, consistency
-  fraud/        score, routing, report
-  store/        database, mock policies, mock claims system
+  fraud/        routing (score and outcome), report (template)
+  store/        SQLite store, seeded from data/mock/policies.json
 backend/tests/
-frontend/src/   CustomerPanel, PipelinePanel
-data/mock/      customers, policies, claim files, expected results
-infra/sandbox/  Dockerfile, policy template, provider profile, setup.sh (Brev setup later)
-scripts/        mock document generator, evaluation
+frontend/src/   App, Demo, CustomerPanel, Chat, PipelinePanel, PipelineSections, GraphStrip, SandboxSection, Health, ClaimMap and mapModel (the Map page)
+data/mock/      policies, claim folders, hard versions, index.json, expected results
+infra/sandbox/  Dockerfile, policy template, provider profile, setup.sh
+infra/deploy/   install.sh (the Brev VM), public.sh (the public door)
+scripts/        mock document generator (mockdocs/), measure_agent.py
 docs/
 ```
