@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# The public door of the demo (issue #65): Caddy with automatic HTTPS and a
-# password, in front of the frontend on 127.0.0.1:5173. Nothing else is public.
+# The public door of the demo (issue #65): Caddy with a
+# password, behind the HTTPS of Brev, in front of the frontend on 127.0.0.1:5173. Nothing else is public.
 # Run it again to repair it. To change the password: delete the password file
 # and run it again. To close the door: sudo systemctl disable --now caddy
 set -euo pipefail
 
 user="demo"
 pwfile="$HOME/.config/claims/demo-password"
-# ponytail: sslip.io turns the public IP into a host name, so no domain to buy.
-# The URL changes if the IP changes. Set PUBLIC_HOST when you have a real name.
-host="${PUBLIC_HOST:-$(curl -fsS https://api.ipify.org | tr . -).sslip.io}"
+# Brev gives the HTTPS: an "HTTP port" of the Brev console sends
+# https://80-<instance id>.gobrev.dev to port 80 of the VM. So Caddy speaks
+# plain HTTP on 127.0.0.1:80 and asks for no certificate.
 
 if ! command -v caddy >/dev/null; then
   sudo apt-get install -y debian-keyring debian-archive-keyring apt-transport-https curl
@@ -28,7 +28,8 @@ fi
 hash="$(caddy hash-password <"$pwfile")"
 
 sudo tee /etc/caddy/Caddyfile >/dev/null <<EOF
-$host {
+http://:80 {
+	bind 127.0.0.1
 	basic_auth {
 		$user $hash
 	}
@@ -38,7 +39,6 @@ EOF
 sudo systemctl enable caddy
 sudo systemctl restart caddy
 
-echo "URL:      https://$host"
 echo "User:     $user"
 echo "Password: cat $pwfile"
-echo "Ports 80 and 443 must be open on the VM (Brev console, Access, Expose port)."
+echo "URL: Brev console, instance, Access, HTTP Ports: add port 80, then Share, public."
