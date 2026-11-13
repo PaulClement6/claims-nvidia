@@ -270,7 +270,7 @@ Order: #17, #18, #19 first. Then #20, #21, #22. Then #62. You can start #19 with
 
 **Report.** A table in `docs/EVALUATION.md`: document kind × reader (Omni alone, Parse + Omni), with accuracy and seconds per page. Then a recommendation: where the specialised chain is worth its cost.
 
-**Traps.** Phone photos must be photos of **mock** documents. Images differ between a Mac and Linux (D55): generate on one machine.
+**Traps.** Phone photos must be photos of **mock** documents. The scanned images differ between a Mac and Linux (D57, `docs/LESSONS.md`): generate on one machine.
 
 ### #62 Rails on what the agent reads
 
@@ -283,6 +283,8 @@ Order: #17, #18, #19 first. Then #20, #21, #22. Then #62. You can start #19 with
 2. Put a rail on the customer message, a rail on the text that `extract_document` returns, and a rail on the agent answer.
 3. A block never rejects a claim: the claim goes to a person, and one event says which rail blocked. If Guardrails is down, the claim goes to a person too.
 4. `local` mode still works with no Guardrails.
+
+**Know first.** Today the agent does not read the fields of a document: `extract_document` gives it only the type, and the reader runs in the backend (`docs/TECH.md`, section 3.7). So a proxy in front of the agent model covers the customer message and the answer, but not the document text. The rail on the document text must run in the backend, around the reader.
 
 **Try.** Where the rail runs: in the tool gateway, or as a proxy in front of the model. Which rail model. The cost in seconds per turn.
 
