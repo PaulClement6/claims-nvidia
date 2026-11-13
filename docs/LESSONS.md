@@ -66,3 +66,5 @@
 - The Brev CLI cannot open a port: only the Brev console can. Plan a step for a person. Use its "HTTP Ports" (an HTTPS URL on `gobrev.dev`, with a Brev login until you share it as public), not a raw port: no certificate to manage.
 - Caddy asks Let's Encrypt for a certificate as soon as it starts. With ports 80 and 443 closed, each try fails and counts against the limit of Let's Encrypt: start Caddy only when the ports are open.
 - The pipeline panel uses server-sent events (`EventSource`): check that a tunnel or a proxy supports them before you choose it.
+- The Brev HTTP port does not reach `127.0.0.1`: a service bound to the loopback gives a 503 from Brev. Listen on every interface and check that the raw port stays closed from outside.
+- `vite preview` refuses a Host name that it does not know (403). The proxy in front rewrites the Host header, so the frontend config does not hold the public name.

@@ -41,7 +41,7 @@ To watch, a person needs no Brev account: a public HTTPS URL, a user name and a 
 cd ~/claims-nvidia && infra/deploy/public.sh
 ```
 
-1. The script installs Caddy, makes a password (once) and puts Caddy on `127.0.0.1:80`, in front of the frontend. It prints the user name (`demo`).
+1. The script installs Caddy, makes a password (once) and puts Caddy on port 80, in front of the frontend. Caddy listens on every interface because Brev does not reach `127.0.0.1`; the firewall of the VM keeps port 80 closed from the Internet (checked). It prints the user name (`demo`).
 2. In the Brev console: instance `claims-nvidia`, Access, HTTP Ports, add port 80. Brev gives the URL `https://80-<instance id>.gobrev.dev` and does the HTTPS. Then `Share` and make it public: without that, the URL asks for a Brev login.
 3. Read the password on the VM: `cat ~/.config/claims/demo-password`. Give it by a private channel. It never goes into git or into a chat with other people.
 
@@ -50,6 +50,8 @@ cd ~/claims-nvidia && infra/deploy/public.sh
 | Change the password | `rm ~/.config/claims/demo-password && infra/deploy/public.sh` |
 | Close the door | `sudo systemctl disable --now caddy` |
 | Open it again | `sudo systemctl enable --now caddy` |
+
+Checked on 2026-11-13 from outside, on `https://80-4nq5fm4sn.gobrev.dev`: 401 with no password and with a wrong one, the page and `/health` with the right one, and the events of one agent turn arrive live (at 0.2 s, 5.9 s and 9.9 s).
 
 The URL holds the id of the instance, not its IP: it stays the same after a stop and a start.
 

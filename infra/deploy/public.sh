@@ -9,7 +9,9 @@ user="demo"
 pwfile="$HOME/.config/claims/demo-password"
 # Brev gives the HTTPS: an "HTTP port" of the Brev console sends
 # https://80-<instance id>.gobrev.dev to port 80 of the VM. So Caddy speaks
-# plain HTTP on 127.0.0.1:80 and asks for no certificate.
+# plain HTTP on port 80 and asks for no certificate. Brev does not reach
+# 127.0.0.1, so Caddy listens on every interface: the firewall of the VM keeps
+# port 80 closed from the Internet (checked).
 
 if ! command -v caddy >/dev/null; then
   sudo apt-get install -y debian-keyring debian-archive-keyring apt-transport-https curl
@@ -29,11 +31,13 @@ hash="$(caddy hash-password <"$pwfile")"
 
 sudo tee /etc/caddy/Caddyfile >/dev/null <<EOF
 http://:80 {
-	bind 127.0.0.1
 	basic_auth {
 		$user $hash
 	}
-	reverse_proxy 127.0.0.1:5173
+	# vite preview refuses a Host that it does not know
+	reverse_proxy 127.0.0.1:5173 {
+		header_up Host localhost:5173
+	}
 }
 EOF
 sudo systemctl enable caddy
