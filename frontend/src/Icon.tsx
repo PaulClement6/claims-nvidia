@@ -1,4 +1,4 @@
-// Line icons of the visual refresh (#186): 24 px grid, stroke 1.7, round caps. Inline SVG, no icon library.
+// Line icons of the visual refresh (issue #60): 24 px grid, stroke 1.7, round caps. Inline SVG, no icon library.
 // ponytail: one path list per icon; add a name here when a screen needs a new one.
 const PATHS = {
   terminal: ['M4 5h16v14H4z', 'm8 10 2 2-2 2', 'M13 14h3'],

@@ -1,5 +1,7 @@
 # First prompt
 
+Historical. This is the prompt that started the project on 2026-11-12, when it had documents only. Do not run it again: the repository, the issues and the code exist (see `AGENTS.md`, section Status).
+
 Open a terminal in this folder, start Claude Code, and paste the prompt below.
 
 ```

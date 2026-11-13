@@ -2,7 +2,7 @@
 
 The line of business of the policy sets the workflow. The checks, the score and the routing are shared (`docs/FRAUD.md`).
 
-These lists are a first reading of a typical claims flow. Paul must confirm them.
+These lists are a first reading of a typical claims flow. Paul must confirm them (open point O12 in `docs/DECISIONS.md`). The code uses them as written.
 
 ## Shared fields of every claim
 
@@ -44,4 +44,4 @@ These lists are a first reading of a typical claims flow. Paul must confirm them
 
 ## Build order
 
-Travel first (simplest documents), then property, then health.
+Travel first (simplest documents), then property, then health. All three are built.

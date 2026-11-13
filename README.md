@@ -8,6 +8,27 @@ The second panel shows the full pipeline live: reading, checks, fraud signals an
 The system never rejects a claim. A claim has three possible outcomes:
 `straight_through` (validated with no review by a person), `handler_review` and `investigation`.
 
+## Start here
+
+The base is built: the full claim flow works, in three modes, and the demo runs on a VM. What is left is the document reading pipeline. Nikola builds it, in a fork of this repository, with pull requests.
+
+| You want | Read |
+|---|---|
+| Your role, the method (fork, branch, pull request), each task in detail, how to work with a coding agent | `docs/NIKOLA.md` |
+| How every part works, the NVIDIA technology under it, why we chose it, what you can challenge or redo | `docs/TECH.md` |
+| The rules for every person and every agent | `AGENTS.md` |
+| The whole system on one screen, with your parts in lime | The page **Map** of the app |
+
+If you are a coding agent: read `AGENTS.md`, this file, `docs/NIKOLA.md` and `docs/TECH.md`, then the issue that you were given. Explain the claim flow and the issue before you write code.
+
+The method in five lines:
+
+1. Fork `PaulClement6/claims-nvidia` and clone your fork. Never commit on `main`.
+2. One issue = one branch (`<issue number>-<short name>`) = one pull request to this repository, with `Closes #<number>`.
+3. Write one failing test, make it pass, then refactor. Tests, types and lint pass before the pull request.
+4. Every task ends with a number, and the pull request gives the command that produces it.
+5. Paul or his coordinating agent reviews and merges.
+
 ## Run it in `local` mode
 
 `local` mode needs no GPU, no sandbox and no key. CI runs in this mode.
@@ -36,11 +57,11 @@ Checks (run each one before you open a pull request):
 |---|---|---|
 | Tests | `uv run pytest` | `npm test` |
 | Types | `uv run mypy .` | `npm run typecheck` |
-| Lint | `uv run ruff check .` | `npm run lint` |
+| Lint | `uv run ruff check . ../scripts && uv run ruff format --check . ../scripts` | `npm run lint` |
 
 ## Work on the VM
 
-The demo runs on a Brev VM, and you can work on it too, in your own copy. `docs/DEPLOY.md`, section "For the intern", gives the steps.
+The demo runs on a Brev VM in `sandbox` mode. You can watch it at a public URL behind a password (ask Paul for both). You can also work on the VM, in a clone of your fork: `docs/DEPLOY.md`, section "For the intern", gives the steps.
 
 ## What is yours
 
@@ -104,7 +125,7 @@ Open the page **Map** of the app first: it shows the whole system, and the lime 
 | [#62](https://github.com/PaulClement6/claims-nvidia/issues/62) Rails | NeMo Guardrails on what the agent reads: the customer message, the document text, the agent answer. A block sends the claim to a person | An injected document is blocked; false blocks on the kit; time added per turn |
 
 Do #17, #18 and #19 first. The schemas, one reader and the measure make the other tasks testable.
-Each issue has its own text. Read it before you start.
+Each issue has its own text: it is the contract. `docs/NIKOLA.md`, section 8, adds the reason, the steps, the experiments to try and the traps of each task.
 
 ## The test data
 
@@ -130,7 +151,7 @@ Example, from `cancellation-confirmation.expected.json`:
 
 To generate the documents again, run:
 `cd backend && uv run python ../scripts/generate_mock_documents.py`
-The script writes to `data/mock/`: the documents, their `expected.json`, the hard versions (scans, phone photos) and `index.json`. It gives the same bytes on every run on one machine (images may differ between a Mac and Linux, see D55).
+The script writes to `data/mock/`: the documents, their `expected.json`, the hard versions (scans, phone photos) and `index.json`. It gives the same bytes on every run on one machine (the scanned images may differ between a Mac and Linux, see D57 and `docs/LESSONS.md`).
 To add a document or a scenario, read the header of `scripts/mockdocs/kit.py`.
 
 ## Rules that matter most
@@ -138,7 +159,7 @@ To add a document or a scenario, read the header of `scripts/mockdocs/kit.py`.
 - Every extracted field carries its source: document and page. A field with no source is not stored.
 - The repository holds mock data only. Never add a real document, a real name or real medical data.
 - One ticket = one branch = one pull request. The pull request body says `Closes #<number>`.
-- Never push to `main`. CI must be green before the human merges.
+- You work in a fork. Never commit on `main`. CI (`checks`) must be green before Paul or his coordinating agent merges.
 - `AGENTS.md` holds the full rules. GitHub Copilot reads it too.
 
 ## Where to read more
@@ -146,10 +167,15 @@ To add a document or a scenario, read the header of `scripts/mockdocs/kit.py`.
 | File | Content |
 |---|---|
 | `AGENTS.md` | Rules, commands, how to work |
+| `docs/NIKOLA.md` | The guide of Nikola: role, method, tasks in detail |
+| `docs/TECH.md` | How it works and why: components, NVIDIA technology, choices to challenge |
 | `docs/PRODUCT.md` | The problem, the two panels, the demo |
 | `docs/ARCHITECTURE.md` | Components, the agent and tools, the data model |
 | `docs/WORKFLOWS.md` | The three claim workflows |
 | `docs/MOCK-DATA.md` | Mock customers, policies and claim files |
 | `docs/DECISIONS.md` | Decisions taken and decisions still open |
 | `docs/READING-LIST.md` | NVIDIA documentation to read |
+| `docs/EVALUATION.md` | The measures: method, tables, conclusions |
+| `docs/DEPLOY.md` | The VM: services, install, update, access |
+| `docs/LESSONS.md` | What went wrong and what we learned |
 | `docs/BACKLOG.md` | All tasks, in order |

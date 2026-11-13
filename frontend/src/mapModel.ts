@@ -138,7 +138,7 @@ export const BOXES: MapBox[] = [
       { n: 21, label: 'classification' },
       { n: 22, label: 'hard cases' },
     ],
-    // The contract test has no fixed name yet: README.md, section "The reader", says how to write it.
+    // The contract test has no fixed name yet: README.md, section "What is yours", says how to write it.
     check: {
       text: 'Call check_reader_contract(OmniReader()) in a test (see README.md), then run it with CLAIMS_READER=omni:',
       cmd: 'cd backend && uv run pytest -k reader',

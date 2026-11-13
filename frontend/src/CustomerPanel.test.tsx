@@ -88,7 +88,8 @@ test('Enter sends the message, the input is off while the request runs, the answ
   fireEvent.change(input, { target: { value: 'I was ill' } })
   fireEvent.submit(input.closest('form')!)
 
-  expect(await screen.findByText('I was ill')).toHaveClass('bubble-customer')
+  // The selector keeps the query off the input, which can still hold the same text on a slow machine.
+  expect(await screen.findByText('I was ill', { selector: '.bubble-customer' })).toBeInTheDocument()
   expect(input).toBeDisabled()
   const post = fetchMock.mock.calls.find(([, i]) => i?.method === 'POST')!
   expect(post[0]).toBe('/claims/CL-1/messages')

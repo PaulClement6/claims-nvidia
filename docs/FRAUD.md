@@ -43,7 +43,7 @@ Written for every `investigation`. The handler must understand it in one minute.
 - What the system did not check.
 - Suggested next steps for the investigator.
 
-In `nim` mode an LLM writes the text from the signals only. It adds no fact. In `local` mode a template writes it.
+A template writes the text from the signals, in every mode. It adds no fact. Later (issue #26) an LLM can write it from the signals only, and it must add no fact.
 
 ## Later (not in the first version)
 

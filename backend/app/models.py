@@ -1,4 +1,4 @@
-"""Pydantic models of docs/ARCHITECTURE.md section 4 (later tickets import them)."""
+"""Pydantic models of docs/ARCHITECTURE.md section 4."""
 
 from datetime import date, datetime
 from enum import StrEnum
