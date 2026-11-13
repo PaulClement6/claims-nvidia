@@ -27,7 +27,10 @@ readonly here
 readonly repo="$here/../.."
 readonly image="${CLAIMS_SANDBOX_IMAGE:-claims-agent:1}" provider="claims-nim" profile="claims-nim"
 readonly env_file="${ENV_FILE:-$repo/.env}"
-export DOCKER_HOST="${DOCKER_HOST:-unix://$HOME/.colima/default/docker.sock}"
+# Colima on a Mac. On Linux the default socket of Docker is right.
+if [[ -z "${DOCKER_HOST:-}" && -S "$HOME/.colima/default/docker.sock" ]]; then
+  export DOCKER_HOST="unix://$HOME/.colima/default/docker.sock"
+fi
 
 die() {
   echo "setup: $*" >&2
@@ -39,13 +42,13 @@ command -v openshell >/dev/null || die "the openshell command is missing"
 [[ "$(openshell --version | awk '{print $2}')" == "0.1.5" ]] || die "OpenShell 0.1.5 is required"
 openshell status 2>&1 | grep -q Connected || die "no OpenShell gateway is connected (is Colima running?)"
 command -v docker >/dev/null || die "the docker command is missing"
-docker info >/dev/null 2>&1 || die "the Docker engine does not answer on $DOCKER_HOST"
+docker info >/dev/null 2>&1 || die "the Docker engine does not answer (${DOCKER_HOST:-default socket})"
 command -v uv >/dev/null || die "uv is missing"
 grep -q '^NVIDIA_KEY=.' "$env_file" || die "NVIDIA_KEY is missing in $env_file"
 if openshell sandbox list --names 2>/dev/null | grep -q '^claims-'; then
   die "a sandbox of this app exists: reset the demo (POST /demo/reset) to delete it, then run again"
 fi
-echo "ok: OpenShell 0.1.5, gateway connected, Docker on $DOCKER_HOST"
+echo "ok: OpenShell 0.1.5, gateway connected, Docker on ${DOCKER_HOST:-the default socket}"
 
 echo "== Image $image"
 ctx="$(mktemp -d)"
@@ -53,6 +56,8 @@ trap 'rm -rf "$ctx"' EXIT
 uv run --no-project --python 3.12 python "$repo/backend/app/agent/sandbox_image.py" "$ctx" ||
   die "could not make the build context"
 echo "build context: $(find "$ctx" -type f | wc -l | tr -d ' ') files, none of them a .env"
+# The agent is another user in the image: the files must be readable with any umask.
+chmod -R a+rX "$ctx"
 docker build -q -t "$image" "$ctx" >/dev/null || die "docker build failed"
 echo "built $image"
 

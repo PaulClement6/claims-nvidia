@@ -16,12 +16,13 @@ Target: a working demo on real-looking mock claim files at the Q1 2027 event.
 | `docs/MOCK-DATA.md` | Mock customers, policies and the three demo claim files |
 | `docs/DECISIONS.md` | Decisions taken and decisions still open |
 | `docs/READING-LIST.md` | NVIDIA documentation to read, with what to take from each |
+| `docs/DEPLOY.md` | The Brev VM: services, install, update, access for the intern |
 | `docs/BACKLOG.md` | Ordered tasks, with the tasks kept for the intern |
 | `docs/BRIEF.md` | Paul's first brief, kept as the source |
 
 ## Status
 
-2026-11-12: M0 to M3 are built (issues #2 to #15), except the deploy on the VM (backlog task 24). The full claim flow works in the three modes: `local` (the default, and CI), `nim` (the LangGraph agent in the backend) and `sandbox` (the same graph in OpenShell). The pipeline panel shows the sandbox policy, the denials and a confinement test. The three mock claim files give `straight_through`, `handler_review` and `investigation` (`docs/EVALUATION.md`). Next for the base: the deploy on a Brev VM. The intern owns M4: the document reading pipeline behind the `Reader` contract (`README.md`).
+2026-11-13: M0 to M3 are built (issues #2 to #16). The full claim flow works in the three modes: `local` (the default, and CI), `nim` (the LangGraph agent in the backend) and `sandbox` (the same graph in OpenShell). The demo runs in `sandbox` mode on the Brev VM `claims-nvidia` (`docs/DEPLOY.md`). The three mock claim files give `straight_through`, `handler_review` and `investigation` (`docs/EVALUATION.md`). The intern owns M4: the document reading pipeline behind the `Reader` contract (`README.md`).
 
 ## Commands (target, same as NemoForge)
 

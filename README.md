@@ -38,6 +38,10 @@ Checks (run each one before you open a pull request):
 | Types | `uv run mypy .` | `npm run typecheck` |
 | Lint | `uv run ruff check .` | `npm run lint` |
 
+## Work on the VM
+
+The demo runs on a Brev VM, and you can work on it too, in your own copy. `docs/DEPLOY.md`, section "For the intern", gives the steps.
+
 ## What is yours
 
 You own the document reading pipeline in `backend/app/docintel/`.

@@ -50,3 +50,13 @@
 - reportlab keeps a JPEG as it is (DCTDecode) when `drawImage` gets a JPEG file or an `ImageReader` of one: the scan PDF is a plain page with one image, no text layer, and the bytes of the JPEG are the ones Pillow wrote.
 - pdfium does not embed the standard fonts of the reportlab PDFs: it draws a substitute that depends on the machine. A pixel test of a scan must be coarse (reduced to 1/8, mean grey level): two different documents differ by about 11 on that scale, a Mac against Linux by far less.
 - The titles and stories of `/demo/kit` are read by a visitor in the customer panel (non-negotiable 2): never write "fraud", "tampered" or "edited" there. The seeded signals live in `index.json` only, which no route serves.
+
+
+## Deploy on the Brev VM (issue #16, 2026-11-13)
+
+- A `umask 077` in the shell that runs `infra/sandbox/setup.sh` gave an image where the agent user could not read `/app/app/agent`: every turn failed in less than a second with the fallback message and no network line in the sandbox log. The script now makes the build context readable (`chmod -R a+rX`). When a turn fails with no denial in the log, run `python -m app.agent.sandbox_turn` by hand with `openshell sandbox exec`.
+- The NemoForge recipe works unchanged on Ubuntu 22.04 with the GCP kernel 6.8: write `gateway.toml` before the OpenShell installer starts the gateway.
+- `/claims/{id}/events` is a stream: a `curl` on it never ends. Use `/claims/{id}` to read the state in a script.
+- `pkill -f <text>` over SSH kills its own shell when the text is in the command line.
+- A Brev VM has no public SSH port: `brev port-forward` or `ssh -L` through the Brev host is the only way in. Good for us, the app has no login.
+
