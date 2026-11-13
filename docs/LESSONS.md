@@ -60,3 +60,9 @@
 - `pkill -f <text>` over SSH kills its own shell when the text is in the command line.
 - A Brev VM has no public SSH port: `brev port-forward` or `ssh -L` through the Brev host is the only way in. Good for us, the app has no login.
 
+
+## Public URL for the demo (issue #65, 2026-11-13)
+
+- The Brev CLI cannot open a port: only the Brev console can (Access, Expose port). Plan a step for a person.
+- Caddy asks Let's Encrypt for a certificate as soon as it starts. With ports 80 and 443 closed, each try fails and counts against the limit of Let's Encrypt: start Caddy only when the ports are open.
+- The pipeline panel uses server-sent events (`EventSource`): check that a tunnel or a proxy supports them before you choose it.
