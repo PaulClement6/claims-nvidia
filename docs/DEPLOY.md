@@ -13,7 +13,7 @@ Deployed and tested on 2026-11-13 (issue #16).
 | System | Ubuntu 22.04, kernel 6.8, Landlock active |
 | Code | `~/claims-nvidia`, branch `main`, user `ubuntu` |
 
-Nothing is open to the Internet. SSH is closed from outside (checked): access goes through Brev only. Every service listens on `127.0.0.1`.
+SSH is closed from outside (checked): work on the VM goes through Brev only. Every service listens on `127.0.0.1`. One door can be public: the demo, behind a password (see "Watch the demo from any computer").
 
 | Service (systemd user unit) | Listens on |
 |---|---|
@@ -32,6 +32,26 @@ brev port-forward claims-nvidia -p 5173:5173
 ```
 
 Open `http://localhost:5173`. The sidebar must show `Mode: sandbox`.
+
+## Watch the demo from any computer
+
+To watch, a person needs no Brev account: a public HTTPS URL, a user name and a password (D61, issue #65). To work on the VM, a person needs Brev.
+
+```sh
+cd ~/claims-nvidia && infra/deploy/public.sh
+```
+
+1. The script installs Caddy, makes a password (once) and puts Caddy in front of the frontend. It prints the URL and the user name (`demo`).
+2. Open the ports 80 and 443 of the VM in the Brev console: instance `claims-nvidia`, Access, Expose port. Caddy gets its certificate from Let's Encrypt on the first request, so port 80 or 443 must be reachable.
+3. Read the password on the VM: `cat ~/.config/claims/demo-password`. Give it by a private channel. It never goes into git or into a chat with other people.
+
+| To do | Command |
+|---|---|
+| Change the password | `rm ~/.config/claims/demo-password && infra/deploy/public.sh` |
+| Close the door | `sudo systemctl disable --now caddy` |
+| Open it again | `sudo systemctl enable --now caddy` |
+
+The URL holds the public IP of the VM (`https://<ip-with-dashes>.sslip.io`). If the IP changes after a stop and a start, run the script again: it prints the new URL.
 
 ## Install from zero (about 5 minutes)
 
@@ -100,6 +120,6 @@ The VM costs about $3 per day when it runs. Stop it when nobody uses it: `brev s
 
 ## Limits
 
-- No access control on the app (D33). It is safe only because nothing is public. Add a login before you open a port.
+- No access control in the app (D33). The public URL has one shared password for everybody (Caddy basic auth): a person who has it can do all that the demo can do. Never open port 5173 or 8000 directly.
 - One free key for the VM: about 40 requests per minute, so about 2 claims per minute.
 - Tested with one visitor at a time. Not tested: several sandboxes at the same time.
