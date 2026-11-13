@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { send } from './api'
+import ClaimMap from './ClaimMap'
 import Demo from './Demo'
 import { HealthRows, useHealth } from './Health'
 import { Icon, type IconName } from './Icon'
@@ -10,7 +11,10 @@ export type Shared = { claimId: string | null; onClaim: (id: string | null) => v
 
 // The nav is built from this list: to add a page, add one line. No router: `useState` holds the current page.
 type Page = { id: string; label: string; icon: IconName; render: (shared: Shared) => ReactNode }
-const PAGES: Page[] = [{ id: 'demo', label: 'Claim demo', icon: 'activity', render: (s) => <Demo {...s} /> }]
+const PAGES: Page[] = [
+  { id: 'demo', label: 'Claim demo', icon: 'activity', render: (s) => <Demo {...s} /> },
+  { id: 'map', label: 'Map', icon: 'grid', render: () => <ClaimMap /> },
+]
 
 function useTheme() {
   const [theme, setTheme] = useState(document.documentElement.dataset.theme === 'light' ? 'light' : 'dark')

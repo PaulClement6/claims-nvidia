@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, expect, test, vi } from 'vitest'
 import App from './App'
 
@@ -16,14 +16,17 @@ test('shows the brand, the two panels and the backend health', async () => {
   expect(await screen.findByText('ok', { selector: '.pill' })).toBeInTheDocument()
 })
 
-test('the nav is built from the pages: one item today, the current one, and a page header', async () => {
+test('the nav is built from the pages: the demo first, then the map, and a page header', async () => {
   stub({ status: 'ok', mode: 'sandbox' })
   render(<App />)
   const nav = screen.getByRole('navigation', { name: 'Main' })
-  expect(within(nav).getAllByRole('button')).toHaveLength(1)
+  expect(within(nav).getAllByRole('button').map((b) => b.textContent)).toEqual(['Claim demo', 'Map'])
   expect(within(nav).getByRole('button', { name: 'Claim demo' })).toHaveAttribute('aria-current', 'page')
   expect(screen.getByRole('heading', { level: 1, name: 'Claim demo' })).toBeInTheDocument()
   expect(await screen.findByText('Demo · mode sandbox')).toBeInTheDocument()
+  fireEvent.click(within(nav).getByRole('button', { name: 'Map' }))
+  expect(within(nav).getByRole('button', { name: 'Map' })).toHaveAttribute('aria-current', 'page')
+  expect(screen.getByRole('heading', { level: 1, name: /How a claim is/ })).toBeInTheDocument()
 })
 
 test('the customer panel says what the customer sees and never names the fraud checks', () => {
