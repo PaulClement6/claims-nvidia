@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 type Status = 'checking' | 'ok' | 'down'
-type Info = { status: Status; mode: string | null; model: string | null }
+export type Info = { status: Status; mode: string | null; model: string | null }
 
 const MODE_TONE: Record<string, string> = { local: 'idle', nim: 'warn', sandbox: 'ok' }
 
@@ -20,8 +20,7 @@ async function checkHealth(): Promise<Info> {
   }
 }
 
-// the backend pill, the mode pill under it, and the agent model when there is one
-export default function Health() {
+export function useHealth() {
   const [info, setInfo] = useState<Info>({ status: 'checking', mode: null, model: null })
 
   useEffect(() => {
@@ -31,14 +30,34 @@ export default function Health() {
     const id = setInterval(update, 5000)
     return () => clearInterval(id)
   }, [])
+  return info
+}
 
-  const { status, mode, model } = info
+// the rows of the SYSTEM block: backend, mode, and the agent model when there is one
+export function HealthRows({ info: { status, mode, model } }: { info: Info }) {
   const tone = status === 'ok' ? 'ok' : status === 'down' ? 'bad' : 'idle'
   return (
     <>
-      <span className={`pill pill-${tone}`}>Backend: {status}</span>
-      {mode && <span className={`pill pill-${MODE_TONE[mode] ?? 'idle'}`}>Mode: {mode}</span>}
-      {model && <span className="mono muted model-name">{model}</span>}
+      <div className="health-row">
+        <span>Backend</span>
+        <span className={`pill pill-${tone}`}>{status}</span>
+      </div>
+      {mode && (
+        <div className="health-row">
+          <span>Mode</span>
+          <span className={`pill pill-${MODE_TONE[mode] ?? 'idle'}`}>{mode}</span>
+        </div>
+      )}
+      {model && (
+        <div className="health-row">
+          <span>Model</span>
+          <span className="mono muted model-name">{model}</span>
+        </div>
+      )}
     </>
   )
+}
+
+export default function Health() {
+  return <HealthRows info={useHealth()} />
 }

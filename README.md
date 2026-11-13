@@ -89,7 +89,9 @@ To get a free key:
 The NVIDIA stack changes every month. Check the current documentation before you write code against an NVIDIA API.
 `docs/READING-LIST.md` has the links to the model documentation.
 
-## Your six tasks
+## Your tasks
+
+Open the page **Map** of the app first: it shows the whole system, and the lime boxes are yours. Each box gives its files and its issue.
 
 | Issue | What to build | The number it gives |
 |---|---|---|
@@ -99,6 +101,7 @@ The NVIDIA stack changes every month. Check the current documentation before you
 | [#20](https://github.com/PaulClement6/claims-nvidia/issues/20) Tuning | Test the prompt, the image resolution, one call per page or per document, reasoning on or off | A table of accuracy and time per variant |
 | [#21](https://github.com/PaulClement6/claims-nvidia/issues/21) Classification with Omni | Replace the fixture classifier with Omni | Accuracy on the kit |
 | [#22](https://github.com/PaulClement6/claims-nvidia/issues/22) Hard cases | Scans and phone photos. Test Nemotron Parse where Omni fails | The gain per document kind |
+| [#62](https://github.com/PaulClement6/claims-nvidia/issues/62) Rails | NeMo Guardrails on what the agent reads: the customer message, the document text, the agent answer. A block sends the claim to a person | An injected document is blocked; false blocks on the kit; time added per turn |
 
 Do #17, #18 and #19 first. The schemas, one reader and the measure make the other tasks testable.
 Each issue has its own text. Read it before you start.

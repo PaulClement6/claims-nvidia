@@ -50,6 +50,7 @@ Each task ends with a number.
 28. Tuning: prompt, image resolution, one call per page or per document, reasoning on or off. Result: a table of accuracy and time per variant.
 29. Document classification with Omni, in place of the fixture. Result: accuracy on the kit.
 30. Hard cases: scans and phone photos. Test Nemotron Parse where Omni fails. Result: the gain per document kind. These numbers support the request for GPU credits.
+30b. Rails on what the agent reads (issue #62, D60): NeMo Guardrails on the customer message, on the text of the documents and on the agent answer. A block never rejects a claim: it goes to a person. Result: an injected document is blocked, with the count of false blocks on the kit and the time added per turn.
 
 ## M5: Make it better (intern or later)
 

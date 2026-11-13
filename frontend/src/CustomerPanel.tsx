@@ -64,43 +64,47 @@ export default function CustomerPanel({ claimId, onClaim }: { claimId: string | 
 
   return (
     <section className="card panel panel-customer" aria-label="Customer">
-      <p className="notice">Demo. Do not upload a real document.</p>
-      <h2>Customer</h2>
-      {claimId && (
-        <button type="button" onClick={newClaim}>
-          New claim
-        </button>
-      )}
-      {error && <p className="pill pill-bad">{error}</p>}
-      {!claimId ? (
-        <div className="stack">
-          <h3>1. Pick an account</h3>
-          {customers.map((c) => (
-            <button key={c.id} type="button" onClick={() => void pickCustomer(c)}>
-              {c.name}
-            </button>
-          ))}
-        </div>
-      ) : claim?.policy_number ? (
-        <>
-          <p className="mono">{`Claim ${claim.claim_id} · ${claim.policy_number}`}</p>
-          <Chat claimId={claim.claim_id} policy={claim.policy_number} />
-        </>
-      ) : claim && starting ? (
-        <div className="chat-list" role="log" aria-label="Conversation">
-          <Typing />
-        </div>
-      ) : claim ? (
-        <div className="stack">
-          <h3>{name ? `2. Pick a policy of ${name}` : '2. Pick a policy'}</h3>
-          <input aria-label="Filter policies" placeholder="Number or line of business" value={filter} onChange={(e) => setFilter(e.target.value)} />
-          {shown.map((p) => (
-            <button key={p.number} type="button" onClick={() => void pickPolicy(p)}>
-              <span className="mono">{p.number}</span> · {p.line_of_business}
-            </button>
-          ))}
-        </div>
-      ) : null}
+      <header className="panel-head">
+        <span className="eyebrow">Customer view</span>
+        {claimId && (
+          <button type="button" onClick={newClaim}>
+            New claim
+          </button>
+        )}
+      </header>
+      <div className="panel-body">
+        <p className="notice">Demo. Do not upload a real document.</p>
+        {error && <p className="pill pill-bad">{error}</p>}
+        {!claimId ? (
+          <div className="stack">
+            <h3>1. Pick an account</h3>
+            {customers.map((c) => (
+              <button key={c.id} type="button" onClick={() => void pickCustomer(c)}>
+                {c.name}
+              </button>
+            ))}
+          </div>
+        ) : claim?.policy_number ? (
+          <>
+            <p className="mono claim-line">{`Claim ${claim.claim_id} · ${claim.policy_number}`}</p>
+            <Chat claimId={claim.claim_id} policy={claim.policy_number} />
+          </>
+        ) : claim && starting ? (
+          <div className="chat-list" role="log" aria-label="Conversation">
+            <Typing />
+          </div>
+        ) : claim ? (
+          <div className="stack">
+            <h3>{name ? `2. Pick a policy of ${name}` : '2. Pick a policy'}</h3>
+            <input aria-label="Filter policies" placeholder="Number or line of business" value={filter} onChange={(e) => setFilter(e.target.value)} />
+            {shown.map((p) => (
+              <button key={p.number} type="button" onClick={() => void pickPolicy(p)}>
+                <span className="mono">{p.number}</span> · {p.line_of_business}
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
     </section>
   )
 }

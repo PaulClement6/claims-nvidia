@@ -15,7 +15,7 @@
   flex-direction: column;
   gap: var(--space-5, 20px);
   max-width: 1500px;
-  padding: var(--space-6, 24px) var(--space-7, 28px) var(--space-9, 36px);
+  padding: 0;
   box-sizing: border-box;
   min-width: 0;
   background: var(--page-glow, none);
@@ -299,7 +299,7 @@
 }
 
 /* Wide: four columns, 72 px gutters for the arrows. The sandbox zone and the model zone share the second column. */
-@container (min-width: 1100px) {
+@container (min-width: 940px) {
   .cm-map {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -531,4 +531,9 @@
   .cm .cm-box {
     transition: none;
   }
+}
+
+/* Long names (extract_document) break inside a narrow box. */
+.cm .cm-box {
+  overflow-wrap: anywhere;
 }

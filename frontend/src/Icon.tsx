@@ -22,6 +22,9 @@ const PATHS = {
   plus: ['M12 5v14', 'M5 12h14'],
   'trend-up': ['M7 17L17 7M9 7h8v8'],
   'trend-down': ['M7 7l10 10M17 9v8H9'],
+  // Added for claims: the document and the route nodes of the graph strip.
+  file: ['M6 3h8l4 4v14H6z', 'M14 3v4h4', 'M9 13h6', 'M9 17h6'],
+  route: ['M6 4v10a4 4 0 0 0 4 4h8', 'm15 15 3 3-3 3', 'M6 4h.01'],
 } as const
 
 export type IconName = keyof typeof PATHS

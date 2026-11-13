@@ -1,12 +1,12 @@
 // The Map page (issue #61): what the system is, and where the intern builds.
-// Wide (the map is 1100 px or more): zones side by side, with arrows measured from the real boxes.
+// Wide (the map is 940 px or more): zones side by side, with arrows measured from the real boxes.
 // Narrow: zones stacked, the order replaces the arrows. The detail panel always says what comes in and goes out.
 import { useLayoutEffect, useRef, useState } from 'react'
 import { Icon } from './Icon'
 import './ClaimMap.css'
 import { ARROWS, BOXES, EVENTS, ISSUES_URL, LEGEND, PRINCIPLES, TASKS, ZONES, type Arrow, type MapBox, type Status } from './mapModel'
 
-const WIDE = 1100
+const WIDE = 940
 const STATUS_TAG: Record<Status, string | null> = { built: null, yours: 'YOURS', planned: 'LATER' }
 const STATUS_NAME: Record<Status, string> = { built: 'Built', yours: 'Yours', planned: 'Later' }
 const titleOf = (id: string) => BOXES.find((b) => b.id === id)?.title ?? id

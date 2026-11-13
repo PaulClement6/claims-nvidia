@@ -169,7 +169,7 @@ export default function Chat({ claimId, policy }: { claimId: string; policy: str
         }}
       >
         <input ref={field} aria-label="Message" placeholder="Write a message" value={text} disabled={busy} onChange={(e) => setText(e.target.value)} />
-        <button type="submit" disabled={busy}>
+        <button type="submit" className="btn-primary" disabled={busy}>
           Send
         </button>
         <label className="chat-upload" aria-disabled={busy}>
