@@ -2,13 +2,15 @@
 // `workflow` events of the claim, which both agents write when a node starts
 // (the LangGraph agent in `nim` mode, the scripted agent in `local` mode).
 
-export const NODES = [
-  ['intake', 'Intake'],
-  ['documents', 'Documents'],
-  ['checks', 'Checks'],
-  ['route', 'Route'],
-  ['answer', 'Answer'],
-] as const
+import { Icon, type IconName } from './Icon'
+
+export const NODES: readonly (readonly [string, string, IconName])[] = [
+  ['intake', 'Intake', 'user'],
+  ['documents', 'Documents', 'file'],
+  ['checks', 'Checks', 'shield'],
+  ['route', 'Route', 'route'],
+  ['answer', 'Answer', 'terminal'],
+]
 
 export type NodeState = 'done' | 'current' | 'todo'
 
@@ -29,20 +31,22 @@ export default function GraphStrip({ events }: { events: Event[] }) {
   const states = nodeStates(events)
   return (
     <ol className="graph-strip" aria-label="Agent graph">
-      {NODES.map(([id, label], i) => (
+      {NODES.map(([id, label, icon], i) => (
         <li key={id} className="graph-step">
           <span
             className="graph-node"
             data-state={states[id]}
+            data-label={WORDS[states[id]]}
             aria-current={states[id] === 'current' ? 'step' : undefined}
           >
             {label}
             <span className="sr-only"> ({WORDS[states[id]]})</span>
+            <span className="ico">
+              <Icon name={icon} size={16} />
+            </span>
           </span>
           {i < NODES.length - 1 && (
-            <span className="graph-arrow" aria-hidden="true">
-              →
-            </span>
+            <span className="graph-arrow" aria-hidden="true" />
           )}
         </li>
       ))}

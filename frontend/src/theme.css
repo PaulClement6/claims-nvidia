@@ -1,34 +1,101 @@
-/* Claims design system, copied from NemoForge. */
+/* NemoForge design system. Variables and shared classes are a contract with the admin screens (#43). */
 
 :root,
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #0a0b0a;
-  --sidebar: #0f110f;
-  --surface: #141614;
-  --surface-raised: #1c1f1b;
-  --border: #2a2e28;
-  --text: #f3f4ef;
-  --text-2: #a9afa4;
-  --primary: #ffe600;
-  --on-primary: #0a0b0a;
-  --highlight: #ffe600;
-  --on-highlight: #0a0b0a;
-  --accent: #76b900;
-  --link: #a8d65c;
-  --accent-surface: #12200a;
-  --ok: #8fd12a;
-  --ok-bg: #1a2c08;
-  --warn: #ff9f1c;
-  --warn-bg: #3a2608;
-  --bad: #ff6b5e;
-  --bad-bg: #3a1512;
-  --idle: #a9afa4;
-  --idle-bg: #1c1f1b;
+  /* Lime glow (visual refresh, PRD #186). Lime = primary, yellow = needs attention, red = blocked, orange = read-write.
+     Tints are the mockup alpha tints flattened on --surface, so the contrast test can read them. */
+  --bg: #070908;
+  --sidebar: #0b0e0c;
+  --surface: #0f1311;
+  --surface-raised: #151a17;
+  --border: #1e2621;
+  /* Boundary of inputs, selects and textareas: 3:1 on bg, surface and raised (WCAG 1.4.11). --border stays for cards.
+     The mockup #3a4640 is under 3:1: this is the darkest green grey that passes. */
+  --border-control: #5f6a63;
+  --text: #f2f5ee;
+  --text-2: #a3ab9e;
+  --primary: #b4f03c;
+  --on-primary: #0a0d06;
+  --highlight: #b4f03c;
+  --on-highlight: #0a0d06;
+  --attention: #ffd60a;
+  --attention-bg: #2c2a10;
+  --accent: #b4f03c;
+  --link: #b4f03c;
+  --accent-surface: #232e16;
+  --ok: #b4f03c;
+  --ok-bg: #232e16;
+  --warn: #ffb04d;
+  --warn-bg: #2e2512;
+  --bad: #ff8a7f;
+  --bad-bg: #2e1e1b;
+  --idle: #a3ab9e;
+  --idle-bg: #151a17;
+  /* The LLM judge tag (fidelity pass 2): blue, so the two rail kinds differ in more than the text. */
+  --info: #8dbdff;
+  --info-bg: #1c2832;
+  /* Glow: primary buttons, active item, hot card (--glow); attention tile; sparkline and chart line. */
+  --glow: 0 8px 28px -10px rgb(180 240 60 / 70%);
+  --glow-attention: 0 8px 28px -10px rgb(255 214 10 / 45%);
+  --spark-glow: drop-shadow(0 0 4px rgb(180 240 60 / 55%));
+  /* One radial lime light at the top of the content area (main.content). */
+  --page-glow: radial-gradient(900px 420px at 18% -8%, rgb(180 240 60 / 7%), transparent 70%);
+  /* The selected rail node and the hot pipeline stage; the Sessions launch card. */
+  --glow-node: 0 0 0 1px rgb(180 240 60 / 30%), 0 14px 40px -16px rgb(180 240 60 / 70%);
+  --glow-hero: 0 20px 60px -30px rgb(180 240 60 / 45%);
+  /* Sessions (fidelity pass 2, F3): the launch card border, its lime light and its right column;
+     the rail-block count box and the Open button of a session card. Alphas of mockups/Sessions.html. */
+  --launch-border: rgb(180 240 60 / 30%);
+  --launch-light: radial-gradient(640px 260px at 0% 0%, rgb(180 240 60 / 10%), transparent 70%);
+  --can-use-bg: rgb(7 9 8 / 55%);
+  --attention-border: rgb(255 214 10 / 30%);
+  --open-border: rgb(180 240 60 / 45%);
   --font: 'IBM Plex Sans', 'Segoe UI', Arial, sans-serif;
   --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  /* Type, spacing, radius, controls and motion of frontend/DesignTemplate. Same in both themes. */
+  --fs-display: 34px;
+  /* Page h1 (.page-head), panel titles and the small stat numbers of the mockups. */
+  --fs-title: 28px;
+  --fs-panel: 17px;
+  --fs-stat: 18px;
+  --fs-h1: 22px;
+  --fs-kpi: 32px;
+  --fs-h2: 16px;
+  --fs-body: 14px;
+  --fs-sm: 13px;
+  --fs-xs: 12px;
+  --fs-eyebrow: 11px;
+  /* The kind tag of a rail node. */
+  --fs-tag: 10px;
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-2-5: 10px;
+  --space-3: 12px;
+  --space-3-5: 14px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-9: 36px;
+  --space-10: 40px;
+  --radius-xs: 5px;
+  --radius-sm: 6px;
   --radius: 8px;
-  --radius-lg: 12px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 14px;
+  --radius-full: 999px;
+  --control-sm: 32px;
+  --control: 36px;
+  --control-md: 40px;
+  --control-lg: 44px;
+  /* Hover and background changes, panel open, progress width. */
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
 }
 
 :root[data-theme='light'] {
@@ -41,6 +108,7 @@
      Dark has no --divider: its rules fall back to --border. */
   --border: #858a80;
   --divider: #e2e3dc;
+  --border-control: #858a80;
   --text: #111311;
   --text-2: #2b2f29;
   --primary: #111311;
@@ -58,6 +126,35 @@
   --bad-bg: #fce8e6;
   --idle: #2b2f29;
   --idle-bg: #eff0ea;
+  /* A dark blue on a pale blue: 8:1 and more (AAA). */
+  --info: #1a4785;
+  --info-bg: #e8f1fd;
+  /* No light design for the lime glow yet (#194): attention looks as today (dark border), no glow.
+     `:root` applies in light too, so each dark-only token is reset here. */
+  --attention: #111311;
+  --attention-bg: #eff0ea;
+  --glow: none;
+  --glow-attention: none;
+  --spark-glow: none;
+  --page-glow: none;
+  --glow-node: none;
+  --glow-hero: none;
+  --launch-border: var(--text);
+  --launch-light: none;
+  --can-use-bg: var(--bg);
+  --attention-border: var(--attention);
+  --open-border: var(--primary);
+  /* Light only: menus and raised items. Dark uses borders, no shadow. */
+  --shadow-raised: 0 4px 16px rgb(17 19 17 / 8%);
+}
+
+/* `[data-theme]` gives the same specificity as the theme blocks; later in the file, so it wins. */
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  :root[data-theme] {
+    --dur-fast: 0s;
+    --dur: 0s;
+  }
 }
 
 /* Base elements */
@@ -105,7 +202,7 @@ textarea {
 button {
   min-height: 36px;
   padding: 0 14px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   background: transparent;
   font-weight: 500;
   cursor: pointer;
@@ -123,8 +220,10 @@ select,
 textarea {
   min-height: 40px;
   padding: 0 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   background: var(--surface-raised);
+  /* Set, not inherited: a label around the field can be 600 (.admin-page label). */
+  font-weight: 400;
 }
 textarea {
   padding: 10px 12px;
@@ -167,6 +266,7 @@ td {
   border: 1px solid var(--divider, var(--border));
   border-radius: var(--radius-lg);
   padding: 18px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 3%);
 }
 
 .pill {
@@ -202,9 +302,27 @@ td {
   background: var(--idle-bg);
   color: var(--idle);
 }
+.pill-attention {
+  background: var(--attention-bg);
+  color: var(--attention);
+}
+
+/* Icon box: <span class="ico"><Icon name="…" /></span>. */
+.ico {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--control);
+  height: var(--control);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--divider, var(--border));
+  color: var(--accent);
+}
 
 /* Any element can be a button (<a>, <label>): give it the button box too. */
 .btn-primary,
+.btn-secondary,
 .btn-danger {
   display: inline-flex;
   align-items: center;
@@ -224,10 +342,19 @@ td {
   background: var(--primary);
   color: var(--on-primary);
   font-weight: 600;
+  box-shadow: var(--glow);
 }
 .btn-primary:hover:not(:disabled) {
   background: var(--primary);
   filter: brightness(0.92);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--surface-raised);
 }
 
 .btn-danger {
@@ -246,290 +373,24 @@ td {
   font-family: var(--mono);
 }
 
-/* App shell */
 
-.shell {
-  display: flex;
-  min-height: 100vh;
+.btn-secondary,
+.btn-danger {
+  border-color: var(--border-control);
 }
-
-.sidebar {
-  flex: 0 0 232px;
-  box-sizing: border-box;
-  padding: 20px 14px;
-  background: var(--sidebar);
-  border-right: 1px solid var(--divider, var(--border));
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
+.btn-danger {
+  border-color: var(--bad);
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 8px;
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.sidebar-foot {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 0 8px;
-  font-size: 13px;
-}
-.sidebar-foot .actions {
-  display: flex;
-  gap: 8px;
-}
-
-.content {
-  flex: 1;
-  min-width: 0;
-  box-sizing: border-box;
-  padding: 24px 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* Panels: both fill the viewport height and scroll inside. */
-
-.shell {
-  height: 100vh;
-}
-.panels {
-  flex-direction: row;
-  min-height: 0;
-}
-.panel {
-  box-sizing: border-box;
-  min-width: 0;
-  min-height: 0;
-  overflow: auto;
-}
-.panel-customer {
-  flex: 0 0 440px;
-}
-.panel-pipeline {
-  flex: 1;
-}
-
-@media (max-width: 899px) {
-  .shell {
-    height: auto;
-    flex-direction: column;
-  }
-  .sidebar {
-    flex: none;
-  }
-  .panels {
-    flex-direction: column;
-  }
-  .panel,
-  .panel-customer,
-  .panel-pipeline {
-    flex: none;
-    height: calc(100vh - 48px);
-  }
-}
-
-/* Customer panel */
-
-.notice {
-  margin: 0 0 12px;
-  padding: 8px 12px;
-  border-radius: var(--radius);
-  background: var(--warn-bg);
-  color: var(--warn);
+.eyebrow {
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
   font-weight: 500;
-}
-
-.report-summary {
-  font-size: 17px;
-  line-height: 1.4;
-}
-.stack {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 8px;
-  margin-top: 12px;
-}
-.stack button {
-  text-align: left;
-}
-
-/* Pipeline panel */
-
-.events {
-  list-style: none;
-  margin: 12px 0 0;
-  padding: 0;
-}
-.events li {
-  border-top: 1px solid var(--divider, var(--border));
-}
-.events summary {
-  display: flex;
-  flex-wrap: wrap; /* a long model name goes to its own line, the row never grows wider than the panel */
-  align-items: center;
-  gap: 4px 10px;
-  padding: 10px 0;
-  cursor: pointer;
-}
-.event-title {
-  flex: 1 1 10em;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.events summary .mono {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-/* a table may scroll inside its own box: the panel never scrolls sideways */
-.table-scroll {
-  max-width: 100%;
-  overflow-x: auto;
-}
-.events pre {
-  margin: 0 0 10px;
-  padding: 10px 12px;
-  overflow: auto;
-  border-radius: var(--radius);
-  background: var(--surface-raised);
-  font-size: 12px;
-}
-.events details p {
-  margin: 4px 0;
-  font-size: 12px;
-}
-
-/* Chat */
-
-.chat {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 12px;
-  padding: 4px;
-  border: 1px dashed transparent;
-  border-radius: var(--radius);
-}
-.chat-over {
-  border-color: var(--accent);
-  background: var(--accent-surface);
-}
-.chat-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-height: 240px;
-  max-height: calc(100vh - 360px);
-  overflow-y: auto;
-}
-.bubble {
-  max-width: 85%;
-  margin: 0;
-  padding: 8px 12px;
-  border-radius: var(--radius-lg);
-  overflow-wrap: anywhere;
-}
-.bubble-customer {
-  align-self: flex-end;
-  background: var(--primary);
-  color: var(--on-primary);
-}
-.bubble-agent {
-  align-self: flex-start;
-  border: 1px solid var(--border);
-  background: var(--surface-raised);
-  color: var(--text);
-}
-.chat-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-/* the message box takes its own row: four buttons left it 20px wide */
-.chat-form > input:not([type='file']) {
-  flex: 1 1 100%;
-  min-width: 0;
-}
-/* under the buttons: when Done works */
-.chat-help {
-  flex: 1 1 100%;
-  margin: 0;
-  font-size: 12px;
-}
-.chat-upload {
-  display: inline-flex;
-  align-items: center;
-  box-sizing: border-box;
-  min-height: 36px;
-  padding: 0 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-weight: 500;
-  cursor: pointer;
-}
-.chat-upload[aria-disabled='true'] {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Graph strip of the pipeline panel: one box per node of the agent graph. */
-
-.graph-strip {
-  display: flex;
-  flex-wrap: wrap; /* wraps when the panel is narrow, always below 900px */
-  gap: 8px 6px;
-  margin: -12px 0 8px;
-  padding: 26px 0 8px; /* the top 18px cover the padding of the panel when stuck */
-  list-style: none;
-  /* stays in view while the list of events scrolls under it */
-  position: sticky;
-  top: -18px;
-  z-index: 1;
-  background: var(--surface);
-}
-.graph-step {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.graph-node {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  box-sizing: border-box;
-  padding: 0 12px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text-2);
-  font-weight: 500;
-  white-space: nowrap;
-}
-.graph-node[data-state='done'],
-.graph-node[data-state='current'] {
-  background: var(--accent-surface);
-  border-color: var(--accent-surface);
-  color: var(--accent);
-}
-.graph-node[data-state='current'] {
-  border-color: var(--highlight);
-}
-/* the highlight is yellow: on the light surface it needs a dark ring to be seen */
-:root[data-theme='light'] .graph-node[data-state='current'] {
-  box-shadow: 0 0 0 1px var(--primary);
-}
-.graph-arrow {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--text-2);
 }
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -539,87 +400,436 @@ td {
   white-space: nowrap;
 }
 
-/* Sandbox section of the pipeline panel (issue #15). */
+/* App shell: a sidebar and the page. At 1100 px and more the page fills the window and the panels scroll inside. */
 
-.sandbox-line {
+.shell {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
-  margin: 0;
+  height: 100vh;
 }
-.reach {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 6px 14px;
-  margin: 0;
-}
-.reach dt {
-  color: var(--text-2);
-}
-.reach dd {
-  margin: 0;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.tool-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 6px;
-}
-.tool-pill {
-  padding: 2px 8px;
-  font-size: 11px;
-}
-.tool-pill::before {
-  display: none;
-}
-.probe-list {
+
+.sidebar {
+  flex: 0 0 232px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 22px var(--space-3-5);
+  background: var(--sidebar);
+  border-right: 1px solid var(--divider, var(--border));
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  gap: 26px;
 }
-.probe-list li {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
+
+.brand {
+  display: flex;
   align-items: center;
-  gap: 2px 10px;
+  gap: var(--space-2-5);
+  padding: 0 var(--space-2);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
-.probe-list .muted {
-  grid-column: 2;
-  overflow-wrap: anywhere;
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
-/* the denied table: long paths wrap, so the panel does not scroll sideways */
-.sandbox table {
-  table-layout: fixed;
+.nav-group .eyebrow {
+  padding: 0 var(--space-3) var(--space-1-5);
 }
-.sandbox th:first-child {
-  width: 6.5em;
+.nav button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--control-md);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  color: var(--text);
+  text-align: left;
 }
-.sandbox th,
-.sandbox td {
-  padding: 8px 8px;
-  overflow-wrap: anywhere;
+.nav button > svg {
+  flex: none;
 }
-.sidebar-foot .model-name {
-  font-size: 11px;
-  overflow-wrap: anywhere;
+.nav button:hover:not(:disabled) {
+  background: var(--surface-raised);
 }
-.sandbox h4 {
-  margin: 4px 0 0;
-  font-size: 13px;
+.nav button[aria-current='page'] {
+  background: var(--highlight);
+  color: var(--on-highlight);
   font-weight: 600;
+  box-shadow: var(--glow);
 }
-.sandbox > p {
+
+.sidebar-foot {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.health-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5);
+  padding: var(--space-3-5);
+  background: var(--surface);
+  border: 1px solid var(--divider, var(--border));
+  border-radius: var(--radius-lg);
+  font-size: var(--fs-sm);
+}
+.health-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.health-row .model-name {
+  min-width: 0;
+  font-size: var(--fs-eyebrow);
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 32px;
+  background: var(--page-glow);
+}
+.page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Page header: eyebrow, title, one grey line. */
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+.page-head .title {
+  flex: 1 1 320px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.page-head h1 {
+  font-size: var(--fs-title);
+  letter-spacing: -0.02em;
+}
+.page-head p {
   margin: 0;
+  color: var(--text-2);
+}
+
+/* The two panels: cards with a header (a small mono label) and a body that scrolls. */
+.panels {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: var(--space-4);
+}
+.panel {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.panel-customer {
+  flex: 0 0 420px;
+}
+.panel-pipeline {
+  flex: 1;
+}
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 52px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--divider, var(--border));
+}
+.panel-head .eyebrow {
+  color: var(--accent);
+}
+.panel-head button {
+  min-height: var(--control-sm);
+  font-size: var(--fs-sm);
+}
+.panel-body,
+.chat-list,
+.cases-list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-control) transparent;
+}
+.panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3-5);
+  padding: 18px;
+}
+.panel-body > * {
+  flex: none;
+}
+.panel h3 {
+  font-size: var(--fs-h2);
+}
+.panel h4 {
+  margin: var(--space-1) 0 0;
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.panel p {
+  margin: 0;
+}
+.panel ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+@media (max-width: 1099px) {
+  .shell {
+    height: auto;
+    min-height: 100vh;
+  }
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .panels {
+    flex-direction: column;
+  }
+  .panel,
+  .panel-customer,
+  .panel-pipeline {
+    flex: none;
+    height: 80vh;
+    min-height: 480px;
+  }
+}
+
+/* Below 720 px the sidebar is a block above the page. */
+@media (max-width: 719px) {
+  .shell {
+    flex-direction: column;
+  }
+  .sidebar {
+    position: static;
+    flex: none;
+    height: auto;
+    gap: var(--space-4);
+    border-right: 0;
+    border-bottom: 1px solid var(--divider, var(--border));
+  }
+  .sidebar-foot {
+    margin-top: 0;
+  }
+  .content {
+    padding: 20px var(--space-4);
+  }
+}
+
+/* Customer panel */
+
+.notice {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+.claim-line {
+  font-size: var(--fs-xs);
+  color: var(--text-2);
+}
+.report-summary {
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+/* Pick lists (account, policy) and the sections of the pipeline panel. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+.panel-customer .stack button {
+  display: flex;
+  align-items: center;
+  min-height: var(--control-lg);
+  border-color: var(--divider, var(--border));
+  background: var(--surface-raised);
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+.panel-customer .stack button::after {
+  content: '›';
+  margin-left: auto;
+  color: var(--text-2);
+}
+.panel-customer .stack button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.panel-customer .stack input {
+  min-height: var(--control-md);
+}
+
+/* Chat */
+
+.chat {
+  flex: 1;
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-1);
+  border: 1px dashed transparent;
+  border-radius: var(--radius-md);
+}
+.chat-over {
+  border-color: var(--accent);
+  background: var(--accent-surface);
+}
+.chat-list {
+  flex: 1 1 200px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow-y: auto;
+}
+.bubble {
+  max-width: 85%;
+  margin: 0;
+  padding: var(--space-2) var(--space-3-5);
+  border-radius: var(--radius-lg);
+  overflow-wrap: anywhere;
+}
+.bubble-customer {
+  align-self: flex-end;
+  border-bottom-right-radius: var(--radius-xs);
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.bubble-agent {
+  align-self: flex-start;
+  border: 1px solid var(--divider, var(--border));
+  border-bottom-left-radius: var(--radius-xs);
+  background: var(--surface-raised);
+  color: var(--text);
+}
+.chat-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+/* the message box takes its own row: four buttons left it 20px wide */
+.chat-form > input:not([type='file']) {
+  flex: 1 1 100%;
+  min-width: 0;
+  border-radius: var(--radius-md);
+}
+.chat-help {
+  flex: 1 1 100%;
+  font-size: var(--fs-xs);
+}
+.chat-upload {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+}
+.chat-upload:hover {
+  background: var(--surface-raised);
+}
+.chat-upload[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Sample cases of the chat: collapsed by default, scrolls inside its own box */
+.cases {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.cases-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 220px;
+  overflow-y: auto;
+}
+.case {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+  padding: var(--space-2-5) var(--space-3);
+  background: var(--bg);
+}
+.case blockquote {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1-5);
+  margin: 0;
+  padding-left: var(--space-2-5);
+  border-left: 3px solid var(--accent);
+  overflow-wrap: anywhere;
+}
+.case-doc {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+.case-doc button {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.case-hard {
+  min-height: 28px;
+  padding: 0 var(--space-2-5);
+  font-size: var(--fs-xs);
 }
 
 /* The agent is typing: three dots, or a still "…" for people who ask for less motion. */
-
 .typing {
   display: inline-flex;
   align-items: center;
@@ -667,53 +877,241 @@ td {
   }
 }
 
-/* Sample cases of the chat: collapsed by default, scrolls inside its own box */
+/* Pipeline panel */
 
-.cases {
+/* Graph strip: one stage card per node of the agent graph (the look of the NemoForge pipeline stages).
+   Icon, number, label and state: the order comes from the CSS; the state word is also in the sr-only text. */
+.graph-strip {
+  counter-reset: step;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: var(--space-2-5);
+  list-style: none;
+  /* stays in view while the list of events scrolls under it: it covers the padding of the panel body */
+  position: sticky;
+  top: -18px;
+  z-index: 1;
+  margin: -18px -18px 0;
+  padding: 18px 18px var(--space-3-5);
+  background: var(--surface);
+  border-bottom: 1px solid var(--divider, var(--border));
+}
+.graph-step {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  counter-increment: step;
+}
+.graph-node {
+  flex: 1;
   min-width: 0;
-}
-.cases-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 260px;
-  overflow-y: auto;
-}
-.case {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 10px 12px;
-}
-.case h3 {
-  margin: 0;
-}
-.case blockquote {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
+  gap: var(--space-1-5);
+  padding: var(--space-2-5);
+  border: 1px solid var(--divider, var(--border));
+  border-radius: var(--radius-xl);
+  background: var(--bg);
+  color: var(--text-2);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+.graph-node .ico {
+  order: -2;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  color: var(--text-2);
+}
+.graph-node::before {
+  order: -1;
+  content: '0' counter(step);
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+.graph-node::after {
+  content: attr(data-label);
+  font-family: var(--mono);
+  font-size: var(--fs-tag);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.graph-node[data-state='done'],
+.graph-node[data-state='current'] {
+  color: var(--text);
+}
+.graph-node[data-state='done']::after {
+  color: var(--ok);
+}
+.graph-node[data-state='done'] .ico {
+  color: var(--accent);
+}
+.graph-node[data-state='current'] {
+  border-color: var(--accent);
+  box-shadow: var(--glow-node);
+}
+.graph-node[data-state='current'] .ico {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.graph-node[data-state='current']::after {
+  color: var(--link);
+}
+/* the link between two stages */
+.graph-arrow {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--space-2-5) * -1);
+  width: var(--space-2-5);
+  height: 2px;
+  background: linear-gradient(90deg, var(--divider, var(--border)), var(--accent));
+}
+:root[data-theme='light'] .graph-node[data-state='current'] {
+  box-shadow: 0 0 0 1px var(--primary);
+}
+@media (max-width: 520px) {
+  .graph-arrow {
+    display: none;
+  }
+}
+
+/* The sections of the claim: a block with the page tone, like the stages of NemoForge. */
+.panel-pipeline .stack {
+  padding: var(--space-4);
+  border: 1px solid var(--divider, var(--border));
+  border-radius: var(--radius-xl);
+  background: var(--bg);
+}
+.panel-pipeline .stack .card {
+  background: var(--surface);
+  padding: var(--space-3);
+}
+
+/* a table may scroll inside its own box: the panel never scrolls sideways */
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.panel-pipeline th,
+.panel-pipeline td {
+  padding: 8px 10px;
+  vertical-align: top;
+}
+.panel-pipeline thead th {
+  border-top: 0;
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.panel-pipeline td {
+  font-size: var(--fs-sm);
+}
+
+.events {
+  list-style: none;
   margin: 0;
-  padding-left: 10px;
-  border-left: 3px solid var(--border);
+  padding: 0;
+}
+.events li {
+  border-top: 1px solid var(--divider, var(--border));
+}
+.events summary {
+  display: flex;
+  flex-wrap: wrap; /* a long model name goes to its own line, the row never grows wider than the panel */
+  align-items: center;
+  gap: 4px 10px;
+  padding: 10px 0;
+  cursor: pointer;
+}
+.event-title {
+  flex: 1 1 10em;
+  min-width: 0;
   overflow-wrap: anywhere;
 }
-.case-doc {
+.events summary .mono {
+  min-width: 0;
+  font-size: var(--fs-xs);
+  overflow-wrap: anywhere;
+}
+.events pre {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  overflow: auto;
+  border: 1px solid var(--divider, var(--border));
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-size: var(--fs-xs);
+}
+.events details p {
+  margin: 4px 0;
+  font-size: var(--fs-xs);
+}
+
+/* Sandbox section (issue #15) */
+.sandbox-line {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 8px 12px;
 }
-.case-doc button {
+.reach {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 14px;
+  margin: 0;
+}
+.reach dt {
+  color: var(--text-2);
+}
+.reach dd {
+  margin: 0;
   min-width: 0;
   overflow-wrap: anywhere;
-  text-align: left;
 }
-.case-hard {
-  min-height: 28px;
-  padding: 0 10px;
-  font-size: 12px;
+.tool-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.tool-pill {
+  padding: 2px 8px;
+  font-size: 11px;
+}
+.tool-pill::before {
+  display: none;
+}
+.probe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0 !important;
+  list-style: none;
+}
+.probe-list li {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 2px 10px;
+}
+.probe-list .muted {
+  grid-column: 2;
+  overflow-wrap: anywhere;
+}
+/* the denied table: long paths wrap, so the panel does not scroll sideways */
+.sandbox table {
+  table-layout: fixed;
+}
+.sandbox th:first-child {
+  width: 6.5em;
+}
+.sandbox th,
+.sandbox td {
+  overflow-wrap: anywhere;
 }
