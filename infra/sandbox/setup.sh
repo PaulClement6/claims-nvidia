@@ -56,6 +56,8 @@ trap 'rm -rf "$ctx"' EXIT
 uv run --no-project --python 3.12 python "$repo/backend/app/agent/sandbox_image.py" "$ctx" ||
   die "could not make the build context"
 echo "build context: $(find "$ctx" -type f | wc -l | tr -d ' ') files, none of them a .env"
+# The agent is another user in the image: the files must be readable with any umask.
+chmod -R a+rX "$ctx"
 docker build -q -t "$image" "$ctx" >/dev/null || die "docker build failed"
 echo "built $image"
 
