@@ -38,7 +38,7 @@ The boundary is the tool `extract_document` (decision D24). The base ships a fix
 21. Spike: our own LangGraph agent in OpenShell, one MCP tool call (decision D36, which replaces the Hermes plan of D27). Done: issue #13.
 22. `sandbox` mode: the graph in OpenShell, the tool gateway as an MCP server, a policy that allows only the gateway and the model provider (D44 to D49). Done: issue #14.
 23. Sandbox policy, denials and a confinement test shown in the pipeline panel, with the mode in the sidebar. Tests for non-negotiable 6 (D50 to D54). Done: issue #15.
-24. Deploy on a Brev VM (no GPU needed with hosted endpoints). Write `docs/DEPLOY.md`. The intern gets access.
+24. Deploy on a Brev VM (no GPU needed with hosted endpoints). Write `docs/DEPLOY.md`. The intern gets access. Done: issue #16 (D58). Left: the Brev invite of the intern, by Paul.
 
 ## M4: Document reading pipeline (intern)
 
