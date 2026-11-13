@@ -69,38 +69,42 @@ function Events({ claimId }: { claimId: string | null }) {
 
   return (
     <section className="card panel panel-pipeline" aria-label="Pipeline">
-      <h2>Pipeline</h2>
-      {claimId && <p className="mono">Claim {claimId}</p>}
-      {claimId && <GraphStrip events={events} />}
-      {claimId && <SandboxSection claimId={claimId} events={events} />}
-      {claim?.fraud_report && <FraudReportSection report={claim.fraud_report} />}
-      {claim && <OutcomeSection claim={claim} />}
-      {claim && <ChecksSection claim={claim} ran={checksRan} />}
-      {claim && <ExtractedSection docs={claim.documents} claimId={claimId!} />}
-      <h3>Events</h3>
-      {events.length === 0 ? (
-        <p className="muted">No event yet. Start a claim in the customer panel.</p>
-      ) : (
-        <ol className="events">
-          {events.map((e) => (
-            <li key={e.sequence}>
-              <details>
-                <summary>
-                  <span className={`pill ${pillOf(e)}`}>{e.actor}</span>
-                  <span className="event-title">{e.title}</span>
-                  {e.model && <span className="mono muted">{e.model}</span>}
-                  {e.duration !== null && <span className="mono muted">{Math.round(e.duration * 1000)} ms</span>}
-                </summary>
-                <p className="muted">Inputs</p>
-                <pre className="mono">{JSON.stringify(e.inputs, null, 2)}</pre>
-                <p className="muted">Outputs</p>
-                <pre className="mono">{JSON.stringify(e.outputs, null, 2)}</pre>
-              </details>
-            </li>
-          ))}
-          <li ref={end} />
-        </ol>
-      )}
+      <header className="panel-head">
+        <span className="eyebrow">Pipeline · live</span>
+        {claimId && <span className="mono muted">Claim {claimId}</span>}
+      </header>
+      <div className="panel-body">
+        {claimId && <GraphStrip events={events} />}
+        {claimId && <SandboxSection claimId={claimId} events={events} />}
+        {claim?.fraud_report && <FraudReportSection report={claim.fraud_report} />}
+        {claim && <OutcomeSection claim={claim} />}
+        {claim && <ChecksSection claim={claim} ran={checksRan} />}
+        {claim && <ExtractedSection docs={claim.documents} claimId={claimId!} />}
+        <h3>Events</h3>
+        {events.length === 0 ? (
+          <p className="muted">No event yet. Start a claim in the customer panel.</p>
+        ) : (
+          <ol className="events">
+            {events.map((e) => (
+              <li key={e.sequence}>
+                <details>
+                  <summary>
+                    <span className={`pill ${pillOf(e)}`}>{e.actor}</span>
+                    <span className="event-title">{e.title}</span>
+                    {e.model && <span className="mono muted">{e.model}</span>}
+                    {e.duration !== null && <span className="mono muted">{Math.round(e.duration * 1000)} ms</span>}
+                  </summary>
+                  <p className="muted">Inputs</p>
+                  <pre className="mono">{JSON.stringify(e.inputs, null, 2)}</pre>
+                  <p className="muted">Outputs</p>
+                  <pre className="mono">{JSON.stringify(e.outputs, null, 2)}</pre>
+                </details>
+              </li>
+            ))}
+            <li ref={end} />
+          </ol>
+        )}
+      </div>
     </section>
   )
 }
