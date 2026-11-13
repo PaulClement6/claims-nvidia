@@ -9,6 +9,8 @@ Target: a working demo on real-looking mock claim files at the Q1 2027 event.
 
 | File | Content |
 |---|---|
+| `docs/NIKOLA.md` | The guide of Nikola (the intern) and of his agent: role, method with a fork, each task in detail |
+| `docs/TECH.md` | How every part works, the NVIDIA technology, why we chose it, what can be challenged |
 | `docs/PRODUCT.md` | Problem, users, the two panels, the claim flow, the demo that defines "done" |
 | `docs/ARCHITECTURE.md` | Components, agent and tools, modes, data model, event stream |
 | `docs/WORKFLOWS.md` | The three claim workflows: documents, fields, rules |
@@ -22,7 +24,7 @@ Target: a working demo on real-looking mock claim files at the Q1 2027 event.
 
 ## Status
 
-2026-11-13: M0 to M3 are built (issues #2 to #16). The full claim flow works in the three modes: `local` (the default, and CI), `nim` (the LangGraph agent in the backend) and `sandbox` (the same graph in OpenShell). The demo runs in `sandbox` mode on the Brev VM `claims-nvidia` (`docs/DEPLOY.md`). The three mock claim files give `straight_through`, `handler_review` and `investigation` (`docs/EVALUATION.md`). The intern owns M4: the document reading pipeline behind the `Reader` contract (`README.md`).
+2026-11-13: M0 to M3 are built (issues #2 to #16). The full claim flow works in the three modes: `local` (the default, and CI), `nim` (the LangGraph agent in the backend) and `sandbox` (the same graph in OpenShell). The demo runs in `sandbox` mode on the Brev VM `claims-nvidia` (`docs/DEPLOY.md`). The three mock claim files give `straight_through`, `handler_review` and `investigation` (`docs/EVALUATION.md`). The demo can be watched at a public URL behind a password (D61). Nikola, the intern, has his access and starts M4 in a fork (D62): the document reading pipeline behind the `Reader` contract, its evaluation and the rails (`docs/NIKOLA.md`).
 
 ## Commands (target, same as NemoForge)
 
@@ -58,6 +60,7 @@ Each rule must point to a test that checks it. The ticket that first touches a r
 - A feature PRD is an issue with the label `prd`. Tickets are issues that link to it.
 - Labels: `afk` (agent can do it alone), `human` (needs a person), `intern` (kept for the intern), `blocked`.
 - One ticket = one branch = one pull request. The PR body says `Closes #<number>`.
+- Nikola and his agent work in a fork (the repository is public): a branch `<issue number>-<short name>` in the fork, a pull request to `PaulClement6/claims-nvidia`. They do not push to this repository and they do not merge. Sub-tasks go in the upstream issue, not in a second backlog. Steps: `docs/NIKOLA.md`, section 4.
 - Skills live in `.agents/skills/` (copied from `nemoforge-plateforme` on 2026-11-12).
 
 ## How to work
