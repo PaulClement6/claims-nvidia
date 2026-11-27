@@ -9,6 +9,8 @@ import pytest
 from PIL import Image, ImageChops, ImageStat
 from pypdf import PdfReader
 
+from app.demo import NOT_KIT
+
 ROOT = Path(__file__).resolve().parents[2]
 HARD_KEYS = {"variant", "source_document"}
 spec = importlib.util.spec_from_file_location(
@@ -44,7 +46,8 @@ def exact(folder: Path) -> dict[str, str]:
     return {
         str(p.relative_to(folder)): hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted(folder.glob("**/*"))
-        if p.suffix in {".pdf", ".json"}
+        if p.relative_to(folder).parts[0] not in NOT_KIT
+        and p.suffix in {".pdf", ".json"}
         and p.name not in BY_HAND
         and not is_image_based(p)
     }
@@ -98,7 +101,9 @@ def test_generator_is_deterministic_and_matches_the_committed_files(
     assert sorted(everything) == sorted(
         str(p.relative_to(MOCK))
         for p in MOCK.glob("**/*")
-        if p.is_file() and p.name not in BY_HAND
+        if p.is_file()
+        and p.name not in BY_HAND
+        and p.relative_to(MOCK).parts[0] not in NOT_KIT
     )
 
 

@@ -1,0 +1,1252 @@
+{
+ "source": "stored.jsonl of the live run s7-live-1 (#20, S7), before the safeguards of #125: every field stored at confidence 0.9 on a page with a text layer. Mock data only. Fields: document (key of the kit), document_type (as the reader had it), field, value as stored, snippet as the model gave it, page where the snippet is shown, runs where it was stored.",
+ "fields": [
+  {
+   "document": "claim-1-travel/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "departure_date",
+   "value": "2026-08-10",
+   "snippet": "2026-08-10",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-1-travel/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "traveller_name",
+   "value": "Anna Keller",
+   "snippet": "Anna Keller",
+   "page": 1,
+   "runs": [
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-1-travel/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "traveller_name",
+   "value": "Anna Keller",
+   "snippet": "Anna Keller\nRosenweg 7\n3011 Bern\nSwitzerland",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7"
+   ]
+  },
+  {
+   "document": "claim-1-travel/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "trip_price",
+   "value": 1840.0,
+   "snippet": "CHF 1,840.00",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-1-travel/cancellation-confirmation.pdf",
+   "document_type": "cancellation_confirmation",
+   "field": "booking_reference",
+   "value": "WPR-482913",
+   "snippet": "Booking reference: WPR-482913",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-1-travel/cancellation-confirmation.pdf",
+   "document_type": "cancellation_confirmation",
+   "field": "cancellation_date",
+   "value": "2026-08-04",
+   "snippet": "Cancellation date: 2026-08-04",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-1-travel/cancellation-confirmation.pdf",
+   "document_type": "cancellation_confirmation",
+   "field": "refund_received",
+   "value": 340.0,
+   "snippet": "Refund to your card 340.00",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-1-travel/cancellation-confirmation.pdf",
+   "document_type": "cancellation_confirmation",
+   "field": "refund_received",
+   "value": 340.0,
+   "snippet": "The refund of CHF 340.00 will be credited within 10 working days.",
+   "page": 1,
+   "runs": [
+    "r2-s7"
+   ]
+  },
+  {
+   "document": "claim-1-travel/medical-certificate.pdf",
+   "document_type": "medical_certificate",
+   "field": "cause",
+   "value": "gastroenteritis with fever",
+   "snippet": "gastroenteritis with fever",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-1-travel/medical-certificate.pdf",
+   "document_type": "medical_certificate",
+   "field": "patient_name",
+   "value": "Anna Keller",
+   "snippet": "Anna Keller",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-1-travel/medical-certificate.pdf",
+   "document_type": "medical_certificate",
+   "field": "unfit_from",
+   "value": "2026-08-03",
+   "snippet": "2026-08-03",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-2-property/repair-invoice.pdf",
+   "document_type": "repair_invoice",
+   "field": "customer_name",
+   "value": "Marco Bianchi",
+   "snippet": "Marco Bianchi\nVia Nassa 18\n6900 Lugano\nSwitzerland",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-2-property/repair-invoice.pdf",
+   "document_type": "repair_invoice",
+   "field": "invoice_date",
+   "value": "2026-09-22",
+   "snippet": "Date: 2026-09-22",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-2-property/repair-invoice.pdf",
+   "document_type": "repair_invoice",
+   "field": "invoice_number",
+   "value": "BSU-2026-1187",
+   "snippet": "Invoice no.: BSU-2026-1187",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-2-property/repair-invoice.pdf",
+   "document_type": "repair_invoice",
+   "field": "repair_company",
+   "value": "Blaubach Sanitaer & Umbau AG",
+   "snippet": "Blaubach Sanitaer & Umbau AG",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-2-property/repair-invoice.pdf",
+   "document_type": "repair_invoice",
+   "field": "total",
+   "value": 3200.0,
+   "snippet": "Total (VAT included) CHF 3,200.00",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-3-health/medical-invoice.pdf",
+   "document_type": "medical_invoice",
+   "field": "invoice_date",
+   "value": "2026-10-18",
+   "snippet": "Date: 2026-10-18",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-3-health/medical-invoice.pdf",
+   "document_type": "medical_invoice",
+   "field": "invoice_number",
+   "value": "MZS-2026-3317",
+   "snippet": "Invoice no.: MZS-2026-3317",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-3-health/medical-invoice.pdf",
+   "document_type": "medical_invoice",
+   "field": "patient_name",
+   "value": "Jonas Meier",
+   "snippet": "Patient: Jonas Meier",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-3-health/medical-invoice.pdf",
+   "document_type": "medical_invoice",
+   "field": "provider",
+   "value": "Medizinzentrum Seeblick AG",
+   "snippet": "Medizinzentrum Seeblick AG",
+   "page": 1,
+   "runs": [
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-3-health/medical-invoice.pdf",
+   "document_type": "medical_invoice",
+   "field": "provider",
+   "value": "Medizinzentrum Seeblick AG",
+   "snippet": "Medizinzentrum Seeblick AG, Seestrasse 41, 8800 Thalwil",
+   "page": 1,
+   "runs": [
+    "r1-s7"
+   ]
+  },
+  {
+   "document": "claim-3-health/medical-invoice.pdf",
+   "document_type": "medical_invoice",
+   "field": "total",
+   "value": 4450.0,
+   "snippet": "Total CHF 4,450.00",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-3-health/medical-report.pdf",
+   "document_type": "medical_report",
+   "field": "diagnosis",
+   "value": "sprained ankle, right, ligament injury grade II. No fracture on the X-ray.",
+   "snippet": "Diagnosis: sprained ankle, right, ligament injury grade II. No fracture on the X-ray.",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-3-health/medical-report.pdf",
+   "document_type": "medical_report",
+   "field": "patient_name",
+   "value": "Lukas Meier",
+   "snippet": "Lukas Meier",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7"
+   ]
+  },
+  {
+   "document": "claim-3-health/medical-report.pdf",
+   "document_type": "medical_report",
+   "field": "patient_name",
+   "value": "Lukas Meier",
+   "snippet": "Patient: Lukas Meier (born 1991-03-08), examined on 2026-10-25.",
+   "page": 1,
+   "runs": [
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-3-health/medical-report.pdf",
+   "document_type": "medical_report",
+   "field": "provider",
+   "value": "Dr. med. R. Haller",
+   "snippet": "Dr. med. R. Haller",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "claim-3-health/medical-report.pdf",
+   "document_type": "medical_report",
+   "field": "treatment_date",
+   "value": "2026-10-25",
+   "snippet": "Thalwil, 2026-10-25",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "departure_date",
+   "value": "2026-05-14",
+   "snippet": "2026-05-14",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "traveller_name",
+   "value": "Anna Keller",
+   "snippet": "Anna Keller\nRosenweg 7\n3011 Bern\nSwitzerland",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "trip_price",
+   "value": 1320.0,
+   "snippet": "CHF 1,320.00",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/luggage-report.pdf",
+   "document_type": "luggage_report",
+   "field": "airline",
+   "value": "Alpenwind Airlines AG",
+   "snippet": "Alpenwind Airlines AG",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/luggage-report.pdf",
+   "document_type": "luggage_report",
+   "field": "incident_date",
+   "value": "2026-05-14",
+   "snippet": "2026-05-14",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/luggage-report.pdf",
+   "document_type": "luggage_report",
+   "field": "report_reference",
+   "value": "AW-OPO-20471",
+   "snippet": "Report reference: AW-OPO-20471",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/luggage-report.pdf",
+   "document_type": "luggage_report",
+   "field": "traveller_name",
+   "value": "Anna Keller",
+   "snippet": "Anna Keller",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/receipt-jacket-shoes.pdf",
+   "document_type": "receipt",
+   "field": "amount_paid",
+   "value": 398.0,
+   "snippet": "CHF 398.00",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/receipt-jacket-shoes.pdf",
+   "document_type": "receipt",
+   "field": "item_description",
+   "value": "Rain jacket, waterproof",
+   "snippet": "Rain jacket, waterproof",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/receipt-jacket-shoes.pdf",
+   "document_type": "receipt",
+   "field": "merchant",
+   "value": "Bergfreund Sport AG",
+   "snippet": "Bergfreund Sport AG",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/receipt-jacket-shoes.pdf",
+   "document_type": "receipt",
+   "field": "purchase_date",
+   "value": "2026-03-18",
+   "snippet": "2026-03-18",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/receipt-trolley.pdf",
+   "document_type": "receipt",
+   "field": "amount_paid",
+   "value": 389.0,
+   "snippet": "CHF 389.00",
+   "page": 1,
+   "runs": [
+    "r1-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/receipt-trolley.pdf",
+   "document_type": "receipt",
+   "field": "amount_paid",
+   "value": 389.0,
+   "snippet": "Total paid CHF 389.00",
+   "page": 1,
+   "runs": [
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/receipt-trolley.pdf",
+   "document_type": "receipt",
+   "field": "item_description",
+   "value": "Cabin trolley, hard shell, 55 cm",
+   "snippet": "Cabin trolley, hard shell, 55 cm",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/receipt-trolley.pdf",
+   "document_type": "receipt",
+   "field": "merchant",
+   "value": "Kofferhaus Limmat AG",
+   "snippet": "Kofferhaus Limmat AG",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-luggage/receipt-trolley.pdf",
+   "document_type": "receipt",
+   "field": "purchase_date",
+   "value": "2026-04-02",
+   "snippet": "2026-04-02",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/police-report.pdf",
+   "document_type": "police_report",
+   "field": "customer_name",
+   "value": "Anna Keller",
+   "snippet": "Anna Keller\nRosenweg 7\n3011 Bern\nSwitzerland",
+   "page": 1,
+   "runs": [
+    "r2-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/police-report.pdf",
+   "document_type": "police_report",
+   "field": "customer_name",
+   "value": "Anna Keller",
+   "snippet": "Anna Keller Rosenweg 7 3011 Bern Switzerland",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/police-report.pdf",
+   "document_type": "police_report",
+   "field": "incident_date",
+   "value": "2026-10-09",
+   "snippet": "Date: 2026-10-09",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/police-report.pdf",
+   "document_type": "police_report",
+   "field": "offence",
+   "value": "Burglary (forced entry)",
+   "snippet": "Burglary (forced entry)",
+   "page": 1,
+   "runs": [
+    "r2-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/police-report.pdf",
+   "document_type": "police_report",
+   "field": "offence",
+   "value": "Burglary (forced entry)",
+   "snippet": "Offence: Burglary (forced entry)",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/police-report.pdf",
+   "document_type": "police_report",
+   "field": "report_number",
+   "value": "RPA-2026-04417",
+   "snippet": "Report no.: RPA-2026-04417",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/receipt-door-frame.pdf",
+   "document_type": "receipt",
+   "field": "amount_paid",
+   "value": 300.5,
+   "snippet": "CHF 300.50",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/receipt-door-frame.pdf",
+   "document_type": "receipt",
+   "field": "item_description",
+   "value": "Steel door frame reinforcement kit",
+   "snippet": "Steel door frame reinforcement kit",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/receipt-door-frame.pdf",
+   "document_type": "receipt",
+   "field": "merchant",
+   "value": "Bauzentrum Wankdorf AG",
+   "snippet": "Bauzentrum Wankdorf AG",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/receipt-door-frame.pdf",
+   "document_type": "receipt",
+   "field": "purchase_date",
+   "value": "2025-06-03",
+   "snippet": "2025-06-03",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/receipt-lock-set.pdf",
+   "document_type": "receipt",
+   "field": "amount_paid",
+   "value": 318.0,
+   "snippet": "Total paid CHF 318.00",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/receipt-lock-set.pdf",
+   "document_type": "receipt",
+   "field": "item_description",
+   "value": "Security lock set, 5-point, with cylinder",
+   "snippet": "Security lock set, 5-point, with cylinder",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/receipt-lock-set.pdf",
+   "document_type": "receipt",
+   "field": "merchant",
+   "value": "Hardware Rosengarten AG",
+   "snippet": "Hardware Rosengarten AG",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/receipt-lock-set.pdf",
+   "document_type": "receipt",
+   "field": "purchase_date",
+   "value": "2025-05-12",
+   "snippet": "2025-05-12",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/repair-quote.pdf",
+   "document_type": "repair_quote",
+   "field": "customer_name",
+   "value": "Anna Keller",
+   "snippet": "Anna Keller\nRosenweg 7\n3011 Bern\nSwitzerland",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/repair-quote.pdf",
+   "document_type": "repair_quote",
+   "field": "quote_date",
+   "value": "2026-10-12",
+   "snippet": "Date: 2026-10-12",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/repair-quote.pdf",
+   "document_type": "repair_quote",
+   "field": "quote_number",
+   "value": "TWG-Q-2026-0731",
+   "snippet": "Quote no.: TWG-Q-2026-0731",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/repair-quote.pdf",
+   "document_type": "repair_quote",
+   "field": "repair_company",
+   "value": "Tuerenwerk Gantrisch AG",
+   "snippet": "Tuerenwerk Gantrisch AG",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-anna-theft/repair-quote.pdf",
+   "document_type": "repair_quote",
+   "field": "total",
+   "value": 2640.0,
+   "snippet": "Total (VAT included) CHF 2,640.00",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-elena-travel/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "departure_date",
+   "value": "2026-06-20",
+   "snippet": "2026-06-20",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7"
+   ]
+  },
+  {
+   "document": "kit-elena-travel/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "departure_date",
+   "value": "2026-06-20",
+   "snippet": "Departure: 2026-06-20",
+   "page": 1,
+   "runs": [
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-elena-travel/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "traveller_name",
+   "value": "Elena Rossi",
+   "snippet": "Elena Rossi",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7"
+   ]
+  },
+  {
+   "document": "kit-elena-travel/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "traveller_name",
+   "value": "Elena Rossi",
+   "snippet": "Traveller: Elena Rossi",
+   "page": 1,
+   "runs": [
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-elena-travel/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "trip_price",
+   "value": 2150.0,
+   "snippet": "CHF 2,150.00",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7"
+   ]
+  },
+  {
+   "document": "kit-elena-travel/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "trip_price",
+   "value": 2150.0,
+   "snippet": "Total trip price CHF 2,150.00",
+   "page": 1,
+   "runs": [
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-elena-travel/cancellation-confirmation.pdf",
+   "document_type": "cancellation_confirmation",
+   "field": "booking_reference",
+   "value": "WPR-515027",
+   "snippet": "Booking reference: WPR-515027",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-elena-travel/cancellation-confirmation.pdf",
+   "document_type": "cancellation_confirmation",
+   "field": "cancellation_date",
+   "value": "2026-06-03",
+   "snippet": "Cancellation date: 2026-06-03",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-elena-travel/cancellation-confirmation.pdf",
+   "document_type": "cancellation_confirmation",
+   "field": "refund_received",
+   "value": 400.0,
+   "snippet": "Refund of CHF 400.00 will be credited within 10 working days.",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7"
+   ]
+  },
+  {
+   "document": "kit-elena-travel/cancellation-confirmation.pdf",
+   "document_type": "cancellation_confirmation",
+   "field": "refund_received",
+   "value": 400.0,
+   "snippet": "Refund to your card 400.00",
+   "page": 1,
+   "runs": [
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-clean/medical-invoice.pdf",
+   "document_type": "medical_invoice",
+   "field": "invoice_date",
+   "value": "2026-11-09",
+   "snippet": "Date: 2026-11-09",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-clean/medical-invoice.pdf",
+   "document_type": "medical_invoice",
+   "field": "invoice_number",
+   "value": "GLB-2026-5521",
+   "snippet": "Invoice no.: GLB-2026-5521",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-clean/medical-invoice.pdf",
+   "document_type": "medical_invoice",
+   "field": "patient_name",
+   "value": "Lukas Meier",
+   "snippet": "Patient: Lukas Meier",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-clean/medical-invoice.pdf",
+   "document_type": "medical_invoice",
+   "field": "provider",
+   "value": "Gesundheitszentrum Limmatblick AG",
+   "snippet": "Gesundheitszentrum Limmatblick AG Badenerstrasse 300, 8004 Zurich",
+   "page": 1,
+   "runs": [
+    "r1-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-clean/medical-invoice.pdf",
+   "document_type": "medical_invoice",
+   "field": "provider",
+   "value": "Gesundheitszentrum Limmatblick AG",
+   "snippet": "Gesundheitszentrum Limmatblick AG, Badenerstrasse 300, 8004 Zurich",
+   "page": 1,
+   "runs": [
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-clean/medical-invoice.pdf",
+   "document_type": "medical_invoice",
+   "field": "total",
+   "value": 840.0,
+   "snippet": "Total CHF 840.00",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-clean/medical-report.pdf",
+   "document_type": "medical_report",
+   "field": "diagnosis",
+   "value": "contusion of the left wrist. No fracture on the X-ray.",
+   "snippet": "Diagnosis: contusion of the left wrist. No fracture on the X-ray.",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-clean/medical-report.pdf",
+   "document_type": "medical_report",
+   "field": "patient_name",
+   "value": "Lukas Meier",
+   "snippet": "Patient: Lukas Meier (born 1991-03-08), examined on 2026-11-06.",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-clean/medical-report.pdf",
+   "document_type": "medical_report",
+   "field": "provider",
+   "value": "Dr. med. N. Frei",
+   "snippet": "Dr. med. N. Frei",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-clean/medical-report.pdf",
+   "document_type": "medical_report",
+   "field": "treatment_date",
+   "value": "2026-11-06",
+   "snippet": "Zurich, 2026-11-06",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-household/repair-quote.pdf",
+   "document_type": "repair_quote",
+   "field": "customer_name",
+   "value": "Lukas Meier",
+   "snippet": "Lukas Meier\nHirschengasse 9\n8032 Zurich\nSwitzerland",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-household/repair-quote.pdf",
+   "document_type": "repair_quote",
+   "field": "quote_date",
+   "value": "2026-09-16",
+   "snippet": "Date: 2026-09-16",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-household/repair-quote.pdf",
+   "document_type": "repair_quote",
+   "field": "quote_number",
+   "value": "GFB-Q-2026-0388",
+   "snippet": "Quote no.: GFB-Q-2026-0388",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-household/repair-quote.pdf",
+   "document_type": "repair_quote",
+   "field": "repair_company",
+   "value": "Glas & Fenster Brunner GmbH",
+   "snippet": "Glas & Fenster Brunner GmbH",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-lukas-household/repair-quote.pdf",
+   "document_type": "repair_quote",
+   "field": "total",
+   "value": 1260.0,
+   "snippet": "Total (VAT included) CHF 1,260.00",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-marco-bathroom/repair-invoice.pdf",
+   "document_type": "repair_invoice",
+   "field": "customer_name",
+   "value": "Marco Bianchi",
+   "snippet": "Marco Bianchi\nVia Nassa 18\n6900 Lugano\nSwitzerland",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-marco-bathroom/repair-invoice.pdf",
+   "document_type": "repair_invoice",
+   "field": "invoice_date",
+   "value": "2026-11-09",
+   "snippet": "Date: 2026-11-09",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-marco-bathroom/repair-invoice.pdf",
+   "document_type": "repair_invoice",
+   "field": "invoice_number",
+   "value": "ZI-2026-0652",
+   "snippet": "Invoice no.: ZI-2026-0652",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-marco-bathroom/repair-invoice.pdf",
+   "document_type": "repair_invoice",
+   "field": "repair_company",
+   "value": "Zanetti Impianti SA",
+   "snippet": "Zanetti Impianti SA",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-marco-bathroom/repair-invoice.pdf",
+   "document_type": "repair_invoice",
+   "field": "total",
+   "value": 4740.0,
+   "snippet": "Total (VAT included) CHF 4,740.00",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-marco-travel/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "departure_date",
+   "value": "2026-08-23",
+   "snippet": "2026-08-23",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-marco-travel/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "traveller_name",
+   "value": "Marco Bianchi",
+   "snippet": "Marco Bianchi",
+   "page": 1,
+   "runs": [
+    "r1-s7"
+   ]
+  },
+  {
+   "document": "kit-marco-travel/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "traveller_name",
+   "value": "Marco Bianchi",
+   "snippet": "Marco Bianchi\nVia Nassa 18\n6900 Lugano\nSwitzerland",
+   "page": 1,
+   "runs": [
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-marco-travel/booking-confirmation.pdf",
+   "document_type": "booking_confirmation",
+   "field": "trip_price",
+   "value": 3200.0,
+   "snippet": "CHF 3,200.00",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-marco-travel/cancellation-confirmation.pdf",
+   "document_type": "cancellation_confirmation",
+   "field": "booking_reference",
+   "value": "SHR-770245",
+   "snippet": "Booking reference: SHR-770245",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-marco-travel/cancellation-confirmation.pdf",
+   "document_type": "cancellation_confirmation",
+   "field": "cancellation_date",
+   "value": "2026-07-13",
+   "snippet": "Cancellation date: 2026-07-13",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  },
+  {
+   "document": "kit-marco-travel/cancellation-confirmation.pdf",
+   "document_type": "cancellation_confirmation",
+   "field": "refund_received",
+   "value": 900.0,
+   "snippet": "The refund of CHF 900.00 will be credited within 10 working days.",
+   "page": 1,
+   "runs": [
+    "r1-s7",
+    "r2-s7",
+    "r3-s7"
+   ]
+  }
+ ]
+}

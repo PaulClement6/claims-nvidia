@@ -299,15 +299,64 @@ def test_a_whole_page_as_snippet_proves_nothing() -> None:
     assert names(out) == ALL_FOUR - {"trip_price"}
 
 
-def test_a_mixed_up_field_with_a_true_snippet_is_stored_known_limit() -> None:
+def test_a_mixed_up_field_with_a_true_snippet_is_stored_unverified() -> None:
     """840.00 is on the page (a line item), so this wrong trip price passes the
-    checks. The snippet proves that the text is there, not that it is the right
-    field (D80): the evaluation measures it."""
+    checks of the snippet. The snippet proves that the text is there, not that it is
+    the right field (D80): no label says "trip price" in front of it (#125), so the
+    value and its source stay and a person checks it."""
     answer = answer_from(BOOKING, trip_price=840.0)
     answer["snippets"]["trip_price"] = "840.00"
     out, _ = read(BOOKING, "booking_confirmation", answer)
     price = next(f for f in out.fields if f.name == "trip_price")
-    assert price.value == 840.0 and price.confidence == VERIFIED
+    assert price.value == 840.0 and price.confidence == UNVERIFIED
+    assert price.source.snippet == "840.00" and price.source.page == 1
+    assert price.confidence < LOW_CONFIDENCE
+    others = {f.confidence for f in out.fields if f.name != "trip_price"}
+    assert others == {VERIFIED}
+
+
+def test_a_field_with_the_label_of_another_field_keeps_value_and_source() -> None:
+    """The customer number K-30418 is on the page, but it is not a booking reference."""
+    answer = answer_from(BOOKING, booking_reference="K-30418")
+    answer["snippets"]["booking_reference"] = "K-30418"
+    out, _ = read(BOOKING, "booking_confirmation", answer)
+    ref = next(f for f in out.fields if f.name == "booking_reference")
+    assert ref.value == "K-30418" and ref.confidence == UNVERIFIED
+    assert (ref.source.document_id, ref.source.page) == ("D-omni", 1)
+    assert ref.source.snippet == "K-30418" and ref.source.box is None
+    assert names(out) == ALL_FOUR
+
+
+def test_a_field_whose_label_fits_stays_verified() -> None:
+    answer = answer_from(BOOKING)
+    answer["snippets"]["booking_reference"] = "Booking reference:\nWPR-482913"
+    answer["snippets"]["departure_date"] = "Departure:\n2026-08-10"
+    out, _ = read(BOOKING, "booking_confirmation", answer)
+    assert names(out) == ALL_FOUR
+    assert {f.confidence for f in out.fields} == {VERIFIED}
+
+
+@pytest.mark.parametrize(
+    "placeholder", ["Not answerable", "null", "N/A", "-", "unbekannt"]
+)
+def test_a_placeholder_is_no_value_and_no_disagreement(placeholder: str) -> None:
+    """Page 1 says "Not answerable", page 2 gives the name: the field is the name,
+    verified, with no conflict between the two pages."""
+    first = nothing_on(DocumentType.booking_confirmation)
+    first["values"]["traveller_name"] = placeholder
+    first["snippets"]["traveller_name"] = placeholder
+    second = nothing_on(DocumentType.booking_confirmation)
+    second["values"]["traveller_name"] = "Anna Keller"
+    second["snippets"]["traveller_name"] = "Anna Keller"
+    stub = Stub(ANSWER, first, second)
+    out = stub.reader().extract(doc(2), two_pages(), "travel")
+    [name] = out.fields
+    assert (name.name, name.value, name.source.page) == (
+        "traveller_name",
+        "Anna Keller",
+        2,
+    )
+    assert name.confidence == VERIFIED
 
 
 @pytest.mark.parametrize(

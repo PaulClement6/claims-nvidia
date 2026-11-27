@@ -138,3 +138,40 @@ def photo(pdf: Path, out: Path, seed: int) -> None:
         img, _noise(size, seed, 5).convert("RGB"), scale=1.0, offset=-128
     )
     img.save(out, "JPEG", quality=85)
+
+
+def render_page(pdf: Path, index: int) -> Image.Image:
+    """Page `index` (from 0) of a PDF as an RGB image at 150 DPI."""
+    doc = pdfium.PdfDocument(str(pdf))
+    try:
+        return doc[index].render(scale=DPI / 72).to_pil().convert("RGB")
+    finally:
+        doc.close()
+
+
+def scan_pages(pdf: Path, out: Path, seeds: list[int], angles: list[float]) -> None:
+    """A flat-bed scan of a document of several pages: the processing of `scan()` on
+    each page, one seed and one angle per page. The PDF has one grey image per page
+    and no text layer."""
+    doc = pdfium.PdfDocument(str(pdf))
+    try:
+        count = len(doc)
+    finally:
+        doc.close()
+    assert count == len(seeds) == len(angles), "one seed and one angle per page"
+    c = Canvas(str(out), pagesize=A4, invariant=1, pageCompression=0)
+    c.setTitle("Scan")
+    c.setAuthor("")
+    for i in range(count):
+        page = render_page(pdf, i).convert("L").point(lambda v: v * 94 // 100)
+        page = page.rotate(angles[i], Image.Resampling.BICUBIC, fillcolor=226)
+        page = page.filter(ImageFilter.GaussianBlur(0.9))
+        page = ImageChops.add(
+            page, _noise(page.size, seeds[i], 7), scale=1.0, offset=-128
+        )
+        jpeg = io.BytesIO()
+        page.save(jpeg, "JPEG", quality=68)
+        jpeg.seek(0)
+        c.drawImage(ImageReader(jpeg), 0, 0, A4[0], A4[1])
+        c.showPage()
+    c.save()

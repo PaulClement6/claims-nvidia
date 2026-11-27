@@ -1,0 +1,354 @@
+%PDF-1.4
+%“Œ‹ž ReportLab Generated PDF document (opensource)
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/Contents 10 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 9 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+5 0 obj
+<<
+/Contents 11 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 9 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+6 0 obj
+<<
+/Contents 12 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 9 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+7 0 obj
+<<
+/PageMode /UseNone /Pages 9 0 R /Type /Catalog
+>>
+endobj
+8 0 obj
+<<
+/Author () /CreationDate (D:20000101000000+00'00') /Creator (anonymous) /Keywords () /ModDate (D:20000101000000+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (unspecified) /Title (Invoice) /Trapped /False
+>>
+endobj
+9 0 obj
+<<
+/Count 3 /Kids [ 4 0 R 5 0 R 6 0 R ] /Type /Pages
+>>
+endobj
+10 0 obj
+<<
+/Length 3640
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+.05 .45 .45 rg
+n 0 823.8898 595.2756 18 re f*
+0 0 0 rg
+BT /F2 18 Tf 21.6 TL ET
+BT 1 0 0 1 56 785.8898 Tm (Wydler Badbau AG) Tj T* ET
+BT /F1 8.5 Tf 10.2 TL ET
+BT 1 0 0 1 56 769.8898 Tm (Gewerbering 14, 8580 Amriswil) Tj T* ET
+BT /F1 8.5 Tf 10.2 TL ET
+BT 1 0 0 1 56 758.8898 Tm (Tel. +41 71 555 38 17) Tj T* ET
+.05 .45 .45 RG
+n 56 729.8898 m 539.2756 729.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 691.8898 Tm (Melina Zbinden) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 678.8898 Tm (Rebhalde 22) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 665.8898 Tm (8500 Frauenfeld) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 652.8898 Tm (Switzerland) Tj T* ET
+BT /F2 9 Tf 10.8 TL ET
+BT 1 0 0 1 330 691.8898 Tm (Invoice no.:) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 420 691.8898 Tm (WB-26-0714) Tj T* ET
+BT /F2 9 Tf 10.8 TL ET
+BT 1 0 0 1 330 678.8898 Tm (Date:) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 420 678.8898 Tm (2026-10-08) Tj T* ET
+BT /F2 9 Tf 10.8 TL ET
+BT 1 0 0 1 330 665.8898 Tm (Work done:) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 420 665.8898 Tm (2026-09-28 to 2026-10-02) Tj T* ET
+BT /F2 16 Tf 19.2 TL ET
+BT 1 0 0 1 56 601.8898 Tm (Invoice) Tj T* ET
+.933333 .933333 .933333 rg
+n 52 556.8898 491.2756 17 re f*
+0 0 0 rg
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 56 561.8898 Tm (Work) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 350 561.8898 Tm (Qty) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 410 561.8898 Tm (Unit \(CHF\)) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 471.5156 561.8898 Tm (Amount \(CHF\)) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 555.8898 m 543.2756 555.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 543.8898 Tm (Demolition of old bathroom tiles, per m2) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 543.8898 Tm (14) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 543.8898 Tm (38.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 543.8898 Tm (532.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 537.8898 m 543.2756 537.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 525.8898 Tm (Disposal of rubble, per container) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 525.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 525.8898 Tm (265.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 525.8898 Tm (265.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 519.8898 m 543.2756 519.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 507.8898 Tm (Waterproofing membrane, per m2) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 507.8898 Tm (14) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 507.8898 Tm (26.50) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 507.8898 Tm (371.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 501.8898 m 543.2756 501.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 489.8898 Tm (Floor drain, stainless steel) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 489.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 489.8898 Tm (189.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 489.8898 Tm (189.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 483.8898 m 543.2756 483.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 471.8898 Tm (Plumber, per hour) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 471.8898 Tm (11) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 471.8898 Tm (98.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 500.3556 471.8898 Tm (1,078.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 465.8898 m 543.2756 465.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 300 447.8898 Tm (Subtotal page 1, carried forward) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 500.3556 447.8898 Tm (2,435.00) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 274.6203 30 Tm (Page 1 of 3) Tj T* ET
+ 
+endstream
+endobj
+11 0 obj
+<<
+/Length 2750
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+.3 .3 .3 rg
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 56 801.8898 Tm (Invoice no.: WB-26-0714) Tj T* ET
+0 0 0 rg
+.6 .6 .6 RG
+n 56 795.8898 m 539.2756 795.8898 l S
+.933333 .933333 .933333 rg
+n 52 756.8898 491.2756 17 re f*
+0 0 0 rg
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 56 761.8898 Tm (Work) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 350 761.8898 Tm (Qty) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 410 761.8898 Tm (Unit \(CHF\)) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 471.5156 761.8898 Tm (Amount \(CHF\)) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 755.8898 m 543.2756 755.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 743.8898 Tm (Brought forward from page 1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 500.3556 743.8898 Tm (2,435.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 725.8898 Tm (Wall tiles 30x60, per m2) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 725.8898 Tm (22) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 725.8898 Tm (54.80) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 500.3556 725.8898 Tm (1,205.60) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 719.8898 m 543.2756 719.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 707.8898 Tm (Tile adhesive, bag 25 kg) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 707.8898 Tm (6) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 707.8898 Tm (31.90) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 707.8898 Tm (191.40) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 701.8898 m 543.2756 701.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 689.8898 Tm (Tiler, per hour) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 689.8898 Tm (19) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 689.8898 Tm (92.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 500.3556 689.8898 Tm (1,748.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 683.8898 m 543.2756 683.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 671.8898 Tm (Silicone joints, per metre) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 671.8898 Tm (28) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 671.8898 Tm (4.50) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 671.8898 Tm (126.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 665.8898 m 543.2756 665.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 653.8898 Tm (Shower screen, glass 8 mm) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 653.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 653.8898 Tm (655.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 653.8898 Tm (655.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 647.8898 m 543.2756 647.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 300 629.8898 Tm (Carried forward to page 3) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 500.3556 629.8898 Tm (6,361.00) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 274.6203 30 Tm (Page 2 of 3) Tj T* ET
+ 
+endstream
+endobj
+12 0 obj
+<<
+/Length 1927
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+.3 .3 .3 rg
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 56 801.8898 Tm (Invoice no.: WB-26-0714) Tj T* ET
+0 0 0 rg
+.6 .6 .6 RG
+n 56 795.8898 m 539.2756 795.8898 l S
+.933333 .933333 .933333 rg
+n 52 756.8898 491.2756 17 re f*
+0 0 0 rg
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 56 761.8898 Tm (Work) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 350 761.8898 Tm (Qty) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 410 761.8898 Tm (Unit \(CHF\)) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 471.5156 761.8898 Tm (Amount \(CHF\)) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 755.8898 m 543.2756 755.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 743.8898 Tm (Brought forward from page 2) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 500.3556 743.8898 Tm (6,361.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 725.8898 Tm (Mixer tap, wall mounted) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 725.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 725.8898 Tm (327.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 725.8898 Tm (327.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 719.8898 m 543.2756 719.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 707.8898 Tm (Travel and small material, flat) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 707.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 707.8898 Tm (78.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 514.2556 707.8898 Tm (78.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 701.8898 m 543.2756 701.8898 l S
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 330 683.8898 Tm (Total) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 477.0256 683.8898 Tm (CHF 6,766.00) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 330 667.8898 Tm (of which VAT 8.1%) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 667.8898 Tm (506.98) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 56 631.8898 Tm (Payable within 30 days.) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 274.6203 30 Tm (Page 3 of 3) Tj T* ET
+ 
+endstream
+endobj
+xref
+0 13
+0000000000 65535 f 
+0000000061 00000 n 
+0000000102 00000 n 
+0000000209 00000 n 
+0000000321 00000 n 
+0000000525 00000 n 
+0000000729 00000 n 
+0000000933 00000 n 
+0000001001 00000 n 
+0000001252 00000 n 
+0000001323 00000 n 
+0000005015 00000 n 
+0000007817 00000 n 
+trailer
+<<
+/ID 
+[<91958db95c0645225d0378583984e156><91958db95c0645225d0378583984e156>]
+% ReportLab generated PDF document -- digest (opensource)
+
+/Info 8 0 R
+/Root 7 0 R
+/Size 13
+>>
+startxref
+9796
+%%EOF

@@ -1,0 +1,52 @@
+{
+  "document_type": "police_report",
+  "fields": [
+    {
+      "name": "report_number",
+      "value": "LPU-2026-04193",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "LPU-2026-04193",
+      "accepted_pages": [
+        1,
+        2
+      ],
+      "page_snippets": {
+        "1": "LPU-2026-04193",
+        "2": "LPU-2026-04193"
+      }
+    },
+    {
+      "name": "incident_date",
+      "value": "2026-11-10",
+      "confidence": 1.0,
+      "page": 2,
+      "snippet": "2026-11-10"
+    },
+    {
+      "name": "customer_name",
+      "value": "Dominik Haefeli",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Dominik Haefeli",
+      "accepted_pages": [
+        1,
+        2
+      ],
+      "page_snippets": {
+        "1": "Dominik Haefeli",
+        "2": "Dominik Haefeli"
+      }
+    },
+    {
+      "name": "offence",
+      "value": "Theft",
+      "confidence": 1.0,
+      "page": 2,
+      "snippet": "Theft"
+    }
+  ],
+  "line_items": [],
+  "line_pages": [],
+  "pages": 2
+}

@@ -1,0 +1,153 @@
+{
+  "document_type": "repair_invoice",
+  "fields": [
+    {
+      "name": "invoice_number",
+      "value": "KB-26-1893",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "KB-26-1893",
+      "accepted_pages": [
+        1,
+        2
+      ],
+      "page_snippets": {
+        "1": "KB-26-1893",
+        "2": "KB-26-1893"
+      }
+    },
+    {
+      "name": "invoice_date",
+      "value": "2026-11-05",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-11-05",
+      "accepted_pages": [
+        1,
+        2
+      ],
+      "page_snippets": {
+        "1": "2026-11-05",
+        "2": "2026-11-05"
+      }
+    },
+    {
+      "name": "repair_company",
+      "value": "Kessler & Brunold Heizservice AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Kessler & Brunold Heizservice AG",
+      "accepted_pages": [
+        1,
+        2
+      ],
+      "page_snippets": {
+        "1": "Kessler & Brunold Heizservice AG",
+        "2": "Kessler & Brunold Heizservice AG"
+      }
+    },
+    {
+      "name": "total",
+      "value": 1885.5,
+      "confidence": 1.0,
+      "page": 2,
+      "snippet": "CHF 1,885.50"
+    },
+    {
+      "name": "customer_name",
+      "value": "Bruno Steinemann",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Bruno Steinemann"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Boiler service, flat 1.01",
+      "quantity": 1,
+      "unit_price": 148.0,
+      "amount": 148.0
+    },
+    {
+      "description": "Boiler service, flat 1.02",
+      "quantity": 1,
+      "unit_price": 148.0,
+      "amount": 148.0
+    },
+    {
+      "description": "Boiler service, flat 1.03",
+      "quantity": 1,
+      "unit_price": 148.0,
+      "amount": 148.0
+    },
+    {
+      "description": "Boiler service, flat 1.04",
+      "quantity": 1,
+      "unit_price": 148.0,
+      "amount": 148.0
+    },
+    {
+      "description": "Boiler service, flat 1.05",
+      "quantity": 1,
+      "unit_price": 148.0,
+      "amount": 148.0
+    },
+    {
+      "description": "Boiler service, flat 1.06",
+      "quantity": 1,
+      "unit_price": 148.0,
+      "amount": 148.0
+    },
+    {
+      "description": "Boiler service, flat 2.01",
+      "quantity": 1,
+      "unit_price": 148.0,
+      "amount": 148.0
+    },
+    {
+      "description": "Boiler service, flat 2.02",
+      "quantity": 1,
+      "unit_price": 148.0,
+      "amount": 148.0
+    },
+    {
+      "description": "Boiler service, flat 2.03, with new circulation pump",
+      "quantity": 1,
+      "unit_price": 312.5,
+      "amount": 312.5
+    },
+    {
+      "description": "Boiler service, flat 2.04",
+      "quantity": 1,
+      "unit_price": 148.0,
+      "amount": 148.0
+    },
+    {
+      "description": "Boiler service, flat 2.05",
+      "quantity": 1,
+      "unit_price": 148.0,
+      "amount": 148.0
+    },
+    {
+      "description": "Call-out fee, second visit",
+      "quantity": 2,
+      "unit_price": 46.5,
+      "amount": 93.0
+    }
+  ],
+  "line_pages": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2
+  ],
+  "pages": 2
+}

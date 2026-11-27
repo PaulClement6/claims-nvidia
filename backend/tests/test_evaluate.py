@@ -14,6 +14,7 @@ from typing import Any
 import pytest
 from pypdf import PdfWriter
 
+from app.demo import NOT_KIT
 from app.docintel.evaluate import evaluate, kit
 from app.docintel.fixture import FixtureReader
 from app.models import Document, ExtractedField, Extraction
@@ -22,7 +23,10 @@ from tests.reader_contract import MOCK
 Json = dict[str, Any]
 
 KIT = sorted(
-    p for e in ("pdf", "jpg", "png") for p in MOCK.glob(f"*/*.{e}") if p.is_file()
+    p
+    for e in ("pdf", "jpg", "png")
+    for p in MOCK.glob(f"*/*.{e}")
+    if p.is_file() and p.parent.name not in NOT_KIT
 )
 
 
@@ -323,7 +327,9 @@ def test_an_extra_field_is_counted_apart_and_does_not_fail_the_document(
 ) -> None:
     report = one(StubReader({"a.pdf": answer(also=[("vat_number", "CHE-1", 1)])}))
     d = doc(report, "a.pdf")
-    assert d["extra"] == [{"name": "vat_number", "value": "CHE-1", "page": 1}]
+    assert d["extra"] == [
+        {"name": "vat_number", "value": "CHE-1", "page": 1, "confidence": 0.9}
+    ]
     assert d["counts"]["extra"] == 1 and d["counts"]["expected"] == 4
     assert d["passed"] is True
     assert report["pooled"]["by_field"]["vat_number"]["expected"] == 0

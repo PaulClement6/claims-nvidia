@@ -1,0 +1,53 @@
+{
+  "document_type": "medical_report",
+  "fields": [
+    {
+      "name": "patient_name",
+      "value": "Mauro Tresch",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Mauro Tresch",
+      "accepted_pages": [
+        1,
+        2
+      ],
+      "page_snippets": {
+        "1": "Mauro Tresch",
+        "2": "Mauro Tresch"
+      }
+    },
+    {
+      "name": "diagnosis",
+      "value": "lumbar disc herniation",
+      "confidence": 1.0,
+      "page": 2,
+      "snippet": "lumbar disc herniation"
+    },
+    {
+      "name": "treatment_date",
+      "value": "2026-10-27",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-10-27"
+    },
+    {
+      "name": "provider",
+      "value": "Thurauen Health Centre AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Thurauen Health Centre AG",
+      "accepted_pages": [
+        1,
+        2
+      ],
+      "page_snippets": {
+        "1": "Thurauen Health Centre AG",
+        "2": "Thurauen Health Centre AG"
+      }
+    }
+  ],
+  "line_items": [],
+  "line_pages": [],
+  "pages": 2,
+  "variant": "scan"
+}

@@ -1,0 +1,43 @@
+{
+  "document_type": "booking_confirmation",
+  "fields": [
+    {
+      "name": "booking_reference",
+      "value": "FBT-317405",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "FBT-317405",
+      "accepted_pages": [
+        1,
+        2
+      ],
+      "page_snippets": {
+        "1": "FBT-317405",
+        "2": "FBT-317405"
+      }
+    },
+    {
+      "name": "traveller_name",
+      "value": "Ottilie Burkhalter",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Ottilie Burkhalter"
+    },
+    {
+      "name": "departure_date",
+      "value": "2027-01-16",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2027-01-16"
+    },
+    {
+      "name": "trip_price",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    }
+  ],
+  "line_items": [],
+  "line_pages": [],
+  "pages": 2
+}

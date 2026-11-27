@@ -562,3 +562,81 @@ The kit has no field that is expected to be empty, so it cannot see a value inve
 - **One variant, 3 runs:** `cd backend && uv run --env-file ../.env python -m app.docintel.evaluate --reader omni --runs 3 --omni dpi=100 --output .dev-data/evaluation/s3-dpi-100.json`. `--omni` takes `prompt`, `dpi`, `temperature`, `thinking`, `reasoning_budget`, `max_tokens` and `timeout`; the report records the settings, `config_id` and the tokens.
 - **Not in git:** the runners of the stages (request limits, logs of every answer, replay) and the saved answers. They are in `backend/.dev-data/issue-20/` on Nikola's machine.
 - **The numbers of a new run** will be close to these, not equal: the endpoint changes with time.
+
+## Reader safeguards (issue #125)
+
+The fix of the safety check N1 of #20: a value in the wrong field must not pass at confidence 0.9. Built and measured from 2026-11-24 to 2026-11-25. The design, every number and the checks are in [`EVALUATION-ISSUE-125.md`](EVALUATION-ISSUE-125.md).
+
+### The result
+
+**On fresh answers of the model (2026-11-25, 3 runs per configuration), the reader of #125 stores no incorrect value at 0.8 or more on N1, for the prompts `v1`, `described` and `example`, and it keeps every right field of the kit.** All 9 criteria written before the run pass.
+
+| Set (3 runs) | Incorrect values at >= 0.8 (no person checks them) | Right fields (accuracy) | Right fields lost or downgraded |
+|---|---|---|---|
+| N1, `v1` + `described` + `example` | **35 -> 0** | 288 -> 298 | 0 |
+| kit, `v1` | **18 -> 12** | 341 -> 341 of 396 | **0** |
+
+- **Safety is not accuracy.** The accuracy of the kit is the same before and after; its safety is better: the 2 doctors stored as the clinic (in every run) now go to a person. The 12 kit values left at 0.9 are the 4 category fields per run (`cause`, `diagnosis` x2, `offence`), outside this issue.
+- **How:** a new module `backend/app/docintel/labels.py`. A placeholder ("Not answerable", "null", "n/a" ...) is no value and is not stored. On a text page, a field keeps 0.9 only when the label before the value, where the snippet is, names the field (English, German, French, Italian); an identifier must not be a sentence; a provider must not read as one titled person. Else the field gets 0.5 with its value and its source (document, page, snippet) unchanged, and the routing that exists sends the claim to a person. No prompt, setting or request byte changed.
+- **Before and after use the same answers.** The model was asked once (360 HTTP attempts, 0 retries, 0 failures); each run was then read by the reader of #20 (commit `0334e55`) and by the reader of #125, with the same request bytes. So the difference is the code alone, not the model or the day.
+- **The safety measure is in the harness:** the report counts the incorrect values at `LOW_CONFIDENCE` or more (from `routing.py`), apart from the incorrect values at any confidence, and the right absences apart from the right values; `--set n1` evaluates N1 apart from the kit. A report of #19 or #20 shows "not available", never 0.
+
+### Limits
+
+- **N1 is a development set:** the rules were designed on its answers of 2026-11-19. The live answers are new, the documents are not. A held-out document set is future work.
+- **Incorrect values stay stored, at 0.5:** a person checks them; nothing is rejected. Scans and photos have no text layer, so their fields stay at 0.5.
+- **The confidence values are flags, not calibrated probabilities.** Some right values with an unusual label or layout get 0.5 too.
+- **Paul confirms** that the paired replay meets the "control of the same day" of the issue.
+
+### How to reproduce
+
+- **In git (CI, no key):** `tests/test_n1_replay.py` and `tests/test_evaluation_safety.py` read the saved N1 answers of 2026-11-19 through a stub of the model.
+- **A live measure:** `cd backend && uv run --env-file ../.env python -m app.docintel.evaluate --reader omni --runs 3 --set n1 --omni prompt=v1` (without `--set` for the kit).
+- **Not in git:** the paired runner and the raw answers of 2026-11-25, in `backend/.dev-data/issue-125/live/` on Nikola's machine (see `EVALUATION-ISSUE-125.md`, section 8).
+
+## One call per page or per document (issue #126)
+
+Measured on 2026-11-26. **Result: the default stays one call per page.** One call per document stored more right fields on the test set, but it does not meet the rules written in advance in #20, and it stored one wrong value at 0.9. The method (committed before the first request), every number, the evidence and the limits are in [`EVALUATION-ISSUE-126.md`](EVALUATION-ISSUE-126.md). Paul has not reviewed this result.
+
+### What was compared
+
+- **Control: the page scope**, one model call per page. **Candidate: the document scope**, one call with every page image of a document (`--omni scope=document`), an experiment that is off by default. Its answer holds one block per page; the checks and the merge of the page scope read the blocks.
+- **The set MP1** (`data/mock/mp1/`, `--set mp1`, not part of the kit): 8 mock documents of 2 or 3 pages, 19 pages, 6 text PDFs and 2 scans, 35 scored fields (2 of them absent), 39 line items (35 on the text PDFs).
+- **Settings and runs:** the settings of #18 for both scopes (prompt `v1`, 150 DPI, temperature 0.2, thinking off, `max_tokens` 2048). 3 runs per scope in one invocation. 133 requests: 4 in a pilot on 2 other documents, 129 in the main run. Each got a 200 at its first attempt and ended with `stop`.
+
+### The result (main run, 3 runs per scope)
+
+| Measure | One call per page | One call per document |
+|---|---|---|
+| Right fields per run, of 35 | 25, 27, 24 (mean 25.33) | 28, 28, 28 |
+| Field accuracy | 72.4 % (76 of 105) | 80.0 % (84 of 105) |
+| Wrong values per run | 9, 8, 9 | 7, 7, 7 |
+| **Wrong values at >= 0.8 per run** | 0, 0, 0 | **1, 1, 1** |
+| Source page right, of the values stored (right and wrong) | 79.8 % (79 of 99) | 88.2 % (90 of 102) |
+| of them: right values only / scans only | 70 of 73 / 16 of 21 | 78 of 81 / 12 of 21 |
+| Line items right, text PDFs, of 35 per run | 23, 25, 25 | 28, 23, 29 |
+| Seconds per document | 10.44 | 9.29 (-11 %; the run means overlap) |
+| Requests per run | 27 | 16 (-41 %) |
+| Tokens per run, prompt + completion | 68,573 + 6,016 | 63,296 + 5,714 (-7.5 %) |
+
+The type was right for 8 of 8 documents in every run. The three document runs gave the same stored value, page and confidence for all 35 fields: repeatability on the same 8 documents, not a measure on other documents.
+
+### The verdict
+
+By the rules of "How a variant was judged" above, as written: **the control stays.**
+
+- **Not met:** "at least 3 more right fields per run" (the gain is 2.67); "no wrong amount, date or identifier" (12 in the 3 document runs, all at 0.5; the page scope has 16); "every line item of the clean PDFs stays right" (28, 23, 29 of 35; neither scope stored a line item of one quote, so 35 was out of reach for both). The other seven rules are met.
+- **Provisional:** the mapping of four rules (3c, 3e, 3f and 4) to MP1 waits for Paul. The verdict is the same under every reading that the method holds: rules 1 and 3a have no mapping, and each one alone gives "the control stays".
+
+### What the answers show
+
+- **Two effects make the gain, and this test does not separate them.** The page scope keeps the first value of a field, and MP1 prints lures on page 1 (a subtotal carried forward, a cost estimate): in 18 cases a later page answer held the right value. In the document scope the model saw all pages and wrote the final value itself.
+- **The model copies values into every page block.** On a text page the checks refuse a copy. A copy can hide a conflict between two pages: in 5 fields the copied value was right, in 1 it was not. A name is printed with a date of birth on page 1 and alone on page 2. The page scope sees two values and stores 0.5; the document scope stores the first form at 0.9, in each of its 3 runs. This is the wrong value at >= 0.8 (wrong by the exact comparison with the answer key).
+- **On a scan** the document scope stored one right value with a page that does not print it (in all 3 runs; one more in the pilot), at 0.5.
+- **Line items** are scored by position; the scopes differ on one document only. Both stored "Brought forward" rows of a continued table as line items.
+- **41 % fewer requests gave 11 % less time:** the page images are most of every request.
+
+### Limits
+
+- 8 mock documents from one generator, in English, 3 runs per scope on one day, one prompt. Each finding rests on 1 to 3 documents. The evaluation runs no claim. The raw answers are not in git (`EVALUATION-ISSUE-126.md`, R15).
+- **A document that gives no field** looks like a document that prints nothing (D80 (13)), and such a claim can be paid with no person. No call failed here, so this experiment gives no new evidence. In the document scope one failed or cut call loses every page. This must be fixed in the base, or assessed by Paul, before the document scope can be a default.

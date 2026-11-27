@@ -1,0 +1,244 @@
+{
+  "set": "mp1",
+  "version": 1,
+  "issue": 126,
+  "purpose": "Multi-page set of issue #126: 8 documents of 2 or 3 pages, to compare one model call per page with one call per document.",
+  "language": "en",
+  "documents": [
+    {
+      "file": "mp1-01-repair-invoice-carried-forward.pdf",
+      "document_type": "repair_invoice",
+      "kind": "text",
+      "pages": 3,
+      "fields_present": 5,
+      "fields_absent": 0,
+      "line_items": 12,
+      "repeated": {
+        "invoice_number": [
+          1,
+          2,
+          3
+        ]
+      },
+      "absent": {},
+      "expected_to_favour": "document",
+      "scenarios": [
+        "number_and_date_on_page_1",
+        "total_on_last_page",
+        "table_over_page_break",
+        "repeated_header",
+        "carried_forward_subtotal",
+        "value_on_two_pages"
+      ]
+    },
+    {
+      "file": "mp1-02-medical-invoice-continued.pdf",
+      "document_type": "medical_invoice",
+      "kind": "text",
+      "pages": 2,
+      "fields_present": 5,
+      "fields_absent": 0,
+      "line_items": 6,
+      "repeated": {},
+      "absent": {},
+      "expected_to_favour": "document",
+      "scenarios": [
+        "number_and_date_on_page_1",
+        "total_on_last_page",
+        "table_over_page_break",
+        "misleading_candidate"
+      ]
+    },
+    {
+      "file": "mp1-03-cancellation-confirmation-scan.pdf",
+      "document_type": "cancellation_confirmation",
+      "kind": "scan",
+      "pages": 3,
+      "fields_present": 3,
+      "fields_absent": 0,
+      "line_items": 4,
+      "repeated": {
+        "booking_reference": [
+          1,
+          2,
+          3
+        ]
+      },
+      "absent": {},
+      "expected_to_favour": "neutral",
+      "scenarios": [
+        "scan",
+        "number_and_date_on_page_1",
+        "total_on_last_page",
+        "repeated_header",
+        "misleading_candidate",
+        "value_on_two_pages"
+      ],
+      "source_text_sha256": [
+        "794c8f3b9faac753ae5e3c11124d245385b8710c5b62e62a51cd1e190f96ee71",
+        "e0acbefe8ae659ff8b15c94a5c9f03abcaac28321ea68b8964c9f230e6a28c29",
+        "adc2e31e4967175751b2d6e2daa8cfe68f883308ff7c93a55357122fd66f7cef"
+      ]
+    },
+    {
+      "file": "mp1-04-repair-quote-terms.pdf",
+      "document_type": "repair_quote",
+      "kind": "text",
+      "pages": 3,
+      "fields_present": 4,
+      "fields_absent": 1,
+      "line_items": 5,
+      "repeated": {
+        "quote_number": [
+          1,
+          2,
+          3
+        ],
+        "customer_name": [
+          1,
+          2
+        ]
+      },
+      "absent": {
+        "quote_date": "lure"
+      },
+      "expected_to_favour": "page",
+      "scenarios": [
+        "terms_page",
+        "repeated_header",
+        "misleading_candidate",
+        "absent_field",
+        "value_on_two_pages"
+      ]
+    },
+    {
+      "file": "mp1-05-repair-invoice-service-rows.pdf",
+      "document_type": "repair_invoice",
+      "kind": "text",
+      "pages": 2,
+      "fields_present": 5,
+      "fields_absent": 0,
+      "line_items": 12,
+      "repeated": {
+        "invoice_number": [
+          1,
+          2
+        ],
+        "invoice_date": [
+          1,
+          2
+        ],
+        "repair_company": [
+          1,
+          2
+        ]
+      },
+      "absent": {},
+      "expected_to_favour": "page",
+      "scenarios": [
+        "total_on_last_page",
+        "table_over_page_break",
+        "repeated_header",
+        "value_on_two_pages"
+      ]
+    },
+    {
+      "file": "mp1-06-medical-report-scan.pdf",
+      "document_type": "medical_report",
+      "kind": "scan",
+      "pages": 2,
+      "fields_present": 4,
+      "fields_absent": 0,
+      "line_items": 0,
+      "repeated": {
+        "patient_name": [
+          1,
+          2
+        ],
+        "provider": [
+          1,
+          2
+        ]
+      },
+      "absent": {},
+      "expected_to_favour": "page",
+      "scenarios": [
+        "scan",
+        "repeated_header",
+        "misleading_candidate",
+        "value_on_two_pages"
+      ],
+      "source_text_sha256": [
+        "10abd53d7ce689959c6d9a8bec4a8843b769b92445b79a2b7ffe12f87fb82d1a",
+        "8337ffbe2efdd39120f88f004504b641e2cdd6b0d56c78d3917cffafdadd0e57"
+      ]
+    },
+    {
+      "file": "mp1-07-booking-confirmation-no-price.pdf",
+      "document_type": "booking_confirmation",
+      "kind": "text",
+      "pages": 2,
+      "fields_present": 3,
+      "fields_absent": 1,
+      "line_items": 0,
+      "repeated": {
+        "booking_reference": [
+          1,
+          2
+        ]
+      },
+      "absent": {
+        "trip_price": "lure"
+      },
+      "expected_to_favour": "neutral",
+      "scenarios": [
+        "repeated_header",
+        "terms_page",
+        "misleading_candidate",
+        "absent_field",
+        "value_on_two_pages"
+      ]
+    },
+    {
+      "file": "mp1-08-police-report-two-dates.pdf",
+      "document_type": "police_report",
+      "kind": "text",
+      "pages": 2,
+      "fields_present": 4,
+      "fields_absent": 0,
+      "line_items": 0,
+      "repeated": {
+        "report_number": [
+          1,
+          2
+        ],
+        "customer_name": [
+          1,
+          2
+        ]
+      },
+      "absent": {},
+      "expected_to_favour": "document",
+      "scenarios": [
+        "repeated_header",
+        "misleading_candidate",
+        "value_on_two_pages"
+      ]
+    }
+  ],
+  "counts": {
+    "documents": 8,
+    "pages": 19,
+    "text_documents": 6,
+    "scan_documents": 2,
+    "text_pages": 14,
+    "scan_pages": 5,
+    "fields_scored": 35,
+    "fields_present": 33,
+    "fields_absent": 2,
+    "fields_repeated": 12,
+    "line_items": 39,
+    "line_items_text": 35,
+    "line_items_scan": 4
+  }
+}

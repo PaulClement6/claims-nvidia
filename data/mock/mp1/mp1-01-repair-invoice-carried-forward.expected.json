@@ -1,0 +1,139 @@
+{
+  "document_type": "repair_invoice",
+  "fields": [
+    {
+      "name": "invoice_number",
+      "value": "WB-26-0714",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "WB-26-0714",
+      "accepted_pages": [
+        1,
+        2,
+        3
+      ],
+      "page_snippets": {
+        "1": "WB-26-0714",
+        "2": "WB-26-0714",
+        "3": "WB-26-0714"
+      }
+    },
+    {
+      "name": "invoice_date",
+      "value": "2026-10-08",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-10-08"
+    },
+    {
+      "name": "repair_company",
+      "value": "Wydler Badbau AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Wydler Badbau AG"
+    },
+    {
+      "name": "total",
+      "value": 6766.0,
+      "confidence": 1.0,
+      "page": 3,
+      "snippet": "CHF 6,766.00"
+    },
+    {
+      "name": "customer_name",
+      "value": "Melina Zbinden",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Melina Zbinden"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Demolition of old bathroom tiles, per m2",
+      "quantity": 14,
+      "unit_price": 38.0,
+      "amount": 532.0
+    },
+    {
+      "description": "Disposal of rubble, per container",
+      "quantity": 1,
+      "unit_price": 265.0,
+      "amount": 265.0
+    },
+    {
+      "description": "Waterproofing membrane, per m2",
+      "quantity": 14,
+      "unit_price": 26.5,
+      "amount": 371.0
+    },
+    {
+      "description": "Floor drain, stainless steel",
+      "quantity": 1,
+      "unit_price": 189.0,
+      "amount": 189.0
+    },
+    {
+      "description": "Plumber, per hour",
+      "quantity": 11,
+      "unit_price": 98.0,
+      "amount": 1078.0
+    },
+    {
+      "description": "Wall tiles 30x60, per m2",
+      "quantity": 22,
+      "unit_price": 54.8,
+      "amount": 1205.6
+    },
+    {
+      "description": "Tile adhesive, bag 25 kg",
+      "quantity": 6,
+      "unit_price": 31.9,
+      "amount": 191.4
+    },
+    {
+      "description": "Tiler, per hour",
+      "quantity": 19,
+      "unit_price": 92.0,
+      "amount": 1748.0
+    },
+    {
+      "description": "Silicone joints, per metre",
+      "quantity": 28,
+      "unit_price": 4.5,
+      "amount": 126.0
+    },
+    {
+      "description": "Shower screen, glass 8 mm",
+      "quantity": 1,
+      "unit_price": 655.0,
+      "amount": 655.0
+    },
+    {
+      "description": "Mixer tap, wall mounted",
+      "quantity": 1,
+      "unit_price": 327.0,
+      "amount": 327.0
+    },
+    {
+      "description": "Travel and small material, flat",
+      "quantity": 1,
+      "unit_price": 78.0,
+      "amount": 78.0
+    }
+  ],
+  "line_pages": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3
+  ],
+  "pages": 3
+}

@@ -1,0 +1,87 @@
+{
+  "document_type": "medical_invoice",
+  "fields": [
+    {
+      "name": "invoice_number",
+      "value": "RMC-40718",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "RMC-40718"
+    },
+    {
+      "name": "invoice_date",
+      "value": "2026-09-17",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-09-17"
+    },
+    {
+      "name": "provider",
+      "value": "Rheinau Health Centre AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Rheinau Health Centre AG"
+    },
+    {
+      "name": "patient_name",
+      "value": "Valentin Egloff",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Valentin Egloff"
+    },
+    {
+      "name": "total",
+      "value": 788.0,
+      "confidence": 1.0,
+      "page": 2,
+      "snippet": "CHF 788.00"
+    }
+  ],
+  "line_items": [
+    {
+      "description": "General consultation, 30 min",
+      "quantity": 1,
+      "unit_price": 118.5,
+      "amount": 118.5
+    },
+    {
+      "description": "X-ray, left knee, 2 views",
+      "quantity": 1,
+      "unit_price": 84.2,
+      "amount": 84.2
+    },
+    {
+      "description": "Ultrasound, knee joint",
+      "quantity": 1,
+      "unit_price": 96.8,
+      "amount": 96.8
+    },
+    {
+      "description": "Manual therapy, 20 min",
+      "quantity": 4,
+      "unit_price": 51.75,
+      "amount": 207.0
+    },
+    {
+      "description": "Knee brace, size M",
+      "quantity": 1,
+      "unit_price": 139.0,
+      "amount": 139.0
+    },
+    {
+      "description": "Follow-up consultation with written report",
+      "quantity": 1,
+      "unit_price": 142.5,
+      "amount": 142.5
+    }
+  ],
+  "line_pages": [
+    1,
+    1,
+    1,
+    1,
+    2,
+    2
+  ],
+  "pages": 2
+}

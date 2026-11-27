@@ -16,6 +16,7 @@ import pytest
 from PIL import Image
 from pypdf import PdfReader
 
+from app.demo import NOT_KIT
 from app.docintel import omni
 from app.docintel.omni import OmniReader
 from app.docintel.schemas import SCHEMAS
@@ -313,6 +314,8 @@ def kit_values() -> tuple[set[str], set[float], set[str]]:
     """Texts, amounts and dates of every answer key of the kit."""
     texts, amounts, dates = set[str](), set[float](), set[str]()
     for path in MOCK.rglob("*.expected.json"):
+        if path.relative_to(MOCK).parts[0] in NOT_KIT:
+            continue  # N1 (#125) is not the kit; its n5 has "Price of the trip"
         key = json.loads(path.read_text(encoding="utf-8"))
         values = [f["value"] for f in key["fields"]]
         values += [v for line in key.get("line_items", []) for v in line.values()]

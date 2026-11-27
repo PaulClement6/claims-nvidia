@@ -1,0 +1,288 @@
+%PDF-1.4
+%“Œ‹ž ReportLab Generated PDF document (opensource)
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/Contents 9 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 8 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+5 0 obj
+<<
+/Contents 10 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 8 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+6 0 obj
+<<
+/PageMode /UseNone /Pages 8 0 R /Type /Catalog
+>>
+endobj
+7 0 obj
+<<
+/Author () /CreationDate (D:20000101000000+00'00') /Creator (anonymous) /Keywords () /ModDate (D:20000101000000+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (unspecified) /Title (Invoice) /Trapped /False
+>>
+endobj
+8 0 obj
+<<
+/Count 2 /Kids [ 4 0 R 5 0 R ] /Type /Pages
+>>
+endobj
+9 0 obj
+<<
+/Length 4089
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+.05 .45 .45 rg
+n 0 823.8898 595.2756 18 re f*
+0 0 0 rg
+BT /F2 18 Tf 21.6 TL ET
+BT 1 0 0 1 56 785.8898 Tm (Kessler & Brunold Heizservice AG) Tj T* ET
+BT /F1 8.5 Tf 10.2 TL ET
+BT 1 0 0 1 56 769.8898 Tm (Werkhofstrasse 6, 8610 Uster) Tj T* ET
+BT /F1 8.5 Tf 10.2 TL ET
+BT 1 0 0 1 56 758.8898 Tm (Tel. +41 44 555 29 64) Tj T* ET
+.05 .45 .45 RG
+n 56 729.8898 m 539.2756 729.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 691.8898 Tm (Bruno Steinemann) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 678.8898 Tm (Hofackerweg 3) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 665.8898 Tm (8620 Wetzikon) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 652.8898 Tm (Switzerland) Tj T* ET
+BT /F2 9 Tf 10.8 TL ET
+BT 1 0 0 1 330 691.8898 Tm (Invoice no.:) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 420 691.8898 Tm (KB-26-1893) Tj T* ET
+BT /F2 9 Tf 10.8 TL ET
+BT 1 0 0 1 330 678.8898 Tm (Date:) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 420 678.8898 Tm (2026-11-05) Tj T* ET
+BT /F2 16 Tf 19.2 TL ET
+BT 1 0 0 1 56 601.8898 Tm (Invoice) Tj T* ET
+.933333 .933333 .933333 rg
+n 52 556.8898 491.2756 17 re f*
+0 0 0 rg
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 56 561.8898 Tm (Work) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 350 561.8898 Tm (Qty) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 410 561.8898 Tm (Unit \(CHF\)) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 471.5156 561.8898 Tm (Amount \(CHF\)) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 555.8898 m 543.2756 555.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 543.8898 Tm (Boiler service, flat 1.01) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 543.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 543.8898 Tm (148.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 543.8898 Tm (148.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 537.8898 m 543.2756 537.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 525.8898 Tm (Boiler service, flat 1.02) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 525.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 525.8898 Tm (148.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 525.8898 Tm (148.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 519.8898 m 543.2756 519.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 507.8898 Tm (Boiler service, flat 1.03) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 507.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 507.8898 Tm (148.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 507.8898 Tm (148.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 501.8898 m 543.2756 501.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 489.8898 Tm (Boiler service, flat 1.04) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 489.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 489.8898 Tm (148.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 489.8898 Tm (148.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 483.8898 m 543.2756 483.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 471.8898 Tm (Boiler service, flat 1.05) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 471.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 471.8898 Tm (148.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 471.8898 Tm (148.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 465.8898 m 543.2756 465.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 453.8898 Tm (Boiler service, flat 1.06) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 453.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 453.8898 Tm (148.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 453.8898 Tm (148.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 447.8898 m 543.2756 447.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 435.8898 Tm (Boiler service, flat 2.01) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 435.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 435.8898 Tm (148.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 435.8898 Tm (148.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 429.8898 m 543.2756 429.8898 l S
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 56 407.8898 Tm (Continued on page 2) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 274.6203 30 Tm (Page 1 of 2) Tj T* ET
+ 
+endstream
+endobj
+10 0 obj
+<<
+/Length 2662
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+.3 .3 .3 rg
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 56 801.8898 Tm (Kessler & Brunold Heizservice AG | Invoice no.: KB-26-1893 | Date: 2026-11-05) Tj T* ET
+0 0 0 rg
+.6 .6 .6 RG
+n 56 795.8898 m 539.2756 795.8898 l S
+.933333 .933333 .933333 rg
+n 52 756.8898 491.2756 17 re f*
+0 0 0 rg
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 56 761.8898 Tm (Work) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 350 761.8898 Tm (Qty) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 410 761.8898 Tm (Unit \(CHF\)) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 471.5156 761.8898 Tm (Amount \(CHF\)) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 755.8898 m 543.2756 755.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 743.8898 Tm (Boiler service, flat 2.02) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 743.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 743.8898 Tm (148.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 743.8898 Tm (148.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 737.8898 m 543.2756 737.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 725.8898 Tm (Boiler service, flat 2.03, with new circulation pump) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 725.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 725.8898 Tm (312.50) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 725.8898 Tm (312.50) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 719.8898 m 543.2756 719.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 707.8898 Tm (Boiler service, flat 2.04) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 707.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 707.8898 Tm (148.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 707.8898 Tm (148.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 701.8898 m 543.2756 701.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 689.8898 Tm (Boiler service, flat 2.05) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 689.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 689.8898 Tm (148.00) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 508.6956 689.8898 Tm (148.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 683.8898 m 543.2756 683.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 671.8898 Tm (Call-out fee, second visit) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 671.8898 Tm (2) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 671.8898 Tm (46.50) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 514.2556 671.8898 Tm (93.00) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 665.8898 m 543.2756 665.8898 l S
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 330 647.8898 Tm (Total) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 477.0256 647.8898 Tm (CHF 1,885.50) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 274.6203 30 Tm (Page 2 of 2) Tj T* ET
+ 
+endstream
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000061 00000 n 
+0000000102 00000 n 
+0000000209 00000 n 
+0000000321 00000 n 
+0000000524 00000 n 
+0000000728 00000 n 
+0000000796 00000 n 
+0000001047 00000 n 
+0000001112 00000 n 
+0000005252 00000 n 
+trailer
+<<
+/ID 
+[<91958db95c0645225d0378583984e156><91958db95c0645225d0378583984e156>]
+% ReportLab generated PDF document -- digest (opensource)
+
+/Info 7 0 R
+/Root 6 0 R
+/Size 11
+>>
+startxref
+7966
+%%EOF

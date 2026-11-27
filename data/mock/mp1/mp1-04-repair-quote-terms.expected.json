@@ -1,0 +1,97 @@
+{
+  "document_type": "repair_quote",
+  "fields": [
+    {
+      "name": "quote_number",
+      "value": "FA/26/0451",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "FA/26/0451",
+      "accepted_pages": [
+        1,
+        2,
+        3
+      ],
+      "page_snippets": {
+        "1": "FA/26/0451",
+        "2": "FA/26/0451",
+        "3": "FA/26/0451"
+      }
+    },
+    {
+      "name": "quote_date",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    },
+    {
+      "name": "repair_company",
+      "value": "Stalder Fassaden GmbH",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Stalder Fassaden GmbH"
+    },
+    {
+      "name": "total",
+      "value": 8488.5,
+      "confidence": 1.0,
+      "page": 2,
+      "snippet": "CHF 8,488.50"
+    },
+    {
+      "name": "customer_name",
+      "value": "Gottfried Wirz",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Gottfried Wirz",
+      "accepted_pages": [
+        1,
+        2
+      ],
+      "page_snippets": {
+        "1": "Gottfried Wirz",
+        "2": "Gottfried Wirz"
+      }
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Scaffolding, erect and remove, per m2",
+      "quantity": 180,
+      "unit_price": 14.2,
+      "amount": 2556.0
+    },
+    {
+      "description": "High-pressure cleaning of facade, per m2",
+      "quantity": 165,
+      "unit_price": 6.8,
+      "amount": 1122.0
+    },
+    {
+      "description": "Crack repair, per metre",
+      "quantity": 42,
+      "unit_price": 17.5,
+      "amount": 735.0
+    },
+    {
+      "description": "Base coat, mineral, per m2",
+      "quantity": 165,
+      "unit_price": 9.4,
+      "amount": 1551.0
+    },
+    {
+      "description": "Top coat, silicate, per m2",
+      "quantity": 165,
+      "unit_price": 15.3,
+      "amount": 2524.5
+    }
+  ],
+  "line_pages": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "pages": 3
+}

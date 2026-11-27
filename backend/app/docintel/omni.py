@@ -2,6 +2,10 @@
 
 Each full page goes to the model as an image. The answer follows the schema of
 the type (issue #17) and gives, for each value, the text it was read from.
+
+One call per page is the default. `scope="document"` (issue #126, an experiment)
+sends all the pages of a document in one call. The answer then holds one block per
+page, and the checks and the merge of the page mode read the blocks.
 """
 
 import base64
@@ -25,6 +29,7 @@ from PIL import Image
 from pydantic import BaseModel, ValidationError
 from pypdf import PdfReader
 
+from app.docintel import labels
 from app.docintel.schemas import SCHEMAS
 from app.models import Document, DocumentType, ExtractedField, Extraction, Source
 from app.workflows import WORKFLOWS
@@ -36,6 +41,10 @@ DPI = 150
 # document with more pages is read in part, and a person checks it.
 MAX_PAGES = 10  # pages rendered and sent per document: at most 1 + 10 model calls
 MAX_PIXELS = 16_000_000  # per image sent; A4 at 150 DPI is 2.2 MP
+# Issue #126, a guess like the two bounds above, not measured: the image bytes of one
+# document call. 10 scanned A4 pages are about 13 MB. A page that does not fit is not
+# sent and counts as not read, like a page after MAX_PAGES.
+MAX_DOCUMENT_BYTES = 24_000_000
 TIMEOUT = 90.0  # seconds, per model call
 MAX_TOKENS = 2048
 MAX_TOKENS_LIMIT = 65536  # the largest max_tokens that the NIM API takes
@@ -181,6 +190,27 @@ CLASSIFY_SCHEMA = {
     "additionalProperties": False,
 }
 PROMPTS = ("v1", "schema-only", "described", "example")
+# Issue #126: what one extraction call holds. `page` is #18: one call per page.
+# `document`: one call with every page image and one block per page in the answer.
+SCOPES = ("page", "document")
+# The prompt of a document call. The rules of the values and of the snippets are
+# those of EXTRACT (v1), word for word, with "that page" for "this page": the scope
+# of the call is the only thing that the comparison of #126 changes.
+EXTRACT_DOCUMENT = """Read every image. {shown} of one {kind}, in order: the first \
+image is page 1.
+Answer with JSON only, in this form: {{"page_1": {{"values": {{...}}, "snippets": \
+{{...}}}}, "page_2": {{...}}}}, with one entry for each image.
+For each page, `values` follows the JSON schema below. Every key is required. Use \
+null for a value that is not on that page: never guess.
+Dates are YYYY-MM-DD. Amounts are plain numbers: no currency, no thousands separator.
+`line_items` lists every line of the table on that page, or [] when there is none.
+For each value that is not null, `snippets` maps its key to the exact text of that \
+page that shows it, copied character by character, as short as possible.
+JSON schema of `values`:
+{schema}"""
+ALL_PAGES = "They are the {pages} pages"
+FIRST_PAGES = "They are the first {sent} of the {pages} pages"  # a document cut short
+PAGE_MARK = "Page {page} of {pages}:"  # the text part in front of each page image
 
 
 @dataclass(frozen=True)
@@ -190,7 +220,9 @@ class OmniSettings:
     byte. DPI, temperature and thinking apply to both calls (classify and page).
     `prompt` is the prompt of a page call: `v1` (#18), `schema-only` (only the
     form of the answer), `described` (`v1` with a description of each field) or
-    `example` (`described` with one worked example)."""
+    `example` (`described` with one worked example). `scope` (issue #126) is what
+    one extraction call holds: `page` (#18) or `document` (every page of a document
+    of two pages or more in one call; only with the prompt `v1`)."""
 
     dpi: int = DPI
     temperature: float = 0.2
@@ -199,6 +231,7 @@ class OmniSettings:
     reasoning_budget: int | None = None  # tokens of thinking; only with thinking on
     timeout: float = TIMEOUT
     prompt: str = "v1"
+    scope: str = "page"
 
     def __post_init__(self) -> None:
         # A value of another type would make another body or another config id for
@@ -211,10 +244,11 @@ class OmniSettings:
             or any(type(v) not in (int, float) for v in reals)
             or type(self.thinking) is not bool
             or type(self.prompt) is not str
+            or type(self.scope) is not str
         ):
             raise TypeError(
                 "dpi, max_tokens and reasoning_budget are int, temperature and "
-                "timeout are numbers, thinking is a bool, prompt is a str"
+                "timeout are numbers, thinking is a bool, prompt and scope are str"
             )
         # 0 and 0.0 are one setting: one body, one config id
         object.__setattr__(self, "temperature", float(self.temperature))
@@ -231,6 +265,11 @@ class OmniSettings:
                 "timeout must be a finite number more than 0",
             ),
             (self.prompt not in PROMPTS, f"prompt must be one of {', '.join(PROMPTS)}"),
+            (self.scope not in SCOPES, f"scope must be one of {', '.join(SCOPES)}"),
+            (
+                self.scope == "document" and self.prompt != "v1",
+                "scope document needs the prompt v1",
+            ),
             (budget is not None and not self.thinking, "a budget needs thinking on"),
             (
                 budget is not None and not 0 < budget < self.max_tokens,
@@ -285,22 +324,56 @@ def page_prompt(
     return text + EXAMPLE if prompt == "example" else text
 
 
-def prompt_sha256(prompt: str) -> str:
+def document_schema(schema: type[BaseModel], pages: int) -> dict[str, Any]:
+    """The JSON schema of a document answer (issue #126): one page answer per page
+    sent, under the keys `page_1` to `page_<pages>`. Every key is required and no
+    other key is allowed, so the form names each page once."""
+    page = answer_schema(schema)
+    defs = page.pop("$defs", {})
+    names = [f"page_{n}" for n in range(1, pages + 1)]
+    return {
+        "type": "object",
+        "properties": {name: {"$ref": "#/$defs/page"} for name in names},
+        "required": names,
+        "additionalProperties": False,
+        "$defs": {"page": page} | defs,
+    }
+
+
+def document_prompt(kind: str, sent: int, pages: int, values: dict[str, Any]) -> str:
+    """The text of a document call: `sent` page images of a document of `pages`
+    pages (fewer are sent only when the document is over a bound)."""
+    shown = ALL_PAGES if sent == pages else FIRST_PAGES
+    return EXTRACT_DOCUMENT.format(
+        shown=shown.format(sent=sent, pages=pages), kind=kind, schema=json.dumps(values)
+    )
+
+
+def prompt_sha256(prompt: str, scope: str = "page") -> str:
     """SHA-256 of every text that a prompt of `PROMPTS` sends, apart from the
     schemas of #17: the classify prompt, the page template and, when the prompt
-    uses them, the descriptions and the example."""
+    uses them, the descriptions and the example. With the scope `document`, also
+    the texts of a document call (a document of one page still uses the page
+    template)."""
     parts = [CLASSIFY, EXTRACT_SCHEMA_ONLY if prompt == "schema-only" else EXTRACT]
     if prompt in ("described", "example"):
         parts.append(json.dumps(DESCRIPTIONS, sort_keys=True))
     if prompt == "example":
         parts.append(EXAMPLE)
+    if scope == "document":
+        parts += [EXTRACT_DOCUMENT, ALL_PAGES, FIRST_PAGES, PAGE_MARK]
     return hashlib.sha256("\n\0\n".join(parts).encode()).hexdigest()
 
 
 def config_id(settings: OmniSettings) -> str:
     """A short name of a configuration: the same settings and prompt texts give the
-    same id. The model and the endpoint are recorded apart in the report."""
-    named = asdict(settings) | {"prompt_sha256": prompt_sha256(settings.prompt)}
+    same id. The model and the endpoint are recorded apart in the report. The scope
+    `page` is left out, so a configuration of #18 to #125 keeps the id that the
+    saved reports hold."""
+    named = asdict(settings)
+    named["prompt_sha256"] = prompt_sha256(settings.prompt, settings.scope)
+    if settings.scope == "page":
+        del named["scope"]
     return hashlib.sha256(json.dumps(named, sort_keys=True).encode()).hexdigest()[:12]
 
 
@@ -372,9 +445,10 @@ def _length(data: bytes) -> int:
         pdf.close()
 
 
-def _json(content: str | None) -> Any:
+def _json(content: str | None, pairs: Callable[[list[Any]], Any] | None = None) -> Any:
     """The JSON of an answer, or None. One ```json fence around the whole answer
-    is removed; nothing else is repaired."""
+    is removed; nothing else is repaired. `pairs` gets the (key, value) pairs of
+    each object, the outer object last."""
     if content is None:
         return None
     text = content.strip()
@@ -384,14 +458,38 @@ def _json(content: str | None) -> Any:
             return None
         text = rest.rstrip().removesuffix("```")
     try:
-        return json.loads(text)
-    except ValueError:
+        return json.loads(text, object_pairs_hook=pairs)
+    except (ValueError, RecursionError):  # also an answer nested too deep to read
         return None
 
 
-def _read(
-    schema: type[BaseModel], answer: Any
-) -> tuple[BaseModel, dict[str, Any], bool] | None:
+def _blocks(content: str | None, count: int) -> tuple[list[Any], bool]:
+    """The block of each of the `count` pages of a document answer (issue #126), in
+    page order, and whether the answer names these pages and nothing else.
+
+    A block is found by its key, `page_1` to `page_<count>`: the order of the keys
+    does not count. A page with no block gets None: nobody read that page. A key
+    that is not one of these pages (`page_0`, `page_9`, `pages`) is never read as a
+    page and makes the answer incomplete. No page number is made up, moved into the
+    range or guessed. An answer that is not an object, or that gives one page key
+    twice (which of the two is the page?), gives no block at all."""
+    twice: list[bool] = []
+
+    def unique(found: list[Any]) -> dict[Any, Any]:
+        twice.append(len({key for key, _ in found}) != len(found))
+        return dict(found)
+
+    answer = _json(content, unique)
+    if not isinstance(answer, dict) or twice[-1]:  # the outer object comes last
+        return [None] * count, False
+    names = [f"page_{n}" for n in range(1, count + 1)]
+    return [answer.get(name) for name in names], set(answer) == set(names)
+
+
+Answer = tuple[BaseModel, dict[str, Any], bool]  # what `_read` gives for one page
+
+
+def _read(schema: type[BaseModel], answer: Any) -> Answer | None:
     """(values, snippets, line items refused) of a page answer, or None when the
     answer as a whole cannot be trusted: not JSON, not the asked form, or no valid
     values even after the failing keys are dropped."""
@@ -481,12 +579,15 @@ def _field(
     name: str,
     value: Any,
     snippets: dict[str, Any],
+    kind: str = "",
 ) -> ExtractedField | None:
     """The field with its source, or None when its source cannot be given.
 
     With a text layer, the snippet must be on the page and hold the value: it is
-    stored as checked evidence. With no text layer (a scan, a photo), nothing can
-    check the snippet: the source is the whole page (a box) and a person checks it.
+    stored as checked evidence. The words in front of the value must also fit the
+    field (#125): if not, value and source stay and a person checks it. With no text
+    layer (a scan, a photo), nothing can check the snippet: the source is the whole
+    page (a box) and a person checks it. `kind` is the type of the document.
     """
     snippet = snippets.get(name)
     if not isinstance(snippet, str) or not 0 < len(snippet.strip()) <= MAX_SNIPPET:
@@ -497,7 +598,8 @@ def _field(
         if not _shown(snippet, page.text):  # an invented source
             return None
         source = Source(document_id=document_id, page=number, snippet=snippet.strip())
-        confidence = VERIFIED
+        fits = labels.verified(kind, name, value, snippet, page.text)
+        confidence = VERIFIED if fits else UNVERIFIED
     else:
         width, height = page.size
         box = (0.0, 0.0, float(width), float(height))
@@ -509,9 +611,12 @@ def _field(
 
 def _retry_after(header: str | None, default: float) -> float:
     try:
-        return min(max(float(header or ""), 0.0), MAX_WAIT)
+        seconds = float(header or "")
     except ValueError:
         return default
+    if math.isnan(seconds):  # "nan" is a float: min and max would keep it
+        return default
+    return min(max(seconds, 0.0), MAX_WAIT)
 
 
 class OmniReader:
@@ -552,23 +657,38 @@ class OmniReader:
         return str(kind)
 
     def _post(self, prompt: str, page: Page, schema: dict[str, Any]) -> str | None:
-        """The content of the answer, or None. The answer must follow `schema`
-        (`response_format`, D80). Retries a timeout, a 429 and a 5xx a few times
-        with a bounded wait; any other error is final."""
-        url = f"data:{page.mime};base64,{base64.b64encode(page.image).decode()}"
+        """The content of the answer to a prompt and one page image, or None."""
+        parts = [{"type": "text", "text": prompt}, _image_part(page)]
+        return self._send(parts, schema)[0]
+
+    def _post_document(
+        self, prompt: str, sent: list[Page], pages: int, schema: dict[str, Any]
+    ) -> tuple[str | None, bool]:
+        """The content of the answer to a prompt and every page image of `sent`
+        (issue #126), or None; and whether the endpoint cut the answer at the token
+        limit (finish reason `length`). In front of each image, a text part names
+        its page: "Page 2 of 3:"."""
+        parts: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
+        for number, page in enumerate(sent, 1):
+            mark = PAGE_MARK.format(page=number, pages=pages)
+            parts += [{"type": "text", "text": mark}, _image_part(page)]
+        content, finish = self._send(parts, schema)
+        cut = content is not None and finish == "length"
+        if cut:
+            log.warning("omni document answer cut at the token limit")
+        return content, cut
+
+    def _send(
+        self, parts: list[dict[str, Any]], schema: dict[str, Any]
+    ) -> tuple[str | None, str | None]:
+        """The content of the answer and its finish reason, or (None, None). The
+        answer must follow `schema` (`response_format`, D80). Retries a timeout, a
+        429 and a 5xx a few times with a bounded wait; any other error is final."""
         form = {"name": "answer", "schema": schema, "strict": True}
         s = self.settings
         body: dict[str, Any] = {
             "model": self.model,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                        {"type": "image_url", "image_url": {"url": url}},
-                    ],
-                }
-            ],
+            "messages": [{"role": "user", "content": parts}],
             "temperature": s.temperature,
             "max_tokens": s.max_tokens,
             "chat_template_kwargs": {"enable_thinking": s.thinking},
@@ -589,18 +709,20 @@ class OmniReader:
             status = str(r.status_code)
             if r.status_code == 200:
                 try:
-                    content = r.json()["choices"][0]["message"]["content"]
+                    choice = r.json()["choices"][0]
+                    content = choice["message"]["content"]
                 except (ValueError, LookupError, TypeError):
-                    content = None
+                    choice, content = None, None
                 if isinstance(content, str) and content.strip():
-                    return content
+                    finish = choice.get("finish_reason") if choice else None
+                    return content, finish if isinstance(finish, str) else None
                 status = "200 with no content"  # e.g. reasoning used every token
                 break
             if r.status_code != 429 and r.status_code < 500:
                 break
             wait = _retry_after(r.headers.get("retry-after"), wait)
         log.warning("omni call failed: %s (model %s)", status, self.model)
-        return None
+        return None, None
 
     def extract(self, document: Document, data: bytes, workflow: str) -> Extraction:
         """The fields that have a source, and the line items when every line is
@@ -610,59 +732,130 @@ class OmniReader:
         schema = SCHEMAS.get(kind)
         if schema is None or kind in NOTHING_TO_READ:
             return Extraction(document_type=kind)
-        has_lines = "line_items" in schema.model_fields
-        fields: dict[str, ExtractedField] = {}
-        lines: list[dict[str, Any]] = []
-        lines_complete = True
         length = _length(data)
-        all_read = len(found) == length  # False above MAX_PAGES
-        first_seen: dict[str, Any] = {}
-        disagree: set[str] = set()  # two pages give two values
+        if self.settings.scope == "document" and len(found) > 1:
+            answers, complete = self._document_answers(schema, kind, found, length)
+        else:  # a document of one page is read as in #18, in both scopes
+            answers, complete = self._page_answers(schema, kind, found, length), True
+        return _merge(document.id, kind, schema, found, length, answers, complete)
+
+    def _page_answers(
+        self, schema: type[BaseModel], kind: DocumentType, found: list[Page], pages: int
+    ) -> list[Answer | None]:
+        """One call per page (#18): the answer of each page, None when it is not
+        an answer that can be trusted."""
         described = self.settings.prompt in ("described", "example")
         form = answer_schema(schema, described)
         sent = values_schema(schema, described)
+        answers = []
         for number, page in enumerate(found, 1):
-            prompt = page_prompt(self.settings.prompt, kind.value, number, length, sent)
-            answer = _read(schema, _json(self._post(prompt, page, form)))
-            if answer is None:  # this page may hold values and lines nobody read
-                all_read = False
+            prompt = page_prompt(self.settings.prompt, kind.value, number, pages, sent)
+            answers.append(_read(schema, _json(self._post(prompt, page, form))))
+        return answers
+
+    def _document_answers(
+        self, schema: type[BaseModel], kind: DocumentType, found: list[Page], pages: int
+    ) -> tuple[list[Answer | None], bool]:
+        """One call for the document (issue #126): the answer of each page of
+        `found`, read from its block, and whether the answer is complete: it names
+        exactly the pages sent and the endpoint did not cut it. No answer, or an
+        answer in another form (most cut answers: their JSON does not close), gives
+        None for every page. An answer that the endpoint marks as cut and that is
+        whole JSON all the same is read, as the page scope reads it, but it is not
+        complete: a person checks every field and no line is kept. Dropping it would
+        leave a document with no field, which nothing marks (D80 (13)). There is no
+        second call and no call per page after a failure: the scope of the call is
+        what #126 compares."""
+        sent = _within(found)
+        prompt = document_prompt(kind.value, len(sent), pages, values_schema(schema))
+        form = document_schema(schema, len(sent))
+        content, cut = self._post_document(prompt, sent, pages, form)
+        blocks, exact = _blocks(content, len(sent))
+        answers = [_read(schema, block) for block in blocks]
+        return answers + [None] * (len(found) - len(sent)), exact and not cut
+
+
+def _image_part(page: Page) -> dict[str, Any]:
+    url = f"data:{page.mime};base64,{base64.b64encode(page.image).decode()}"
+    return {"type": "image_url", "image_url": {"url": url}}
+
+
+def _within(found: list[Page]) -> list[Page]:
+    """The first pages whose images fit together in one document call
+    (MAX_DOCUMENT_BYTES); page 1 is always sent."""
+    total = 0
+    sent: list[Page] = []
+    for page in found:
+        total += len(page.image)
+        if sent and total > MAX_DOCUMENT_BYTES:
+            break
+        sent.append(page)
+    return sent
+
+
+def _merge(
+    document_id: str,
+    kind: DocumentType,
+    schema: type[BaseModel],
+    found: list[Page],
+    length: int,
+    answers: list[Answer | None],
+    complete: bool = True,
+) -> Extraction:
+    """The extraction of a document from the answer of each page of `found` (None:
+    the page was not read). `length` is the number of pages of the document.
+    `complete` is False when a document answer held something that is not one of
+    its pages. Both scopes end here: the checks of a field and of a line, the
+    conflict of two pages and the marks for a person are the same code."""
+    has_lines = "line_items" in schema.model_fields
+    fields: dict[str, ExtractedField] = {}
+    lines: list[dict[str, Any]] = []
+    lines_complete = True
+    all_read = complete and len(found) == length  # False above MAX_PAGES
+    first_seen: dict[str, Any] = {}
+    disagree: set[str] = set()  # two pages give two values
+    for number, (page, answer) in enumerate(zip(found, answers, strict=True), 1):
+        if answer is None:  # this page may hold values and lines nobody read
+            all_read = False
+            continue
+        values, snippets, lines_refused = answer
+        for name in schema.model_fields:
+            value = getattr(values, name)
+            # A placeholder ("Not answerable") is no value: skipped like null,
+            # so it never makes a conflict with the real value of another page.
+            if name == "line_items" or value is None or labels.is_placeholder(value):
                 continue
-            values, snippets, lines_refused = answer
-            for name in schema.model_fields:
-                value = getattr(values, name)
-                if name == "line_items" or value is None:
-                    continue
-                same = _norm(value) if isinstance(value, str) else value
-                if first_seen.setdefault(name, same) != same:
-                    disagree.add(name)
-                if name in fields:
-                    continue
-                field = _field(document.id, number, page, name, value, snippets)
-                if field is not None:
-                    fields[name] = field
-            if has_lines:
-                read = [
-                    line.model_dump()
-                    for line in values.line_items  # type: ignore[attr-defined]
-                    if any(v is not None for v in line.model_dump().values())
-                ]
-                if lines_refused or not all(_on_page(i, page.text) for i in read):
-                    lines_complete = False
-                lines += read
-        # Not final, so a person checks it (D80): every field when a page was not
-        # read (it may hold a value that changes the claim); a field that two pages
-        # give differently; the total when the list of lines is not complete.
-        doubt = set(fields) if not all_read else disagree
-        if has_lines and not (lines_complete and all_read):
-            # An incomplete list would look complete to T003 and to the settlement:
-            # no list at all.
-            lines = []
-            doubt = doubt | {"total"}
-        for name in doubt & set(fields):
-            field = fields[name]
-            fields[name] = field.model_copy(
-                update={"confidence": min(field.confidence, UNVERIFIED)}
-            )
-        return Extraction(
-            document_type=kind, fields=list(fields.values()), line_items=lines
+            same = _norm(value) if isinstance(value, str) else value
+            if first_seen.setdefault(name, same) != same:
+                disagree.add(name)
+            if name in fields:
+                continue
+            field = _field(document_id, number, page, name, value, snippets, kind.value)
+            if field is not None:
+                fields[name] = field
+        if has_lines:
+            read = [
+                line.model_dump()
+                for line in values.line_items  # type: ignore[attr-defined]
+                if any(v is not None for v in line.model_dump().values())
+            ]
+            if lines_refused or not all(_on_page(i, page.text) for i in read):
+                lines_complete = False
+            lines += read
+    # Not final, so a person checks it (D80): every field when a page was not
+    # read (it may hold a value that changes the claim); a field that two pages
+    # give differently; the total when the list of lines is not complete.
+    doubt = set(fields) if not all_read else disagree
+    if has_lines and not (lines_complete and all_read):
+        # An incomplete list would look complete to T003 and to the settlement:
+        # no list at all.
+        lines = []
+        doubt = doubt | {"total"}
+    for name in doubt & set(fields):
+        field = fields[name]
+        fields[name] = field.model_copy(
+            update={"confidence": min(field.confidence, UNVERIFIED)}
         )
+    return Extraction(
+        document_type=kind, fields=list(fields.values()), line_items=lines
+    )

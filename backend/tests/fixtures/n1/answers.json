@@ -1,0 +1,246 @@
+{
+ "source": {
+  "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+  "date": "2026-11-19",
+  "omni_sha256": "138edc6ef7256d2b0545e94d22f9709be8f25bbf68433366ee2d4b686a305ddb",
+  "config_ids": {
+   "v1": "b0f2e2ccab2b",
+   "schema-only": "3cc3e9264e13"
+  },
+  "calls": 108
+ },
+ "answers": {
+  "v1": {
+   "1": {
+    "n1-repair-invoice.pdf": {
+     "classify": "{\"document_type\": \"repair_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"null\",\n    \"invoice_date\": \"2023-01-01\",\n    \"repair_company\": \"Tobler & Gerig Haustechnik AG\",\n    \"total\": 477.0,\n    \"customer_name\": \"Irene Kaelin\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace the kitchen mixer tap\",\n        \"quantity\": 1,\n        \"unit_price\": 284.0,\n        \"amount\": 284.0\n      },\n      {\n        \"description\": \"Descale the boiler, per hour\",\n        \"quantity\": 2,\n        \"unit_price\": 96.5,\n        \"amount\": 193.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"null\",\n    \"invoice_date\": \"2023-01-01\",\n    \"repair_company\": \"Tobler & Gerig Haustechnik AG\",\n    \"total\": \"CHF 477.00\",\n    \"customer_name\": \"Irene Kaelin\",\n    \"line_items\": \"Replace the kitchen mixer tap 1 284.00 284.00 Descale the boiler, per hour 2 96.50 193.00\"\n  }\n}"
+    },
+    "n2-medical-invoice.pdf": {
+     "classify": "{\"document_type\": \"medical_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"P-60417\",\n    \"invoice_date\": \"2026-08-21\",\n    \"provider\": \"Hausarztzentrum Seewinkel AG\",\n    \"patient_name\": \"Ramon Gasser\",\n    \"total\": 133.2,\n    \"line_items\": [\n      {\n        \"description\": \"General check-up, 20 min\",\n        \"quantity\": 1,\n        \"unit_price\": 74.3,\n        \"amount\": 74.3\n      },\n      {\n        \"description\": \"Blood test, basic panel\",\n        \"quantity\": 1,\n        \"unit_price\": 58.9,\n        \"amount\": 58.9\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"Patient no.: P-60417\",\n    \"invoice_date\": \"Date: 2026-08-21\",\n    \"provider\": \"Hausarztzentrum Seewinkel AG\",\n    \"patient_name\": \"Ramon Gasser\",\n    \"total\": \"Total CHF 133.20\",\n    \"line_items\": \"Service Qty Unit (CHF) Amount (CHF)\\nGeneral check-up, 20 min 1 74.30 74.30\\nBlood test, basic panel 1 58.90 58.90\"\n  }\n}"
+    },
+    "n3-repair-quote.pdf": {
+     "classify": "{\"document_type\": \"repair_quote\"}",
+     "page": "{\n  \"values\": {\n    \"quote_number\": \"RB-Q-2731\",\n    \"quote_date\": \"2026-12-15\",\n    \"repair_company\": \"Rietmann Bedachungen GmbH\",\n    \"total\": 690.90,\n    \"customer_name\": \"Corinne Baumli\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace roof tiles\",\n        \"quantity\": 12,\n        \"unit_price\": 18.4,\n        \"amount\": 220.8\n      },\n      {\n        \"description\": \"Scaffold, one day\",\n        \"quantity\": 1,\n        \"unit_price\": 345.0,\n        \"amount\": 345.0\n      },\n      {\n        \"description\": \"Repair the gutter, per metre\",\n        \"quantity\": 3,\n        \"unit_price\": 41.70,\n        \"amount\": 125.1\n      }\n    ]\n  },\n  \"snippets\": {\n    \"quote_number\": \"Quote no.: RB-Q-2731\",\n    \"quote_date\": \"Valid until: 2026-12-15\",\n    \"repair_company\": \"Rietmann Bedachungen GmbH\",\n    \"total\": \"220.80\\n345.00\\n125.10\",\n    \"customer_name\": \"Corinne Baumli\\nHofwiesenweg 3\\n9442 Berneck\\nSwitzerland\",\n    \"line_items\": \"Work Qty Unit (CHF) Amount (CHF)\\nReplace roof tiles 12 18.40 220.80\\nScaffold, one day 1 345.00 345.00\\nRepair the gutter, per metre 3 41.70 125.10\"\n  }\n}"
+    },
+    "n4-booking-confirmation.pdf": {
+     "classify": "{\"document_type\": \"booking_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": \"sent separately by e-mail\",\n    \"traveller_name\": \"Fabienne Rohner\",\n    \"departure_date\": \"2027-02-06\",\n    \"trip_price\": 1500,\n    \"line_items\": []\n  },\n  \"snippets\": {\n    \"booking_reference\": \"Customer no.: K-55190\\nBooking reference: sent separately by e-mail\",\n    \"traveller_name\": \"Traveller: Fabienne Rohner\",\n    \"departure_date\": \"Departure: 2027-02-06\",\n    \"trip_price\": \"Trip: Tromso, Norway, 5 nights, half board\"\n  }\n}"
+    },
+    "n5-cancellation-confirmation.pdf": {
+     "classify": "{\"document_type\": \"cancellation_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": \"SWT-60382\",\n    \"cancellation_date\": \"2026-09-30\",\n    \"refund_received\": null,\n    \"line_items\": [\n      {\n        \"description\": \"Price of the trip\",\n        \"amount\": 2145.0\n      },\n      {\n        \"description\": \"Cancellation charge\",\n        \"amount\": -320.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"booking_reference\": \"Booking reference: SWT-60382\",\n    \"cancellation_date\": \"Cancelled on: 2026-09-30\",\n    \"refund_received\": \"Refund: under review. We will confirm the amount in writing.\",\n    \"line_items\": \"Item Amount (CHF)\\nPrice of the trip 2,145.00\\nCancellation charge -320.00\"\n  }\n}"
+    },
+    "n6-medical-report.pdf": {
+     "classify": "{\"document_type\": \"medical_report\"}",
+     "page": "{\n  \"values\": {\n    \"patient_name\": \"Nadine Caflisch\",\n    \"diagnosis\": \"acute bronchitis\",\n    \"treatment_date\": null,\n    \"provider\": \"Dr. med. Corina Tschudi\"\n  },\n  \"snippets\": {\n    \"patient_name\": \"Patient: Nadine Caflisch\",\n    \"diagnosis\": \"Diagnosis: acute bronchitis\",\n    \"treatment_date\": \"Dr. med. Corina Tschudi\",\n    \"provider\": \"Dr. med. Corina Tschudi\"\n  }\n}"
+    },
+    "n7-booking-confirmation-scan.pdf": {
+     "classify": "{\"document_type\": \"booking_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": null,\n    \"traveller_name\": \"Mirjam Eggenberger\",\n    \"departure_date\": null,\n    \"trip_price\": 0,\n    \"line_items\": []\n  },\n  \"snippets\": {\n    \"booking_reference\": \"Booking confirmation\",\n    \"traveller_name\": \"Mirjam Eggenberger\",\n    \"departure_date\": \"Hiking week in the Alpstein, 6 nights\",\n    \"trip_price\":   \"\",\n    \"line_items\": \"Traveller: Mirjam Eggenberger\\nTrip: Hiking week in the Alpstein, 6 nights\"\n  }\n}"
+    },
+    "n8-repair-invoice-photo.jpg": {
+     "classify": "{\"document_type\": \"repair_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"J-88213\",\n    \"invoice_date\": \"2026-10-14\",\n    \"repair_company\": \"Kuster Elektro AG\",\n    \"total\": 724.0,\n    \"customer_name\": \"Not answerable\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace the fuse box\",\n        \"quantity\": 1,\n        \"unit_price\": 412.0,\n        \"amount\": 412.0\n      },\n      {\n        \"description\": \"Electricrian, per hour\",\n        \"quantity\": 3,\n        \"unit_price\": 104.0,\n        \"amount\": 312.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"J-88213\",\n    \"invoice_date\": \"2026-10-14\",\n    \"repair_company\": \"Kuster Elektro AG\",\n    \"total\": \"CHF 724.00\",\n    \"customer_name\": \"Not answerable\",\n    \"line_items\": \"Replace the fuse box 1 412.00 412.00 Electricrian, per hour 3 104.00 312.00 Total CHF 724.00\"\n  }\n}"
+    },
+    "n9-receipt-scan.pdf": {
+     "classify": "{\"document_type\": \"receipt\"}",
+     "page": "{\n  \"values\": {\n    \"merchant\": \"Gartencenter Rosenhalde\",\n    \"purchase_date\": \"2026-07-03\",\n    \"item_description\": \"garden bench, teak, 3 seats\",\n    \"amount_paid\": 0,\n    \"line_items\": []\n  },\n  \"snippets\": {\n    \"merchant\": \"Gartencenter Rosenhalde\",\n    \"purchase_date\": \"2026-07-03\",\n    \"item_description\": \"garden bench, teak, 3 seats\",\n    \"amount_paid\":  \"\",\n    \"line_items\": \"\"\n  }\n}"
+    }
+   },
+   "2": {
+    "n1-repair-invoice.pdf": {
+     "classify": "{\"document_type\": \"repair_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"Not answerable\",\n    \"invoice_date\": \"2023-01-01\",\n    \"repair_company\": \"Tobler & Gerig Haustechnik AG\",\n    \"total\": 477.0,\n    \"customer_name\": \"Irene Kaelin\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace the kitchen mixer tap\",\n        \"quantity\": 1,\n        \"unit_price\": 284.0,\n        \"amount\": 284.0\n      },\n      {\n        \"description\": \"Descale the boiler, per hour\",\n        \"quantity\": 2,\n        \"unit_price\": 96.5,\n        \"amount\": 193.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"Not answerable\",\n    \"invoice_date\": \"2023-01-01\",\n    \"repair_company\": \"Tobler & Gerig Haustechnik AG\",\n    \"total\":  \"CHF 477.00\",\n    \"customer_name\": \"Irene Kaelin\",\n    \"line_items\": \"Replace the kitchen mixer tap\\nDescale the boiler, per hour\"\n  }\n}"
+    },
+    "n2-medical-invoice.pdf": {
+     "classify": "{\"document_type\": \"medical_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"P-60417\",\n    \"invoice_date\": \"2026-08-21\",\n    \"provider\": \"Hausarztzentrum Seewinkel AG\",\n    \"patient_name\": \"Ramon Gasser\",\n    \"total\": 133.2,\n    \"line_items\": [\n      {\n        \"description\": \"General check-up, 20 min\",\n        \"quantity\": 1,\n        \"unit_price\": 74.3,\n        \"amount\": 74.3\n      },\n      {\n        \"description\": \"Blood test, basic panel\",\n        \"quantity\": 1,\n        \"unit_price\": 58.9,\n        \"amount\": 58.9\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"Patient no.: P-60417\",\n    \"invoice_date\": \"Date: 2026-08-21\",\n    \"provider\": \"Hausarztzentrum Seewinkel AG\\nSeewinkelstrasse 14, 6403 Kuessnacht\\nTel. +41 41 555 63 08 | billing@seewinkel.example\\nUID CHE-418.903.276 | IBAN CH62 0838 7000 4417 2950 3\",\n    \"patient_name\": \"Ramon Gasser\\nBachtelweg 5\\n6340 Baar\\nSwitzerland\",\n    \"total\": \"Total CHF 133.20\",\n    \"line_items\": \"Service Qty Unit (CHF) Amount (CHF)\\nGeneral check-up, 20 min 1 74.30 74.30\\nBlood test, basic panel 1 58.90 58.90\"\n  }\n}"
+    },
+    "n3-repair-quote.pdf": {
+     "classify": "{\"document_type\": \"repair_quote\"}",
+     "page": "{\n  \"values\": {\n    \"quote_number\": \"RB-Q-2731\",\n    \"quote_date\": \"2026-12-15\",\n    \"repair_company\": \"Rietmann Bedachungen GmbH\",\n    \"total\": 690.9,\n    \"customer_name\": \"Corinne Baumli\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace roof tiles\",\n        \"quantity\": 12,\n        \"unit_price\": 18.4,\n        \"amount\": 220.8\n      },\n      {\n        \"description\": \"Scaffold, one day\",\n        \"quantity\": 1,\n        \"unit_price\": 345.0,\n        \"amount\": 345.0\n      },\n      {\n        \"description\": \"Repair the gutter, per metre\",\n        \"quantity\": 3,\n        \"unit_price\": 41.7,\n        \"amount\": 125.1\n      }\n    ]\n  },\n  \"snippets\": {\n    \"quote_number\": \"Quote no.: RB-Q-2731\",\n    \"quote_date\": \"Valid until: 2026-12-15\",\n    \"repair_company\": \"Rietmann Bedachungen GmbH\",\n    \"total\": \"220.80\\n345.00\\n125.10\",\n    \"customer_name\": \"Corinne Baumli\\nHofwiesenweg 3\\n9442 Berneck\\nSwitzerland\",\n    \"line_items\": \"Work Qty Unit (CHF) Amount (CHF)\\nReplace roof tiles 12 18.40 220.80\\nScaffold, one day 1 345.00 345.00\\nRepair the gutter, per metre 3 41.70 125.10\"\n  }\n}"
+    },
+    "n4-booking-confirmation.pdf": {
+     "classify": "{\"document_type\": \"booking_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": \"sent separately by e-mail\",\n    \"traveller_name\": \"Fabienne Rohner\",\n    \"departure_date\": \"2027-02-06\",\n    \"trip_price\": 1500,\n    \"line_items\": []\n  },\n  \"snippets\": {\n    \"booking_reference\": \"Customer no.: K-55190\\nBooking reference: sent separately by e-mail\",\n    \"traveller_name\": \"Traveller: Fabienne Rohner\",\n    \"departure_date\": \"Departure: 2027-02-06\",\n    \"trip_price\": \"Trip: Tromso, Norway, 5 nights, half board\"\n  }\n}"
+    },
+    "n5-cancellation-confirmation.pdf": {
+     "classify": "{\"document_type\": \"cancellation_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": \"SWT-60382\",\n    \"cancellation_date\": \"2026-09-30\",\n    \"refund_received\": null,\n    \"line_items\": [\n      {\n        \"description\": \"Price of the trip\",\n        \"amount\": 2145.0\n      },\n      {\n        \"description\": \"Cancellation charge\",\n        \"amount\": -320.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"booking_reference\": \"Booking reference: SWT-60382\",\n    \"cancellation_date\": \"Cancelled on: 2026-09-30\",\n    \"refund_received\": \"Refund: under review. We will confirm the amount in writing.\",\n    \"line_items\": \"Item Amount (CHF)\\nPrice of the trip 2,145.00\\nCancellation charge -320.00\"\n  }\n}"
+    },
+    "n6-medical-report.pdf": {
+     "classify": "{\"document_type\": \"medical_report\"}",
+     "page": "{\n  \"values\": {\n    \"patient_name\": \"Nadine Caflisch\",\n    \"diagnosis\": \"acute bronchitis\",\n    \"treatment_date\": null,\n    \"provider\": \"Dr. med. Corina Tschudi\"\n  },\n  \"snippets\": {\n    \"patient_name\": \"Patient: Nadine Caflisch\",\n    \"diagnosis\": \"Diagnosis: acute bronchitis\",\n    \"treatment_date\": \"Dr. med. Corina Tschudi\",\n    \"provider\": \"Dr. med. Corina Tschudi\"\n  }\n}"
+    },
+    "n7-booking-confirmation-scan.pdf": {
+     "classify": "{\"document_type\": \"booking_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": null,\n    \"traveller_name\": \"Mirjam Eggenberger\",\n    \"departure_date\": null,\n    \"trip_price\": 0,\n    \"line_items\": []\n  },\n  \"snippets\": {\n    \"booking_reference\": \"Booking confirmation\",\n    \"traveller_name\": \"Mirjam Eggenberger\",\n    \"departure_date\": \"Hiking week in the Alpstein, 6 nights\",\n    \"trip_price\":   \"\",\n    \"line_items\": \"\"\n  }\n}"
+    },
+    "n8-repair-invoice-photo.jpg": {
+     "classify": "{\"document_type\": \"repair_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"J-88213\",\n    \"invoice_date\": \"2026-10-14\",\n    \"repair_company\": \"Kuster Elektro AG\",\n    \"total\": 724.0,\n    \"customer_name\": \"Not answerable\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace the fuse box\",\n        \"quantity\": 1,\n        \"unit_price\": 412.0,\n        \"amount\": 412.0\n      },\n      {\n        \"description\": \"Electricrian, per hour\",\n        \"quantity\": 3,\n        \"unit_price\": 104.0,\n        \"amount\": 312.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"J-88213\",\n    \"invoice_date\": \"2026-10-14\",\n    \"repair_company\": \"Kuster Elektro AG\",\n    \"total\": \"CHF 724.00\",\n    \"customer_name\": \"Not answerable\",\n    \"line_items\": \"Replace the fuse box\",\n    \"line_items\": \"Electricrian, per hour\"\n  }\n}"
+    },
+    "n9-receipt-scan.pdf": {
+     "classify": "{\"document_type\": \"receipt\"}",
+     "page": "{\n  \"values\": {\n    \"merchant\": \"Gartencenter Rosenhalde\",\n    \"purchase_date\": \"2026-07-03\",\n    \"item_description\": \"garden bench, teak, 3 seats\",\n    \"amount_paid\": 0,\n    \"line_items\": []\n  },\n  \"snippets\": {\n    \"merchant\": \"Gartencenter Rosenhalde\",\n    \"purchase_date\": \"2026-07-03\",\n    \"item_description\": \"garden bench, teak, 3 seats\",\n    \"amount_paid\":  \"\",\n    \"line_items\": \"\"\n  }\n}"
+    }
+   },
+   "3": {
+    "n1-repair-invoice.pdf": {
+     "classify": "{\"document_type\": \"repair_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"Not answerable\",\n    \"invoice_date\": \"2023-01-01\",\n    \"repair_company\": \"Tobler & Gerig Haustechnik AG\",\n    \"total\": 477.0,\n    \"customer_name\": \"Irene Kaelin\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace the kitchen mixer tap\",\n        \"quantity\": 1,\n        \"unit_price\": 284.0,\n        \"amount\": 284.0\n      },\n      {\n        \"description\": \"Descale the boiler, per hour\",\n        \"quantity\": 2,\n        \"unit_price\": 96.5,\n        \"amount\": 193.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"Not answerable\",\n    \"invoice_date\": \"2023-01-01\",\n    \"repair_company\": \"Tobler & Gerig Haustechnik AG\",\n    \"total\":  \"CHF 477.00\",\n    \"customer_name\": \"Irene Kaelin\",\n    \"line_items\": \"Replace the kitchen mixer tap\\nDescale the boiler, per hour\"\n  }\n}"
+    },
+    "n2-medical-invoice.pdf": {
+     "classify": "{\"document_type\": \"medical_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"P-60417\",\n    \"invoice_date\": \"2026-08-21\",\n    \"provider\": \"Hausarztzentrum Seewinkel AG\",\n    \"patient_name\": \"Ramon Gasser\",\n    \"total\": 133.2,\n    \"line_items\": [\n      {\n        \"description\": \"General check-up, 20 min\",\n        \"quantity\": 1,\n        \"unit_price\": 74.3,\n        \"amount\": 74.3\n      },\n      {\n        \"description\": \"Blood test, basic panel\",\n        \"quantity\": 1,\n        \"unit_price\": 58.9,\n        \"amount\": 58.9\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"Patient no.: P-60417\",\n    \"invoice_date\": \"Date: 2026-08-21\",\n    \"provider\": \"Hausarztzentrum Seewinkel AG\\nSeewinkelstrasse 14, 6403 Kuessnacht\\nTel. +41 41 555 63 08 | billing@seewinkel.example\\nUID CHE-418.903.276 | IBAN CH62 0838 7000 4417 2950 3\",\n    \"patient_name\": \"Ramon Gasser\\nBachtelweg 5\\n6340 Baar\\nSwitzerland\",\n    \"total\": \"Total CHF 133.20\",\n    \"line_items\": \"Service Qty Unit (CHF) Amount (CHF)\\nGeneral check-up, 20 min 1 74.30 74.30\\nBlood test, basic panel 1 58.90 58.90\"\n  }\n}"
+    },
+    "n3-repair-quote.pdf": {
+     "classify": "{\"document_type\": \"repair_quote\"}",
+     "page": "{\n  \"values\": {\n    \"quote_number\": \"RB-Q-2731\",\n    \"quote_date\": \"2026-12-15\",\n    \"repair_company\": \"Rietmann Bedachungen GmbH\",\n    \"total\": 690.90,\n    \"customer_name\": \"Corinne Baumli\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace roof tiles\",\n        \"quantity\": 12,\n        \"unit_price\": 18.4,\n        \"amount\": 220.8\n      },\n      {\n        \"description\": \"Scaffold, one day\",\n        \"quantity\": 1,\n        \"unit_price\": 345.0,\n        \"amount\": 345.0\n      },\n      {\n        \"description\": \"Repair the gutter, per metre\",\n        \"quantity\": 3,\n        \"unit_price\": 41.7,\n        \"amount\": 125.1\n      }\n    ]\n  },\n  \"snippets\": {\n    \"quote_number\": \"Quote no.: RB-Q-2731\",\n    \"quote_date\": \"Valid until: 2026-12-15\",\n    \"repair_company\": \"Rietmann Bedachungen GmbH\",\n    \"total\": \"220.80\\n345.00\\n125.10\",\n    \"customer_name\": \"Corinne Baumli\\nHofwiesenweg 3\\n9442 Berneck\\nSwitzerland\",\n    \"line_items\": \"Work Qty Unit (CHF) Amount (CHF)\\nReplace roof tiles 12 18.40 220.80\\nScaffold, one day 1 345.00 345.00\\nRepair the gutter, per metre 3 41.70 125.10\"\n  }\n}"
+    },
+    "n4-booking-confirmation.pdf": {
+     "classify": "{\"document_type\": \"booking_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": \"sent separately by e-mail\",\n    \"traveller_name\": \"Fabienne Rohner\",\n    \"departure_date\": \"2027-02-06\",\n    \"trip_price\": 1500,\n    \"line_items\": []\n  },\n  \"snippets\": {\n    \"booking_reference\": \"sent separately by e-mail\",\n    \"traveller_name\": \"Fabienne Rohner\",\n    \"departure_date\": \"2027-02-06\",\n    \"trip_price\": \"1500\"\n  }\n}"
+    },
+    "n5-cancellation-confirmation.pdf": {
+     "classify": "{\"document_type\": \"cancellation_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": \"SWT-60382\",\n    \"cancellation_date\": \"2026-09-30\",\n    \"refund_received\": null,\n    \"line_items\": [\n      {\n        \"description\": \"Price of the trip\",\n        \"amount\": 2145.0\n      },\n      {\n        \"description\": \"Cancellation charge\",\n        \"amount\": -320.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"booking_reference\": \"Booking reference: SWT-60382\",\n    \"cancellation_date\": \"Cancelled on: 2026-09-30\",\n    \"refund_received\": \"Refund: under review. We will confirm the amount in writing.\",\n    \"line_items\": \"Item Amount (CHF)\\nPrice of the trip 2,145.00\\nCancellation charge -320.00\"\n  }\n}"
+    },
+    "n6-medical-report.pdf": {
+     "classify": "{\"document_type\": \"medical_report\"}",
+     "page": "{\n  \"values\": {\n    \"patient_name\": \"Nadine Caflisch\",\n    \"diagnosis\": \"acute bronchitis\",\n    \"treatment_date\": null,\n    \"provider\": \"Dr. med. Corina Tschudi\"\n  },\n  \"snippets\": {\n    \"patient_name\": \"Patient: Nadine Caflisch\",\n    \"diagnosis\": \"Diagnosis: acute bronchitis\",\n    \"treatment_date\": \"Dr. med. Corina Tschudi\",\n    \"provider\": \"Dr. med. Corina Tschudi\"\n  }\n}"
+    },
+    "n7-booking-confirmation-scan.pdf": {
+     "classify": "{\"document_type\": \"booking_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": null,\n    \"traveller_name\": \"Mirjam Eggenberger\",\n    \"departure_date\": null,\n    \"trip_price\": 0,\n    \"line_items\": []\n  },\n  \"snippets\": {\n    \"booking_reference\": \"Booking confirmation\",\n    \"traveller_name\": \"Mirjam Eggenberger\",\n    \"departure_date\": \"Hiking week in the Alpstein, 6 nights\",\n    \"trip_price\":   \"\",\n    \"line_items\": \"\"\n  }\n}"
+    },
+    "n8-repair-invoice-photo.jpg": {
+     "classify": "{\"document_type\": \"repair_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"J-88213\",\n    \"invoice_date\": \"2026-10-14\",\n    \"repair_company\": \"Kuster Elektro AG\",\n    \"total\": 724.0,\n    \"customer_name\": \"Kuster Elektro AG\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace the fuse box\",\n        \"quantity\": 1,\n        \"unit_price\": 412.0,\n        \"amount\": 412.0\n      },\n      {\n        \"description\": \"Electricrian, per hour\",\n        \"quantity\": 3,\n        \"unit_price\": 104.0,\n        \"amount\": 312.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"J-88213\",\n    \"invoice_date\": \"2026-10-14\",\n    \"repair_company\": \"Kuster Elektro AG\",\n    \"total\": \"CHF 724.00\",\n    \"customer_name\": \"Kuster Elektro AG\",\n    \"line_items\": \"Replace the fuse box 1 412.00 412.00 Electricrian, per hour 3 104.00 312.00 Total CHF 724.00\"\n  }\n}"
+    },
+    "n9-receipt-scan.pdf": {
+     "classify": "{\"document_type\": \"receipt\"}",
+     "page": "{\n  \"values\": {\n    \"merchant\": \"Gartencenter Rosenhalde\",\n    \"purchase_date\": \"2026-07-03\",\n    \"item_description\": \"garden bench, teak, 3 seats\",\n    \"amount_paid\": 0,\n    \"line_items\": []\n  },\n  \"snippets\": {\n    \"merchant\": \"Gartencenter Rosenhalde\",\n    \"purchase_date\": \"2026-07-03\",\n    \"item_description\": \"garden bench, teak, 3 seats\",\n    \"amount_paid\":  \"\",\n    \"line_items\": \"\"\n  }\n}"
+    }
+   }
+  },
+  "schema-only": {
+   "1": {
+    "n1-repair-invoice.pdf": {
+     "classify": "{\"document_type\": \"repair_invoice\"}",
+     "page": "{\n    \"values\": {\n        \"invoice_number\": \"Not answerable\",\n        \"invoice_date\": \"2025-06-18\",\n        \"repair_company\": \"Tobler & Gerig Haustechnik AG\",\n        \"total\": 477.0,\n        \"customer_name\": \"Irene Kaelin\",\n        \"line_items\": [\n            {\n                \"description\": \"Replace the kitchen mixer tap\",\n                \"quantity\": 1,\n                \"unit_price\": 284.0,\n                \"amount\": 284.0\n            },\n            {\n                \"description\": \"Descale the boiler, per hour\",\n                \"quantity\": 2,\n                \"unit_price\": 96.5,\n                \"amount\": 193.0\n            }\n        ]\n    },\n    \"snippets\": {\n        \"invoice_number\": \"Not answerable\",\n        \"invoice_date\": \"2025-06-18\",\n        \"repair_company\": \"Tobler & Gerig Haustechnik AG\",\n        \"total\": \"CHF 477.00\",\n        \"customer_name\": \"Irene Kaelin\",\n        \"line_items\": \"Replace the kitchen mixer tap\\nDescale the boiler, per hour\"\n    }\n}"
+    },
+    "n2-medical-invoice.pdf": {
+     "classify": "{\"document_type\": \"medical_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"P-60417\",\n    \"invoice_date\": \"2026-08-21\",\n    \"provider\": \"Hausarztzentrum Seewinkel AG\",\n    \"patient_name\": \"Ramon Gasser\",\n    \"total\": 133.2,\n    \"line_items\": [\n      {\n        \"description\": \"General check-up, 20 min\",\n        \"quantity\": 1,\n        \"unit_price\": 74.3,\n        \"amount\": 74.3\n      },\n      {\n        \"description\": \"Blood test, basic panel\",\n        \"quantity\": 1,\n        \"unit_price\": 58.9,\n        \"amount\": 58.9\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"P-60417\",\n    \"invoice_date\": \"2026-08-21\",\n    \"provider\": \"Hausarztzentrum Seewinkel AG\",\n    \"patient_name\": \"Ramon Gasser\",\n    \"total\": \"CHF 133.20\",\n    \"line_items\": \"General check-up, 20 min 1 74.30 74.30\\nBlood test, basic panel 1 58.90 58.90\"\n  }\n}"
+    },
+    "n3-repair-quote.pdf": {
+     "classify": "{\"document_type\": \"repair_quote\"}",
+     "page": "{\n  \"values\": {\n    \"quote_number\": \"RB-Q-2731\",\n    \"quote_date\": \"2026-12-15\",\n    \"repair_company\": \"Rietmann Bedachungen GmbH\",\n    \"total\": 690.90,\n    \"customer_name\": \"Corinne Baumli\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace roof tiles\",\n        \"quantity\": 12,\n        \"unit_price\": 18.4,\n        \"amount\": 220.8\n      },\n      {\n        \"description\": \"Scaffold, one day\",\n        \"quantity\": 1,\n        \"unit_price\": 345.0,\n        \"amount\": 345.0\n      },\n      {\n        \"description\": \"Repair the gutter, per metre\",\n        \"quantity\": 3,\n        \"unit_price\": 41.7,\n        \"amount\": 125.1\n      }\n    ]\n  },\n  \"snippets\": {\n    \"quote_number\": \"RB-Q-2731\",\n    \"quote_date\": \"2026-12-15\",\n    \"repair_company\": \"Rietmann Bedachungen GmbH\",\n    \"total\":  \"690.90\",\n    \"customer_name\": \"Corinne Baumli\",\n    \"line_items\": \"Replace roof tiles 12 18.40 220.80\\nScaffold, one day 1 345.00 345.00\\nRepair the gutter, per metre 3 41.70 125.10\"\n  }\n}"
+    },
+    "n4-booking-confirmation.pdf": {
+     "classify": "{\"document_type\": \"booking_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": \"sent separately by e-mail\",\n    \"traveller_name\": \"Fabienne Rohner\",\n    \"departure_date\": \"2027-02-06\",\n    \"trip_price\": 1595,\n    \"line_items\": [\n      {\n        \"description\": \"Tromso, Norway, 5 nights, half board\",\n        \"quantity\": 1,\n        \"unit_price\": 1595,\n        \"amount\": 1595\n      }\n    ]\n  },\n  \"snippets\": {\n    \"booking_reference\": \"sent separately by e-mail\",\n    \"traveller_name\": \"Fabienne Rohner\",\n    \"departure_date\": \"2027-02-06\",\n    \"trip_price\":  \"1595\",\n    \"line_items\": \"Tromso, Norway, 5 nights, half board\"\n  }\n}"
+    },
+    "n5-cancellation-confirmation.pdf": {
+     "classify": "{\"document_type\": \"cancellation_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": \"SWT-60382\",\n    \"cancellation_date\": \"2026-09-30\",\n    \"refund_received\": null,\n    \"line_items\": [\n      {\n        \"description\": \"Price of the trip\",\n        \"amount\": 2145.0\n      },\n      {\n        \"description\": \"Cancellation charge\",\n        \"amount\": -320.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"booking_reference\": \"Booking reference: SWT-60382\",\n    \"cancellation_date\": \"Cancelled on: 2026-09-30\",\n    \"refund_received\": \"Refund: under review. We will confirm the amount in writing.\",\n    \"line_items\": \"Price of the trip 2,145.00\\nCancellation charge -320.00\"\n  }\n}"
+    },
+    "n6-medical-report.pdf": {
+     "classify": "{\"document_type\": \"medical_report\"}",
+     "page": "{\n  \"values\": {\n    \"patient_name\": \"Nadine Caflisch\",\n    \"diagnosis\": \"acute bronchitis\",\n    \"treatment_date\": null,\n    \"provider\": \"Dr. med. Corina Tschudi\"\n  },\n  \"snippets\": {\n    \"patient_name\": \"Nadine Caflisch\",\n    \"diagnosis\": \"acute bronchitis\",\n    \"treatment_date\": \"\",\n    \"provider\": \"Dr. med. Corina Tschudi\"\n  }\n}"
+    },
+    "n7-booking-confirmation-scan.pdf": {
+     "classify": "{\"document_type\": \"booking_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": \"Not answerable\",\n    \"traveller_name\": \"Mirjam Eggenberger\",\n    \"departure_date\": \"2022-07-01\",\n    \"trip_price\": 1080.0,\n    \"line_items\": [\n      {\n        \"description\": \"Hiking week in the Alpstein\",\n        \"quantity\": 1,\n        \"unit_price\": 180.0,\n        \"amount\": 180.0\n      },\n      {\n        \"description\": \"Accommodation\",\n        \"quantity\": 6,\n        \"unit_price\": 150.0,\n        \"amount\": 900.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"booking_reference\": \"Not answerable\",\n    \"traveller_name\": \"Mirjam Eggenberger\",\n    \"departure_date\": \"2022-07-01\",\n    \"trip_price\":  \"Not answerable\",\n    \"line_items\": \"Not answerable\"\n  }\n}"
+    },
+    "n8-repair-invoice-photo.jpg": {
+     "classify": "{\"document_type\": \"repair_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"J-88213\",\n    \"invoice_date\": \"2026-10-14\",\n    \"repair_company\": \"Kuster Elektro AG\",\n    \"total\": 724.0,\n    \"customer_name\": \"Not answerable\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace the fuse box\",\n        \"quantity\": 1,\n        \"unit_price\": 412.0,\n        \"amount\": 412.0\n      },\n      {\n        \"description\": \"Electricrian, per hour\",\n        \"quantity\": 3,\n        \"unit_price\": 104.0,\n        \"amount\": 312.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"J-88213\",\n    \"invoice_date\": \"2026-10-14\",\n    \"repair_company\": \"Kuster Elektro AG\",\n    \"total\": \"CHF 724.00\",\n    \"customer_name\": \"Not answerable\",\n    \"line_items\": \"Replace the fuse box 1 412.00 412.00 Electricrian, per hour 3 104.00 312.00\"\n  }\n}"
+    },
+    "n9-receipt-scan.pdf": {
+     "classify": "{\"document_type\": \"receipt\"}",
+     "page": "{\n  \"values\": {\n    \"merchant\": \"Gartencenter Rosenhalde Rosenhaldenweg 30, 5430 Wetteningen Tel. +41 56 555 18 44 UID CHE-000.000.000\",\n    \"purchase_date\": \"2026-07-03\",\n    \"item_description\": \"garden bench, teak, 3 seats\",\n    \"amount_paid\": 0,\n    \"line_items\": [\n      {\n        \"description\": \"garden bench, teak, 3 seats\",\n        \"quantity\": 3,\n        \"unit_price\": 0,\n        \"amount\": 0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"merchant\": \"Gartencenter Rosenhalde Rosenhaldenweg 30, 5430 Wetteningen Tel. +41 56 555 18 44 UID CHE-000.000.000\",\n    \"purchase_date\": \"2026-07-03\",\n    \"item_description\": \"garden bench, teak, 3 seats\",\n    \"amount_paid\": \"0\",\n    \"line_items\": \"Item: garden bench, teak, 3 seats\"\n  }\n}"
+    }
+   },
+   "2": {
+    "n1-repair-invoice.pdf": {
+     "classify": "{\"document_type\": \"repair_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"Not answerable\",\n    \"invoice_date\": \"2025-06-19\",\n    \"repair_company\": \"Tobler & Gerig Haustechnik AG\",\n    \"total\": 477.0,\n    \"customer_name\": \"Irene Kaelin\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace the kitchen mixer tap\",\n        \"quantity\": 1,\n        \"unit_price\": 284.0,\n        \"amount\": 284.0\n      },\n      {\n        \"description\": \"Descale the boiler, per hour\",\n        \"quantity\": 2,\n        \"unit_price\": 96.5,\n        \"amount\": 193.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"Not answerable\",\n    \"invoice_date\": \"2025-06-19\",\n    \"repair_company\": \"Tobler & Gerig Haustechnik AG\",\n    \"total\":  \"CHF 477.00\",\n    \"customer_name\": \"Irene Kaelin\\nTalackerstrasse 31\\n8152 Glattbrugg\\nSwitzerland\",\n    \"line_items\": \"Replace the kitchen mixer tap 1 284.00 284.00\\nDescale the boiler, per hour 2 96.50 193.00\"\n  }\n}"
+    },
+    "n2-medical-invoice.pdf": {
+     "classify": "{\"document_type\": \"medical_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"P-60417\",\n    \"invoice_date\": \"2026-08-21\",\n    \"provider\": \"Hausarztzentrum Seewinkel AG\",\n    \"patient_name\": \"Ramon Gasser\",\n    \"total\": 133.2,\n    \"line_items\": [\n      {\n        \"description\": \"General check-up, 20 min\",\n        \"quantity\": 1,\n        \"unit_price\": 74.3,\n        \"amount\": 74.3\n      },\n      {\n        \"description\": \"Blood test, basic panel\",\n        \"quantity\": 1,\n        \"unit_price\": 58.9,\n        \"amount\": 58.9\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"P-60417\",\n    \"invoice_date\": \"2026-08-21\",\n    \"provider\": \"Hausarztzentrum Seewinkel AG\",\n    \"patient_name\": \"Ramon Gasser\",\n    \"total\": \"CHF 133.20\",\n    \"line_items\": \"General check-up, 20 min 1 74.30 74.30\"\n  }\n}"
+    },
+    "n3-repair-quote.pdf": {
+     "classify": "{\"document_type\": \"repair_quote\"}",
+     "page": "{\n  \"values\": {\n    \"quote_number\": \"RB-Q-2731\",\n    \"quote_date\": \"2026-12-15\",\n    \"repair_company\": \"Rietmann Bedachungen GmbH\",\n    \"total\": 690.90,\n    \"customer_name\": \"Corinne Baumli\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace roof tiles\",\n        \"quantity\": 12,\n        \"unit_price\": 18.4,\n        \"amount\": 220.8\n      },\n      {\n        \"description\": \"Scaffold, one day\",\n        \"quantity\": 1,\n        \"unit_price\": 345.0,\n        \"amount\": 345.0\n      },\n      {\n        \"description\": \"Repair the gutter, per metre\",\n        \"quantity\": 3,\n        \"unit_price\": 41.7,\n        \"amount\": 125.1\n      }\n    ]\n  },\n  \"snippets\": {\n    \"quote_number\": \"RB-Q-2731\",\n    \"quote_date\": \"2026-12-15\",\n    \"repair_company\": \"Rietmann Bedachungen GmbH\",\n    \"total\":  \",\"} \n  }"
+    },
+    "n4-booking-confirmation.pdf": {
+     "classify": "{\"document_type\": \"booking_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": \"sent separately by e-mail\",\n    \"traveller_name\": \"Fabienne Rohner\",\n    \"departure_date\": \"2027-02-06\",\n    \"trip_price\": 1575,\n    \"line_items\": [\n      {\n        \"description\": \"Tromso, Norway, 5 nights, half board\",\n        \"quantity\": 1,\n        \"unit_price\": 1575,\n        \"amount\": 1575\n      }\n    ]\n  },\n  \"snippets\": {\n    \"booking_reference\": \"sent separately by e-mail\",\n    \"traveller_name\": \"Fabienne Rohner\",\n    \"departure_date\": \"2027-02-06\",\n    \"trip_price\":   \"\",\n    \"line_items\": \"Tromso, Norway, 5 nights, half board\"\n  }\n}"
+    },
+    "n5-cancellation-confirmation.pdf": {
+     "classify": "{\"document_type\": \"cancellation_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": \"SWT-60382\",\n    \"cancellation_date\": \"2026-09-30\",\n    \"refund_received\": null,\n    \"line_items\": [\n      {\n        \"description\": \"Price of the trip\",\n        \"amount\": 2145.0\n      },\n      {\n        \"description\": \"Cancellation charge\",\n        \"amount\": -320.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"booking_reference\": \"Booking reference: SWT-60382\",\n    \"cancellation_date\": \"Cancelled on: 2026-09-30\",\n    \"refund_received\": \"Refund: under review. We will confirm the amount in writing.\",\n    \"line_items\": \"Price of the trip 2,145.00\\nCancellation charge -320.00\"\n  }\n}"
+    },
+    "n6-medical-report.pdf": {
+     "classify": "{\"document_type\": \"medical_report\"}",
+     "page": "{\n  \"values\": {\n    \"patient_name\": \"Nadine Caflisch\",\n    \"diagnosis\": \"acute bronchitis\",\n    \"treatment_date\": null,\n    \"provider\": \"Dr. med. Corina Tschudi\"\n  },\n  \"snippets\": {\n    \"patient_name\": \"Nadine Caflisch\",\n    \"diagnosis\": \"acute bronchitis\",\n    \"treatment_date\": \"\",\n    \"provider\": \"Dr. med. Corina Tschudi\"\n  }\n}"
+    },
+    "n7-booking-confirmation-scan.pdf": {
+     "classify": "{\"document_type\": \"booking_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": \"Not answerable\",\n    \"traveller_name\": \"Mirjam Eggenberger\",\n    \"departure_date\": \"2022-07-01\",\n    \"trip_price\": 1200.0,\n    \"line_items\": [\n      {\n        \"description\": \"Hiking week in the Alpstein\",\n        \"quantity\": 1,\n        \"unit_price\": 1200.0,\n        \"amount\": 1200.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"booking_reference\": \"Not answerable\",\n    \"traveller_name\": \"Mirjam Eggenberger\",\n    \"departure_date\": \"2022-07-01\",\n    \"trip_price\":  \"1200.0\",\n    \"line_items\": \"Hiking week in the Alpstein, 6 nights\"\n  }\n}"
+    },
+    "n8-repair-invoice-photo.jpg": {
+     "classify": "{\"document_type\": \"repair_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"J-88213\",\n    \"invoice_date\": \"2026-10-14\",\n    \"repair_company\": \"Kuster Elektro AG\",\n    \"total\": 724.0,\n    \"customer_name\": \"Not answerable\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace the fuse box\",\n        \"quantity\": 1,\n        \"unit_price\": 412.0,\n        \"amount\": 412.0\n      },\n      {\n        \"description\": \"Electricrian, per hour\",\n        \"quantity\": 3,\n        \"unit_price\": 104.0,\n        \"amount\": 312.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"J-88213\",\n    \"invoice_date\": \"2026-10-14\",\n    \"repair_company\": \"Kuster Elektro AG\",\n    \"total\": \"CHF 724.00\",\n    \"customer_name\": \"Not answerable\",\n    \"line_items\": \"Replace the fuse box 1 412.00 412.00 Electricrian, per hour 3 104.00 312.00\"\n  }\n}"
+    },
+    "n9-receipt-scan.pdf": {
+     "classify": "{\"document_type\": \"receipt\"}",
+     "page": "{\n  \"values\": {\n    \"merchant\": \"Gartencenter Rosenhalde Rosenhaldenweg 30, 5430 Wetteningen Tel. +41 56 555 18 44 UID CHE-000.000.000\",\n    \"purchase_date\": \"2026-07-03\",\n    \"item_description\": \"garden bench, teak, 3 seats\",\n    \"amount_paid\": 0,\n    \"line_items\": []\n  },\n  \"snippets\": {\n    \"merchant\": \"Gartencenter Rosenhalde Rosenhaldenweg 30, 5430 Wetteningen Tel. +41 56 555 18 44 UID CHE-000.000.000\",\n    \"purchase_date\": \"2026-07-03\",\n    \"item_description\": \"garden bench, teak, 3 seats\",\n    \"amount_paid\":  \"\",\n    \"line_items\": \"\"\n  }\n}"
+    }
+   },
+   "3": {
+    "n1-repair-invoice.pdf": {
+     "classify": "{\"document_type\": \"repair_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"Not answerable\",\n    \"invoice_date\": \"2025-06-18\",\n    \"repair_company\": \"Tobler & Gerig Haustechnik AG\",\n    \"total\": 477.0,\n    \"customer_name\": \"Irene Kaelin\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace the kitchen mixer tap\",\n        \"quantity\": 1,\n        \"unit_price\": 284.0,\n        \"amount\": 284.0\n      },\n      {\n        \"description\": \"Descale the boiler, per hour\",\n        \"quantity\": 2,\n        \"unit_price\": 96.5,\n        \"amount\": 193.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"Not answerable\",\n    \"invoice_date\": \"2025-06-18\",\n    \"repair_company\": \"Tobler & Gerig Haustechnik AG\",\n    \"total\":  \"CHF 477.00\",\n    \"customer_name\": \"Irene Kaelin\\nTalackerstrasse 31\\n8152 Glattbrugg\\nSwitzerland\",\n    \"line_items\": \"Replace the kitchen mixer tap\\t1\\t284.00\\t284.00\\nDescale the boiler, per hour\\t2\\t96.50\\t193.00\"\n  }\n}"
+    },
+    "n2-medical-invoice.pdf": {
+     "classify": "{\"document_type\": \"medical_invoice\"}",
+     "page": "{\n    \"values\": {\n        \"invoice_number\": \"P-60417\",\n        \"invoice_date\": \"2026-08-21\",\n        \"provider\": \"Hausarztzentrum Seewinkel AG\",\n        \"patient_name\": \"Ramon Gasser\",\n        \"total\": 133.2,\n        \"line_items\": [\n            {\n                \"description\": \"General check-up, 20 min\",\n                \"quantity\": 1,\n                \"unit_price\": 74.3,\n                \"amount\": 74.3\n            },\n            {\n                \"description\": \"Blood test, basic panel\",\n                \"quantity\": 1,\n                \"unit_price\": 58.9,\n                \"amount\": 58.9\n            }\n        ]\n    },\n    \"snippets\": {\n        \"invoice_number\": \"P-60417\",\n        \"invoice_date\": \"2026-08-21\",\n        \"provider\": \"Hausarztzentrum Seewinkel AG\",\n        \"patient_name\": \"Ramon Gasser\",\n        \"total\": \"CHF 133.20\",\n        \"line_items\": \"General check-up, 20 min 1 74.30 74.30\\nBlood test, basic panel 1 58.90 58.90\"\n    }\n}"
+    },
+    "n3-repair-quote.pdf": {
+     "classify": "{\"document_type\": \"repair_quote\"}",
+     "page": "{\n  \"values\": {\n    \"quote_number\": \"RB-Q-2731\",\n    \"quote_date\": \"2026-12-15\",\n    \"repair_company\": \"Rietmann Bedachungen GmbH\",\n    \"total\": 690.90,\n    \"customer_name\": \"Corinne Baumli\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace roof tiles\",\n        \"quantity\": 12,\n        \"unit_price\": 18.4,\n        \"amount\": 220.8\n      },\n      {\n        \"description\": \"Scaffold, one day\",\n        \"quantity\": 1,\n        \"unit_price\": 345.0,\n        \"amount\": 345.0\n      },\n      {\n        \"description\": \"Repair the gutter, per metre\",\n        \"quantity\": 3,\n        \"unit_price\": 41.7,\n        \"amount\": 125.1\n      }\n    ]\n  },\n  \"snippets\": {\n    \"quote_number\": \"RB-Q-2731\",\n    \"quote_date\": \"2026-12-15\",\n    \"repair_company\": \"Rietmann Bedachungen GmbH\",\n    \"total\":  \"690.90\",\n    \"customer_name\": \"Corinne Baumli\",\n    \"line_items\": \"Replace roof tiles 12 18.40 220.80\\nScaffold, one day 1 345.00 345.00\\nRepair the gutter, per metre 3 41.70 125.10\"\n  }\n}"
+    },
+    "n4-booking-confirmation.pdf": {
+     "classify": "{\"document_type\": \"booking_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": \"sent separately by e-mail\",\n    \"traveller_name\": \"Fabienne Rohner\",\n    \"departure_date\": \"2027-02-06\",\n    \"trip_price\": 1595,\n    \"line_items\": [\n      {\n        \"description\": \"Tromso, Norway, 5 nights, half board\",\n        \"quantity\": 1,\n        \"unit_price\": 1595,\n        \"amount\": 1595\n      }\n    ]\n  },\n  \"snippets\": {\n    \"booking_reference\": \"sent separately by e-mail\",\n    \"traveller_name\": \"Fabienne Rohner\",\n    \"departure_date\": \"2027-02-06\",\n    \"trip_price\": \"1595\",\n    \"line_items\": \"[\\\"Tromso, Norway, 5 nights, half board\\\"]\"\n  }\n}"
+    },
+    "n5-cancellation-confirmation.pdf": {
+     "classify": "{\"document_type\": \"cancellation_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": \"SWT-60382\",\n    \"cancellation_date\": \"2026-09-30\",\n    \"refund_received\": null,\n    \"line_items\": [\n      {\n        \"description\": \"Price of the trip\",\n        \"amount\": 2145.0\n      },\n      {\n        \"description\": \"Cancellation charge\",\n        \"amount\": -320.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"booking_reference\": \"Booking reference: SWT-60382\",\n    \"cancellation_date\": \"Cancelled on: 2026-09-30\",\n    \"refund_received\": \"Refund: under review. We will confirm the amount in writing.\",\n    \"line_items\": \"Item Amount (CHF)\\nPrice of the trip 2,145.00\\nCancellation charge -320.00\"\n  }\n}"
+    },
+    "n6-medical-report.pdf": {
+     "classify": "{\"document_type\": \"medical_report\"}",
+     "page": "{\n  \"values\": {\n    \"patient_name\": \"Nadine Caflisch\",\n    \"diagnosis\": \"acute bronchitis\",\n    \"treatment_date\": null,\n    \"provider\": \"Dr. med. Corina Tschudi\"\n  },\n  \"snippets\": {\n    \"patient_name\": \"Nadine Caflisch\",\n    \"diagnosis\": \"acute bronchitis\",\n    \"treatment_date\": \"null\",\n    \"provider\": \"Dr. med. Corina Tschudi\"\n  }\n}"
+    },
+    "n7-booking-confirmation-scan.pdf": {
+     "classify": "{\"document_type\": \"booking_confirmation\"}",
+     "page": "{\n  \"values\": {\n    \"booking_reference\": null,\n    \"traveller_name\": \"Mirjam Eggenberger\",\n    \"departure_date\": null,\n    \"trip_price\": 1000.0,\n    \"line_items\": []\n  },\n  \"snippets\": {\n    \"booking_reference\": \"\",\n    \"traveller_name\": \"Mirjam Eggenberger\",\n    \"departure_date\": \"\",\n    \"trip_price\": \"\",\n    \"line_items\": \"\"\n  }\n}"
+    },
+    "n8-repair-invoice-photo.jpg": {
+     "classify": "{\"document_type\": \"repair_invoice\"}",
+     "page": "{\n  \"values\": {\n    \"invoice_number\": \"J-88213\",\n    \"invoice_date\": \"2026-10-14\",\n    \"repair_company\": \"Kuster Elektro AG\",\n    \"total\": 724.0,\n    \"customer_name\": \"Not answerable\",\n    \"line_items\": [\n      {\n        \"description\": \"Replace the fuse box\",\n        \"quantity\": 1,\n        \"unit_price\": 412.0,\n        \"amount\": 412.0\n      },\n      {\n        \"description\": \"Electricrian, per hour\",\n        \"quantity\": 3,\n        \"unit_price\": 104.0,\n        \"amount\": 312.0\n      }\n    ]\n  },\n  \"snippets\": {\n    \"invoice_number\": \"J-88213\",\n    \"invoice_date\": \"2026-10-14\",\n    \"repair_company\": \"Kuster Elektro AG\",\n    \"total\": \"CHF 724.00\",\n    \"customer_name\": \"Not answerable\",\n    \"line_items\": \"Replace the fuse box 1 412.00 412.00 Electricrian, per hour 3 104.00 312.00\"\n  }\n}"
+    },
+    "n9-receipt-scan.pdf": {
+     "classify": "{\"document_type\": \"receipt\"}",
+     "page": "{\n  \"values\": {\n    \"merchant\": \"Gartencenter Rosenhalde Rosenhaldenweg 30, 5430 Wettengen Tel. +41 56 555 18 44 UID CHE-000.000.000\",\n    \"purchase_date\": \"2026-07-03\",\n    \"item_description\": \"garden bench, teak, 3 seats\",\n    \"amount_paid\": 0,\n    \"line_items\": []\n  },\n  \"snippets\": {\n    \"merchant\": \"Gartencenter Rosenhalde Rosenhaldenweg 30, 5430 Wettengen Tel. +41 56 555 18 44 UID CHE-000.000.000\",\n    \"purchase_date\": \"2026-07-03\",\n    \"item_description\": \"garden bench, teak, 3 seats\"\n  }\n}"
+    }
+   }
+  }
+ }
+}
