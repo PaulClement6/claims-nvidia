@@ -15,6 +15,7 @@ from app.store import DATA, Store
 router = APIRouter(prefix="/demo")
 KIT_SUFFIXES = {".pdf": "application/pdf", ".png": "image/png", ".jpg": "image/jpeg"}
 HARD = "hard"  # the folder of the scans and phone photos
+NOT_KIT = frozenset({"n1"})  # safety sets (issue #125): in data/mock, not in the kit
 
 
 def _data() -> Path:
@@ -27,7 +28,7 @@ def _kit() -> dict[tuple[str, str], Path]:
     found = [
         p
         for p in (_data() / "mock").glob("*/*")
-        if p.suffix in KIT_SUFFIXES and p.is_file()
+        if p.suffix in KIT_SUFFIXES and p.is_file() and p.parent.name not in NOT_KIT
     ]
     found.sort(key=lambda p: (p.parent.name == HARD, p.parent.name, p.name))
     return {(p.parent.name, p.name): p for p in found}

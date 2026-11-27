@@ -16,6 +16,7 @@ import pytest
 from fastapi.testclient import TestClient
 from pypdf import PdfReader
 
+from app.demo import NOT_KIT
 from app.docintel.fixture import FixtureReader
 from app.main import create_app
 from app.models import Document, DocumentType
@@ -85,7 +86,7 @@ def kit_files() -> set[str]:
     return {
         str(p.relative_to(MOCK))
         for p in MOCK.glob("*/*")
-        if p.suffix in {".pdf", ".jpg", ".png"}
+        if p.suffix in {".pdf", ".jpg", ".png"} and p.parent.name not in NOT_KIT
     }
 
 

@@ -1,0 +1,32 @@
+{
+  "document_type": "booking_confirmation",
+  "fields": [
+    {
+      "name": "traveller_name",
+      "value": "Mirjam Eggenberger",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Mirjam Eggenberger"
+    },
+    {
+      "name": "booking_reference",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    },
+    {
+      "name": "trip_price",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    },
+    {
+      "name": "departure_date",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    }
+  ],
+  "line_items": [],
+  "variant": "scan"
+}

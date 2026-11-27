@@ -50,6 +50,7 @@ from app.docintel.compare import (
     field_kind,
 )
 from app.docintel.reader import Reader
+from app.fraud.routing import LOW_CONFIDENCE
 from app.models import Document, DocumentType, Extraction
 from app.store import CLAIM_TYPE
 
@@ -134,9 +135,17 @@ def _answer_key(path: Path) -> tuple[dict[str, Any] | None, str | None]:
     return key, None
 
 
-def kit() -> list[KitDocument]:
+# The standard kit, and the safety sets of data/mock that are not in it (issue #125)
+SETS: tuple[str, ...] = ("kit", *sorted(demo.NOT_KIT))
+SET_KINDS = {"text": "clean", "scan": "scan", "photo": "photo"}  # manifest -> kind
+
+
+def kit(document_set: str = "kit") -> list[KitDocument]:
     """Every document of the kit, in the order of the demo kit (`demo._kit`): the
-    reader bench, the contract test and this harness see the same documents."""
+    reader bench, the contract test and this harness see the same documents. Another
+    set of `SETS` (N1, issue #125) is read from its folder and its manifest."""
+    if document_set != "kit":
+        return _safety_set(document_set)
     mock = demo._data() / "mock"
     index = demo._index()
     policies = {
@@ -157,6 +166,26 @@ def kit() -> list[KitDocument]:
         workflow = CLAIM_TYPE.get(policy["line_of_business"]) if policy else None
         out.append(
             KitDocument(doc_id, path, str(kind), workflow or "unknown", key, error)
+        )
+    return out
+
+
+def _safety_set(name: str) -> list[KitDocument]:
+    """The documents of a safety set (`data/mock/<name>/`), by file name. Its kind
+    comes from its manifest; it has no scenario, so no workflow."""
+    if name not in demo.NOT_KIT:
+        raise ValueError(f"unknown set {name!r}: use one of {', '.join(SETS)}")
+    folder = demo._data() / "mock" / name
+    manifest = _read_json(folder / "manifest.json").get("documents", [])
+    kinds = {d.get("file"): d.get("kind") for d in manifest if isinstance(d, dict)}
+    out = []
+    for path in sorted(folder.glob("*")):
+        if path.suffix not in demo.KIT_SUFFIXES or not path.is_file():
+            continue
+        key, error = _answer_key(path)
+        kind = SET_KINDS.get(str(kinds.get(path.name)), "clean")
+        out.append(
+            KitDocument(f"{name}/{path.name}", path, kind, "unknown", key, error)
         )
     return out
 
@@ -213,6 +242,12 @@ def _source(field: Any, document: Document) -> tuple[bool, int | None]:
     return valid, page
 
 
+def _confidence(field: Any) -> float | None:
+    """The confidence that the reader gave a field, or None when it gave none."""
+    c = getattr(field, "confidence", None)
+    return float(c) if isinstance(c, int | float) and not isinstance(c, bool) else None
+
+
 def _score_field(
     kind: Kind,
     expected: dict[str, Any],
@@ -221,6 +256,9 @@ def _score_field(
     failed: bool,
 ) -> dict[str, Any]:
     value, expected_page = expected["value"], expected["page"]
+    # a null copy of a field stores nothing: the copies with a value decide (a null
+    # first must not hide a wrong value, a null after a right one is not "twice")
+    got = [g for g in got if getattr(g, "value", None) is not None] or got
     row: dict[str, Any] = {
         "name": expected["name"],
         "kind": kind,
@@ -230,6 +268,7 @@ def _score_field(
         "page": None,
         "page_right": None,
         "source": None,
+        "confidence": None,  # issue #125: of the value that the status is about
     }
     if not got:
         verdict = compare_field(kind, value, None)
@@ -246,6 +285,18 @@ def _score_field(
     row |= {"status": verdict.status, "reason": verdict.reason}
     if verdict.status == "missing":  # null with a source: still nothing read
         return row
+    # A wrong status: the highest confidence of the copies that are not right (a
+    # field given twice, right at 0.5 and wrong at 0.9, stored a wrong value at 0.9).
+    wrong = [
+        _confidence(g)
+        for g in got
+        if getattr(g, "value", None) is not None
+        and compare_field(kind, value, getattr(g, "value", None)).status != "right"
+    ]
+    known = [c for c in wrong if c is not None]
+    row["confidence"] = (
+        max(known) if verdict.status == "wrong" and known else _confidence(first)
+    )
     valid, page = _source(first, document)
     right_page = valid and page == expected_page
     return row | {
@@ -260,9 +311,49 @@ def _share(part: int, whole: int) -> float | None:
     return round(part / whole, 4) if whole else None
 
 
-def _field_counts(rows: list[dict[str, Any]], extra: int = 0) -> dict[str, Any]:
+def _trusted(x: dict[str, Any]) -> bool:
+    return bool(x["confidence"] >= LOW_CONFIDENCE)  # routing: below it, a person
+
+
+def _safety(
+    rows: list[dict[str, Any]], extras: list[dict[str, Any]]
+) -> dict[str, int | None]:
+    """Issue #125: the values stored at LOW_CONFIDENCE or more, counted per field of
+    the answer key (a field given twice is one field) and, for the extra fields, per
+    stored value. Every stored value needs its confidence: a value of a report of
+    #19 or #20 has none, then None ("not available"), never 0. A field with no
+    stored value (a right absence, a missing field) needs none."""
+    read = [
+        r for r in rows if r["status"] in ("right", "wrong") and r["read"] is not None
+    ]
+    if any(
+        isinstance(x.get("confidence"), bool)
+        or not isinstance(x.get("confidence"), int | float)
+        for x in read + extras
+    ):
+        return dict.fromkeys(SAFETY)
+    wrong = [r for r in read if r["status"] == "wrong" and _trusted(r)]
+    absent = sum(r["expected"] is None for r in wrong)
+    return {
+        "incorrect_trusted": len(wrong),
+        "incorrect_trusted_absent": absent,  # a value where the page has none
+        "incorrect_trusted_present": len(wrong) - absent,
+        "right_trusted": sum(
+            r["status"] == "right" and r["expected"] is not None and _trusted(r)
+            for r in read
+        ),
+        # not in the answer key: nobody can say if it is right
+        "extra_trusted": sum(_trusted(x) for x in extras),
+    }
+
+
+def _field_counts(
+    rows: list[dict[str, Any]], extras: list[dict[str, Any]] | None = None
+) -> dict[str, Any]:
+    extras = extras or []
     right = sum(r["status"] == "right" for r in rows)
     wrong = sum(r["status"] == "wrong" for r in rows)
+    absent = [r for r in rows if r["expected"] is None]  # the page holds no value
     page_right = sum(r["page_right"] is True for r in rows)
     # right and on the expected page; a field expected empty has no page to check
     verified = sum(
@@ -275,12 +366,20 @@ def _field_counts(rows: list[dict[str, Any]], extra: int = 0) -> dict[str, Any]:
             "right": right,
             "wrong": wrong,
             "missing": sum(r["status"] == "missing" for r in rows),
-            "extra": extra,
+            "extra": len(extras),
             # values read: they have a source to check (page_right is not None)
             "read": sum(r["page_right"] is not None for r in rows),
             "page_right": page_right,
             "verified": verified,
+            # issue #125: a right absence apart from a right value, and the
+            # incorrect values at any confidence, where the page has one or not
+            "absent": len(absent),
+            "right_absent": sum(r["status"] == "right" for r in absent),
+            "right_present": right - sum(r["status"] == "right" for r in absent),
+            "incorrect_absent": sum(r["status"] == "wrong" for r in absent),
+            "incorrect_present": wrong - sum(r["status"] == "wrong" for r in absent),
         }
+        | _safety(rows, extras)
     )
 
 
@@ -294,13 +393,22 @@ def _with_shares(c: dict[str, Any]) -> dict[str, Any]:
 
 COUNTS: tuple[str, ...] = ("expected", "right", "wrong", "missing", "extra", "read")
 COUNTS += ("page_right", "verified")
+COUNTS += ("absent", "right_absent", "right_present")
+COUNTS += ("incorrect_absent", "incorrect_present")
+# issue #125: None when a part has no confidence (a sum with an unknown is unknown)
+SAFETY: tuple[str, ...] = ("incorrect_trusted", "incorrect_trusted_absent")
+SAFETY += ("incorrect_trusted_present", "right_trusted", "extra_trusted")
 
 
 def _sum_counts(many: Iterable[dict[str, Any]]) -> dict[str, Any]:
-    total = dict.fromkeys(COUNTS, 0)
-    for c in many:
+    parts = list(many)
+    total: dict[str, Any] = dict.fromkeys(COUNTS, 0)
+    for c in parts:
         for k in COUNTS:
             total[k] += c[k]
+    for k in SAFETY:
+        values = [c.get(k) for c in parts]
+        total[k] = None if None in values else sum(v for v in values if v is not None)
     return _with_shares(total)
 
 
@@ -344,11 +452,12 @@ def _score(
             "name": name,
             "value": _jsonable(getattr(f, "value", None)),
             "page": _source(f, document)[1],
+            "confidence": _confidence(f),
         }
         for name, found in by_name.items()
         for f in found
     ]
-    counts = _field_counts(rows, len(extra))
+    counts = _field_counts(rows, extra)
     lines = compare_lines(key.get("line_items", []), out.line_items if out else [])
     return {
         "id": doc.id,
@@ -430,14 +539,14 @@ def _aggregate(docs: list[dict[str, Any]]) -> dict[str, Any]:
 
 def _by_field(docs: list[dict[str, Any]]) -> dict[str, Any]:
     rows: dict[str, list[dict[str, Any]]] = {}
-    extra: dict[str, int] = {}
+    extra: dict[str, list[dict[str, Any]]] = {}
     for d in docs:
         for r in d["fields"]:
             rows.setdefault(r["name"], []).append(r)
         for x in d["extra"]:
-            extra[x["name"]] = extra.get(x["name"], 0) + 1
+            extra.setdefault(x["name"], []).append(x)
     names = list(rows) + [n for n in extra if n not in rows]
-    return {n: _field_counts(rows.get(n, []), extra.get(n, 0)) for n in names}
+    return {n: _field_counts(rows.get(n, []), extra.get(n, [])) for n in names}
 
 
 def _group(docs: list[dict[str, Any]], key: str) -> dict[str, list[dict[str, Any]]]:
@@ -492,9 +601,22 @@ def _summary(overalls: list[dict[str, Any]]) -> dict[str, Any]:
         "seconds_per_document": lambda o: o["seconds"]["mean"],
         "wrong": lambda o: o["fields"]["wrong"],
         "missing": lambda o: o["fields"]["missing"],
+        # issue #125: None for a run with no confidence (not counted in the mean)
+        "incorrect_trusted": lambda o: o["fields"]["incorrect_trusted"],
+        "incorrect_trusted_absent": lambda o: o["fields"]["incorrect_trusted_absent"],
+        "incorrect_trusted_present": lambda o: o["fields"]["incorrect_trusted_present"],
+        "right_trusted": lambda o: o["fields"]["right_trusted"],
         "errors": lambda o: o["documents"]["errors"],
     }
-    return {name: _stat([get(o) for o in overalls]) for name, get in pick.items()}
+    out = {name: _stat([get(o) for o in overalls]) for name, get in pick.items()}
+    for name in SAFETY_SUMMARY:  # a run with no confidence: no mean, not a mean of 0
+        if any(pick[name](o) is None for o in overalls):
+            out[name] = _stat([])
+    return out
+
+
+SAFETY_SUMMARY: tuple[str, ...] = ("incorrect_trusted", "incorrect_trusted_absent")
+SAFETY_SUMMARY += ("incorrect_trusted_present", "right_trusted")
 
 
 # ---------------------------------------------------------------- HTTP
@@ -765,13 +887,15 @@ def evaluate(
     meter: HttpMeter | None = None,
     clock: Clock = time.perf_counter,
     command: str = "",
+    document_set: str = "kit",
 ) -> dict[str, Any]:
-    """Runs a new reader `runs` times on the kit and returns the report (schema
-    version 1, `docs/EVALUATION.md`). A document with no usable answer key is not
-    scored: it is listed in `answer_key_errors` and the report is not complete."""
+    """Runs a new reader `runs` times on the kit (or on another set of `SETS`) and
+    returns the report (schema version 1, `docs/EVALUATION.md`). A document with no
+    usable answer key is not scored: it is listed in `answer_key_errors` and the
+    report is not complete."""
     if runs < 1:
         raise ValueError("runs must be 1 or more")
-    documents = kit()
+    documents = kit(document_set)
     scored = [d for d in documents if d.key is not None]
     details: list[dict[str, Any]] = []
     name, code = "", None
@@ -816,7 +940,10 @@ def evaluate(
             "expected_line_items": sum(
                 len(d.key.get("line_items", [])) for d in scored if d.key
             ),
-        },
+        }
+        # only another set is named: a report of the kit stays as #19 wrote it, so
+        # old and new reports of the kit still combine
+        | ({"set": document_set} if document_set != "kit" else {}),
         key_errors=[
             {"document": d.id, "error": d.key_error} for d in documents if d.key is None
         ],
@@ -840,7 +967,7 @@ def _code_fingerprint(reader: Reader) -> str | None:
 def _rescored(doc: dict[str, Any]) -> dict[str, Any]:
     """The counts and the pass of one document, made again from its field rows: a
     total never comes from a number that a file says."""
-    counts = _field_counts(doc["fields"], len(doc["extra"]))
+    counts = _field_counts(doc["fields"], doc["extra"])
     passed = not doc["error"] and counts["verified"] == counts["expected"]
     return doc | {"counts": counts, "passed": passed}
 
@@ -884,6 +1011,13 @@ def _report(
         "kit": kit_info,
         "answer_key_errors": key_errors,
         "summary": _summary([r["overall"] for r in details]),
+        # issue #125: the limit of routing, and whether every run has a confidence
+        "safety": {
+            "threshold": LOW_CONFIDENCE,
+            "available": all(
+                r["overall"]["fields"]["incorrect_trusted"] is not None for r in details
+            ),
+        },
         "pooled": _aggregate(every)
         | {
             "by_type": by_type,
@@ -923,7 +1057,7 @@ DOC_KEYS: tuple[str, ...] = (
 DOC_KEYS += ("seconds", "error", "passed", "fields", "counts", "extra", "line_items")
 # the totals of a run that its documents must give again (raw counts, no share)
 TOTALS = {
-    "fields": COUNTS,
+    "fields": COUNTS + SAFETY,
     "documents": ("count", "passed", "errors", "classified_right"),
     "line_items": ("documents", "documents_right", "expected", "read", "right"),
 }
@@ -971,7 +1105,7 @@ def _load_saved(path: Path) -> tuple[dict[str, Any], str]:
                 again = _rescored(d)
                 if again["passed"] != d["passed"] or any(
                     k in d["counts"] and again["counts"][k] != d["counts"][k]
-                    for k in COUNTS
+                    for k in COUNTS + SAFETY
                 ):
                     raise BadCombine(
                         f"{where}: {d['id']}: the counts do not match its fields"
@@ -1121,10 +1255,17 @@ def dump(report: dict[str, Any]) -> str:
 
 def report_paths(report: dict[str, Any], folder: Path | None = None) -> list[Path]:
     """Where `save_report` writes: a copy named with the reader and the time, then
-    `latest.json`."""
+    `latest.json`. A safety set (N1) has its own: `latest-n1.json`, so `latest.json`
+    stays the report of the kit that the page "Business numbers" shows."""
     folder = folder or report_dir()
     stamp = re.sub(r"[^0-9TZ]", "", report["created_at"])
     reader = re.sub(r"[^a-z0-9_-]", "-", str(report["reader"]).lower()) or "reader"
+    name = report["kit"].get("set")
+    if isinstance(name, str) and name in SETS and name != "kit":
+        return [
+            folder / f"evaluation-{reader}-{name}-{stamp}.json",
+            folder / f"latest-{name}.json",
+        ]
     return [folder / f"evaluation-{reader}-{stamp}.json", folder / "latest.json"]
 
 
@@ -1186,6 +1327,27 @@ def _spread(stat: dict[str, Any]) -> str:
     )
 
 
+def _safety_line(report: dict[str, Any]) -> str:
+    """Issue #125: the incorrect values that no person would check."""
+    f = report["pooled"]["fields"]
+    if f["incorrect_trusted"] is None:
+        return (
+            "- Safety: not available (a run of this report has no confidence per "
+            f"field); incorrect at any confidence: {f['wrong']}"
+        )
+    t, s = LOW_CONFIDENCE, report["summary"]["incorrect_trusted"]
+    return (
+        f"- Safety (per field of the answer key; extra fields per value): "
+        f"incorrect values at confidence >= {t}: {f['incorrect_trusted']} "
+        f"(runs {s['min']} to {s['max']}; {f['incorrect_trusted_absent']} where the "
+        f"page holds no value, {f['incorrect_trusted_present']} wrong values); "
+        f"incorrect at any confidence: {f['wrong']} ({f['incorrect_absent']} + "
+        f"{f['incorrect_present']}); right values at >= {t}: {f['right_trusted']} of "
+        f"{f['right_present']}; right absences: {f['right_absent']} of {f['absent']}; "
+        f"extra fields at >= {t} (not in the answer key): {f['extra_trusted']}"
+    )
+
+
 def summary_text(report: dict[str, Any]) -> str:
     """A markdown summary for the terminal and the pull request. The counts are
     added over the runs."""
@@ -1211,6 +1373,7 @@ def summary_text(report: dict[str, Any]) -> str:
         f"{li['right']} of {li['expected']} lines",
         f"- Seconds per document: {_seconds(sec['mean'])} "
         f"(runs {_seconds(sec['min'])} to {_seconds(sec['max'])})",
+        _safety_line(report),
         "",
         "| " + " | ".join(HEAD) + " |",
         "|" + "---|" * len(HEAD),
@@ -1253,6 +1416,12 @@ def main(argv: list[str] | None = None) -> int:
         "--combine", nargs="+", type=Path, metavar="FILE", help="saved reports"
     )
     ap.add_argument("--runs", type=_positive, help="new reader per run (default 1)")
+    ap.add_argument(
+        "--set",
+        choices=SETS,
+        dest="document_set",
+        help="the documents: the kit (default) or a safety set (n1, issue #125)",
+    )
     ap.add_argument("--output", type=Path, help="also write the report to this file")
     ap.add_argument(
         "--omni",
@@ -1264,6 +1433,8 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     if args.combine and args.runs is not None:
         ap.error("--runs does not go with --combine: the runs are in the files")
+    if args.combine and args.document_set is not None:
+        ap.error("--set does not go with --combine: the set is in the files")
     if args.omni and args.reader != "omni":
         ap.error("--omni goes with --reader omni only")
     # pypdf only counts the pages here; its warnings on a PDF it repairs (the
@@ -1281,7 +1452,12 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 make, settings, meter = READERS[args.reader]()
             report = evaluate(
-                make, args.runs or 1, settings=settings, meter=meter, command=command
+                make,
+                args.runs or 1,
+                settings=settings,
+                meter=meter,
+                command=command,
+                document_set=args.document_set or "kit",
             )
     # BadCombine: saved reports that cannot be combined; RuntimeError: e.g.
     # OmniReader with no NVIDIA_KEY; OSError, ValueError: a kit folder or an
@@ -1305,7 +1481,7 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 2
     print(summary_text(report))
-    print(f"\nReport: {report_dir() / 'latest.json'} (copy: {copy})")
+    print(f"\nReport: {report_paths(report)[1]} (copy: {copy})")
     return 0 if report["complete"] else 1
 
 

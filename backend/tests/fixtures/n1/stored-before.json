@@ -1,0 +1,1173 @@
+{
+ "v1": {
+  "1": {
+   "n1-repair-invoice.pdf": {
+    "document_type": "repair_invoice",
+    "fields": [
+     [
+      "repair_company",
+      "Tobler & Gerig Haustechnik AG",
+      0.9
+     ],
+     [
+      "total",
+      477.0,
+      0.9
+     ],
+     [
+      "customer_name",
+      "Irene Kaelin",
+      0.9
+     ]
+    ]
+   },
+   "n2-medical-invoice.pdf": {
+    "document_type": "medical_invoice",
+    "fields": [
+     [
+      "invoice_number",
+      "P-60417",
+      0.9
+     ],
+     [
+      "invoice_date",
+      "2026-08-21",
+      0.9
+     ],
+     [
+      "provider",
+      "Hausarztzentrum Seewinkel AG",
+      0.9
+     ],
+     [
+      "patient_name",
+      "Ramon Gasser",
+      0.9
+     ],
+     [
+      "total",
+      133.2,
+      0.9
+     ]
+    ]
+   },
+   "n3-repair-quote.pdf": {
+    "document_type": "repair_quote",
+    "fields": [
+     [
+      "quote_number",
+      "RB-Q-2731",
+      0.9
+     ],
+     [
+      "quote_date",
+      "2026-12-15",
+      0.9
+     ],
+     [
+      "repair_company",
+      "Rietmann Bedachungen GmbH",
+      0.9
+     ],
+     [
+      "customer_name",
+      "Corinne Baumli",
+      0.9
+     ]
+    ]
+   },
+   "n4-booking-confirmation.pdf": {
+    "document_type": "booking_confirmation",
+    "fields": [
+     [
+      "booking_reference",
+      "sent separately by e-mail",
+      0.9
+     ],
+     [
+      "traveller_name",
+      "Fabienne Rohner",
+      0.9
+     ],
+     [
+      "departure_date",
+      "2027-02-06",
+      0.9
+     ]
+    ]
+   },
+   "n5-cancellation-confirmation.pdf": {
+    "document_type": "cancellation_confirmation",
+    "fields": [
+     [
+      "booking_reference",
+      "SWT-60382",
+      0.9
+     ],
+     [
+      "cancellation_date",
+      "2026-09-30",
+      0.9
+     ]
+    ]
+   },
+   "n6-medical-report.pdf": {
+    "document_type": "medical_report",
+    "fields": [
+     [
+      "patient_name",
+      "Nadine Caflisch",
+      0.9
+     ],
+     [
+      "diagnosis",
+      "acute bronchitis",
+      0.9
+     ],
+     [
+      "provider",
+      "Dr. med. Corina Tschudi",
+      0.9
+     ]
+    ]
+   },
+   "n7-booking-confirmation-scan.pdf": {
+    "document_type": "booking_confirmation",
+    "fields": [
+     [
+      "traveller_name",
+      "Mirjam Eggenberger",
+      0.5
+     ]
+    ]
+   },
+   "n8-repair-invoice-photo.jpg": {
+    "document_type": "repair_invoice",
+    "fields": [
+     [
+      "invoice_number",
+      "J-88213",
+      0.5
+     ],
+     [
+      "invoice_date",
+      "2026-10-14",
+      0.5
+     ],
+     [
+      "repair_company",
+      "Kuster Elektro AG",
+      0.5
+     ],
+     [
+      "total",
+      724.0,
+      0.5
+     ],
+     [
+      "customer_name",
+      "Not answerable",
+      0.5
+     ]
+    ]
+   },
+   "n9-receipt-scan.pdf": {
+    "document_type": "receipt",
+    "fields": [
+     [
+      "merchant",
+      "Gartencenter Rosenhalde",
+      0.5
+     ],
+     [
+      "purchase_date",
+      "2026-07-03",
+      0.5
+     ],
+     [
+      "item_description",
+      "garden bench, teak, 3 seats",
+      0.5
+     ]
+    ]
+   }
+  },
+  "2": {
+   "n1-repair-invoice.pdf": {
+    "document_type": "repair_invoice",
+    "fields": [
+     [
+      "repair_company",
+      "Tobler & Gerig Haustechnik AG",
+      0.9
+     ],
+     [
+      "total",
+      477.0,
+      0.9
+     ],
+     [
+      "customer_name",
+      "Irene Kaelin",
+      0.9
+     ]
+    ]
+   },
+   "n2-medical-invoice.pdf": {
+    "document_type": "medical_invoice",
+    "fields": [
+     [
+      "invoice_number",
+      "P-60417",
+      0.9
+     ],
+     [
+      "invoice_date",
+      "2026-08-21",
+      0.9
+     ],
+     [
+      "patient_name",
+      "Ramon Gasser",
+      0.9
+     ],
+     [
+      "total",
+      133.2,
+      0.9
+     ]
+    ]
+   },
+   "n3-repair-quote.pdf": {
+    "document_type": "repair_quote",
+    "fields": [
+     [
+      "quote_number",
+      "RB-Q-2731",
+      0.9
+     ],
+     [
+      "quote_date",
+      "2026-12-15",
+      0.9
+     ],
+     [
+      "repair_company",
+      "Rietmann Bedachungen GmbH",
+      0.9
+     ],
+     [
+      "customer_name",
+      "Corinne Baumli",
+      0.9
+     ]
+    ]
+   },
+   "n4-booking-confirmation.pdf": {
+    "document_type": "booking_confirmation",
+    "fields": [
+     [
+      "booking_reference",
+      "sent separately by e-mail",
+      0.9
+     ],
+     [
+      "traveller_name",
+      "Fabienne Rohner",
+      0.9
+     ],
+     [
+      "departure_date",
+      "2027-02-06",
+      0.9
+     ]
+    ]
+   },
+   "n5-cancellation-confirmation.pdf": {
+    "document_type": "cancellation_confirmation",
+    "fields": [
+     [
+      "booking_reference",
+      "SWT-60382",
+      0.9
+     ],
+     [
+      "cancellation_date",
+      "2026-09-30",
+      0.9
+     ]
+    ]
+   },
+   "n6-medical-report.pdf": {
+    "document_type": "medical_report",
+    "fields": [
+     [
+      "patient_name",
+      "Nadine Caflisch",
+      0.9
+     ],
+     [
+      "diagnosis",
+      "acute bronchitis",
+      0.9
+     ],
+     [
+      "provider",
+      "Dr. med. Corina Tschudi",
+      0.9
+     ]
+    ]
+   },
+   "n7-booking-confirmation-scan.pdf": {
+    "document_type": "booking_confirmation",
+    "fields": [
+     [
+      "traveller_name",
+      "Mirjam Eggenberger",
+      0.5
+     ]
+    ]
+   },
+   "n8-repair-invoice-photo.jpg": {
+    "document_type": "repair_invoice",
+    "fields": [
+     [
+      "invoice_number",
+      "J-88213",
+      0.5
+     ],
+     [
+      "invoice_date",
+      "2026-10-14",
+      0.5
+     ],
+     [
+      "repair_company",
+      "Kuster Elektro AG",
+      0.5
+     ],
+     [
+      "total",
+      724.0,
+      0.5
+     ],
+     [
+      "customer_name",
+      "Not answerable",
+      0.5
+     ]
+    ]
+   },
+   "n9-receipt-scan.pdf": {
+    "document_type": "receipt",
+    "fields": [
+     [
+      "merchant",
+      "Gartencenter Rosenhalde",
+      0.5
+     ],
+     [
+      "purchase_date",
+      "2026-07-03",
+      0.5
+     ],
+     [
+      "item_description",
+      "garden bench, teak, 3 seats",
+      0.5
+     ]
+    ]
+   }
+  },
+  "3": {
+   "n1-repair-invoice.pdf": {
+    "document_type": "repair_invoice",
+    "fields": [
+     [
+      "repair_company",
+      "Tobler & Gerig Haustechnik AG",
+      0.9
+     ],
+     [
+      "total",
+      477.0,
+      0.9
+     ],
+     [
+      "customer_name",
+      "Irene Kaelin",
+      0.9
+     ]
+    ]
+   },
+   "n2-medical-invoice.pdf": {
+    "document_type": "medical_invoice",
+    "fields": [
+     [
+      "invoice_number",
+      "P-60417",
+      0.9
+     ],
+     [
+      "invoice_date",
+      "2026-08-21",
+      0.9
+     ],
+     [
+      "patient_name",
+      "Ramon Gasser",
+      0.9
+     ],
+     [
+      "total",
+      133.2,
+      0.9
+     ]
+    ]
+   },
+   "n3-repair-quote.pdf": {
+    "document_type": "repair_quote",
+    "fields": [
+     [
+      "quote_number",
+      "RB-Q-2731",
+      0.9
+     ],
+     [
+      "quote_date",
+      "2026-12-15",
+      0.9
+     ],
+     [
+      "repair_company",
+      "Rietmann Bedachungen GmbH",
+      0.9
+     ],
+     [
+      "customer_name",
+      "Corinne Baumli",
+      0.9
+     ]
+    ]
+   },
+   "n4-booking-confirmation.pdf": {
+    "document_type": "booking_confirmation",
+    "fields": [
+     [
+      "booking_reference",
+      "sent separately by e-mail",
+      0.9
+     ],
+     [
+      "traveller_name",
+      "Fabienne Rohner",
+      0.9
+     ],
+     [
+      "departure_date",
+      "2027-02-06",
+      0.9
+     ]
+    ]
+   },
+   "n5-cancellation-confirmation.pdf": {
+    "document_type": "cancellation_confirmation",
+    "fields": [
+     [
+      "booking_reference",
+      "SWT-60382",
+      0.9
+     ],
+     [
+      "cancellation_date",
+      "2026-09-30",
+      0.9
+     ]
+    ]
+   },
+   "n6-medical-report.pdf": {
+    "document_type": "medical_report",
+    "fields": [
+     [
+      "patient_name",
+      "Nadine Caflisch",
+      0.9
+     ],
+     [
+      "diagnosis",
+      "acute bronchitis",
+      0.9
+     ],
+     [
+      "provider",
+      "Dr. med. Corina Tschudi",
+      0.9
+     ]
+    ]
+   },
+   "n7-booking-confirmation-scan.pdf": {
+    "document_type": "booking_confirmation",
+    "fields": [
+     [
+      "traveller_name",
+      "Mirjam Eggenberger",
+      0.5
+     ]
+    ]
+   },
+   "n8-repair-invoice-photo.jpg": {
+    "document_type": "repair_invoice",
+    "fields": [
+     [
+      "invoice_number",
+      "J-88213",
+      0.5
+     ],
+     [
+      "invoice_date",
+      "2026-10-14",
+      0.5
+     ],
+     [
+      "repair_company",
+      "Kuster Elektro AG",
+      0.5
+     ],
+     [
+      "total",
+      724.0,
+      0.5
+     ],
+     [
+      "customer_name",
+      "Kuster Elektro AG",
+      0.5
+     ]
+    ]
+   },
+   "n9-receipt-scan.pdf": {
+    "document_type": "receipt",
+    "fields": [
+     [
+      "merchant",
+      "Gartencenter Rosenhalde",
+      0.5
+     ],
+     [
+      "purchase_date",
+      "2026-07-03",
+      0.5
+     ],
+     [
+      "item_description",
+      "garden bench, teak, 3 seats",
+      0.5
+     ]
+    ]
+   }
+  }
+ },
+ "schema-only": {
+  "1": {
+   "n1-repair-invoice.pdf": {
+    "document_type": "repair_invoice",
+    "fields": [
+     [
+      "repair_company",
+      "Tobler & Gerig Haustechnik AG",
+      0.9
+     ],
+     [
+      "total",
+      477.0,
+      0.9
+     ],
+     [
+      "customer_name",
+      "Irene Kaelin",
+      0.9
+     ]
+    ]
+   },
+   "n2-medical-invoice.pdf": {
+    "document_type": "medical_invoice",
+    "fields": [
+     [
+      "invoice_number",
+      "P-60417",
+      0.9
+     ],
+     [
+      "invoice_date",
+      "2026-08-21",
+      0.9
+     ],
+     [
+      "provider",
+      "Hausarztzentrum Seewinkel AG",
+      0.9
+     ],
+     [
+      "patient_name",
+      "Ramon Gasser",
+      0.9
+     ],
+     [
+      "total",
+      133.2,
+      0.9
+     ]
+    ]
+   },
+   "n3-repair-quote.pdf": {
+    "document_type": "repair_quote",
+    "fields": [
+     [
+      "quote_number",
+      "RB-Q-2731",
+      0.9
+     ],
+     [
+      "quote_date",
+      "2026-12-15",
+      0.9
+     ],
+     [
+      "repair_company",
+      "Rietmann Bedachungen GmbH",
+      0.9
+     ],
+     [
+      "customer_name",
+      "Corinne Baumli",
+      0.9
+     ]
+    ]
+   },
+   "n4-booking-confirmation.pdf": {
+    "document_type": "booking_confirmation",
+    "fields": [
+     [
+      "booking_reference",
+      "sent separately by e-mail",
+      0.9
+     ],
+     [
+      "traveller_name",
+      "Fabienne Rohner",
+      0.9
+     ],
+     [
+      "departure_date",
+      "2027-02-06",
+      0.9
+     ]
+    ]
+   },
+   "n5-cancellation-confirmation.pdf": {
+    "document_type": "cancellation_confirmation",
+    "fields": [
+     [
+      "booking_reference",
+      "SWT-60382",
+      0.9
+     ],
+     [
+      "cancellation_date",
+      "2026-09-30",
+      0.9
+     ]
+    ]
+   },
+   "n6-medical-report.pdf": {
+    "document_type": "medical_report",
+    "fields": [
+     [
+      "patient_name",
+      "Nadine Caflisch",
+      0.9
+     ],
+     [
+      "diagnosis",
+      "acute bronchitis",
+      0.9
+     ],
+     [
+      "provider",
+      "Dr. med. Corina Tschudi",
+      0.9
+     ]
+    ]
+   },
+   "n7-booking-confirmation-scan.pdf": {
+    "document_type": "booking_confirmation",
+    "fields": [
+     [
+      "booking_reference",
+      "Not answerable",
+      0.5
+     ],
+     [
+      "traveller_name",
+      "Mirjam Eggenberger",
+      0.5
+     ],
+     [
+      "departure_date",
+      "2022-07-01",
+      0.5
+     ]
+    ]
+   },
+   "n8-repair-invoice-photo.jpg": {
+    "document_type": "repair_invoice",
+    "fields": [
+     [
+      "invoice_number",
+      "J-88213",
+      0.5
+     ],
+     [
+      "invoice_date",
+      "2026-10-14",
+      0.5
+     ],
+     [
+      "repair_company",
+      "Kuster Elektro AG",
+      0.5
+     ],
+     [
+      "total",
+      724.0,
+      0.5
+     ],
+     [
+      "customer_name",
+      "Not answerable",
+      0.5
+     ]
+    ]
+   },
+   "n9-receipt-scan.pdf": {
+    "document_type": "receipt",
+    "fields": [
+     [
+      "merchant",
+      "Gartencenter Rosenhalde Rosenhaldenweg 30, 5430 Wetteningen Tel. +41 56 555 18 44 UID CHE-000.000.000",
+      0.5
+     ],
+     [
+      "purchase_date",
+      "2026-07-03",
+      0.5
+     ],
+     [
+      "item_description",
+      "garden bench, teak, 3 seats",
+      0.5
+     ],
+     [
+      "amount_paid",
+      0.0,
+      0.5
+     ]
+    ]
+   }
+  },
+  "2": {
+   "n1-repair-invoice.pdf": {
+    "document_type": "repair_invoice",
+    "fields": [
+     [
+      "repair_company",
+      "Tobler & Gerig Haustechnik AG",
+      0.9
+     ],
+     [
+      "total",
+      477.0,
+      0.9
+     ],
+     [
+      "customer_name",
+      "Irene Kaelin",
+      0.9
+     ]
+    ]
+   },
+   "n2-medical-invoice.pdf": {
+    "document_type": "medical_invoice",
+    "fields": [
+     [
+      "invoice_number",
+      "P-60417",
+      0.9
+     ],
+     [
+      "invoice_date",
+      "2026-08-21",
+      0.9
+     ],
+     [
+      "provider",
+      "Hausarztzentrum Seewinkel AG",
+      0.9
+     ],
+     [
+      "patient_name",
+      "Ramon Gasser",
+      0.9
+     ],
+     [
+      "total",
+      133.2,
+      0.9
+     ]
+    ]
+   },
+   "n3-repair-quote.pdf": {
+    "document_type": "repair_quote",
+    "fields": [
+     [
+      "quote_number",
+      "RB-Q-2731",
+      0.9
+     ],
+     [
+      "quote_date",
+      "2026-12-15",
+      0.9
+     ],
+     [
+      "repair_company",
+      "Rietmann Bedachungen GmbH",
+      0.9
+     ]
+    ]
+   },
+   "n4-booking-confirmation.pdf": {
+    "document_type": "booking_confirmation",
+    "fields": [
+     [
+      "booking_reference",
+      "sent separately by e-mail",
+      0.9
+     ],
+     [
+      "traveller_name",
+      "Fabienne Rohner",
+      0.9
+     ],
+     [
+      "departure_date",
+      "2027-02-06",
+      0.9
+     ]
+    ]
+   },
+   "n5-cancellation-confirmation.pdf": {
+    "document_type": "cancellation_confirmation",
+    "fields": [
+     [
+      "booking_reference",
+      "SWT-60382",
+      0.9
+     ],
+     [
+      "cancellation_date",
+      "2026-09-30",
+      0.9
+     ]
+    ]
+   },
+   "n6-medical-report.pdf": {
+    "document_type": "medical_report",
+    "fields": [
+     [
+      "patient_name",
+      "Nadine Caflisch",
+      0.9
+     ],
+     [
+      "diagnosis",
+      "acute bronchitis",
+      0.9
+     ],
+     [
+      "provider",
+      "Dr. med. Corina Tschudi",
+      0.9
+     ]
+    ]
+   },
+   "n7-booking-confirmation-scan.pdf": {
+    "document_type": "booking_confirmation",
+    "fields": [
+     [
+      "booking_reference",
+      "Not answerable",
+      0.5
+     ],
+     [
+      "traveller_name",
+      "Mirjam Eggenberger",
+      0.5
+     ],
+     [
+      "departure_date",
+      "2022-07-01",
+      0.5
+     ],
+     [
+      "trip_price",
+      1200.0,
+      0.5
+     ]
+    ]
+   },
+   "n8-repair-invoice-photo.jpg": {
+    "document_type": "repair_invoice",
+    "fields": [
+     [
+      "invoice_number",
+      "J-88213",
+      0.5
+     ],
+     [
+      "invoice_date",
+      "2026-10-14",
+      0.5
+     ],
+     [
+      "repair_company",
+      "Kuster Elektro AG",
+      0.5
+     ],
+     [
+      "total",
+      724.0,
+      0.5
+     ],
+     [
+      "customer_name",
+      "Not answerable",
+      0.5
+     ]
+    ]
+   },
+   "n9-receipt-scan.pdf": {
+    "document_type": "receipt",
+    "fields": [
+     [
+      "merchant",
+      "Gartencenter Rosenhalde Rosenhaldenweg 30, 5430 Wetteningen Tel. +41 56 555 18 44 UID CHE-000.000.000",
+      0.5
+     ],
+     [
+      "purchase_date",
+      "2026-07-03",
+      0.5
+     ],
+     [
+      "item_description",
+      "garden bench, teak, 3 seats",
+      0.5
+     ]
+    ]
+   }
+  },
+  "3": {
+   "n1-repair-invoice.pdf": {
+    "document_type": "repair_invoice",
+    "fields": [
+     [
+      "repair_company",
+      "Tobler & Gerig Haustechnik AG",
+      0.9
+     ],
+     [
+      "total",
+      477.0,
+      0.9
+     ],
+     [
+      "customer_name",
+      "Irene Kaelin",
+      0.9
+     ]
+    ]
+   },
+   "n2-medical-invoice.pdf": {
+    "document_type": "medical_invoice",
+    "fields": [
+     [
+      "invoice_number",
+      "P-60417",
+      0.9
+     ],
+     [
+      "invoice_date",
+      "2026-08-21",
+      0.9
+     ],
+     [
+      "provider",
+      "Hausarztzentrum Seewinkel AG",
+      0.9
+     ],
+     [
+      "patient_name",
+      "Ramon Gasser",
+      0.9
+     ],
+     [
+      "total",
+      133.2,
+      0.9
+     ]
+    ]
+   },
+   "n3-repair-quote.pdf": {
+    "document_type": "repair_quote",
+    "fields": [
+     [
+      "quote_number",
+      "RB-Q-2731",
+      0.9
+     ],
+     [
+      "quote_date",
+      "2026-12-15",
+      0.9
+     ],
+     [
+      "repair_company",
+      "Rietmann Bedachungen GmbH",
+      0.9
+     ],
+     [
+      "customer_name",
+      "Corinne Baumli",
+      0.9
+     ]
+    ]
+   },
+   "n4-booking-confirmation.pdf": {
+    "document_type": "booking_confirmation",
+    "fields": [
+     [
+      "booking_reference",
+      "sent separately by e-mail",
+      0.9
+     ],
+     [
+      "traveller_name",
+      "Fabienne Rohner",
+      0.9
+     ],
+     [
+      "departure_date",
+      "2027-02-06",
+      0.9
+     ]
+    ]
+   },
+   "n5-cancellation-confirmation.pdf": {
+    "document_type": "cancellation_confirmation",
+    "fields": [
+     [
+      "booking_reference",
+      "SWT-60382",
+      0.9
+     ],
+     [
+      "cancellation_date",
+      "2026-09-30",
+      0.9
+     ]
+    ]
+   },
+   "n6-medical-report.pdf": {
+    "document_type": "medical_report",
+    "fields": [
+     [
+      "patient_name",
+      "Nadine Caflisch",
+      0.9
+     ],
+     [
+      "diagnosis",
+      "acute bronchitis",
+      0.9
+     ],
+     [
+      "provider",
+      "Dr. med. Corina Tschudi",
+      0.9
+     ]
+    ]
+   },
+   "n7-booking-confirmation-scan.pdf": {
+    "document_type": "booking_confirmation",
+    "fields": [
+     [
+      "traveller_name",
+      "Mirjam Eggenberger",
+      0.5
+     ]
+    ]
+   },
+   "n8-repair-invoice-photo.jpg": {
+    "document_type": "repair_invoice",
+    "fields": [
+     [
+      "invoice_number",
+      "J-88213",
+      0.5
+     ],
+     [
+      "invoice_date",
+      "2026-10-14",
+      0.5
+     ],
+     [
+      "repair_company",
+      "Kuster Elektro AG",
+      0.5
+     ],
+     [
+      "total",
+      724.0,
+      0.5
+     ],
+     [
+      "customer_name",
+      "Not answerable",
+      0.5
+     ]
+    ]
+   },
+   "n9-receipt-scan.pdf": {
+    "document_type": "receipt",
+    "fields": [
+     [
+      "merchant",
+      "Gartencenter Rosenhalde Rosenhaldenweg 30, 5430 Wettengen Tel. +41 56 555 18 44 UID CHE-000.000.000",
+      0.5
+     ],
+     [
+      "purchase_date",
+      "2026-07-03",
+      0.5
+     ],
+     [
+      "item_description",
+      "garden bench, teak, 3 seats",
+      0.5
+     ]
+    ]
+   }
+  }
+ }
+}

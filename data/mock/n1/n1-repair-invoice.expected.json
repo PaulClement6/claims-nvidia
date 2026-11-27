@@ -1,0 +1,52 @@
+{
+  "document_type": "repair_invoice",
+  "fields": [
+    {
+      "name": "repair_company",
+      "value": "Tobler & Gerig Haustechnik AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Tobler & Gerig Haustechnik AG"
+    },
+    {
+      "name": "customer_name",
+      "value": "Irene Kaelin",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Irene Kaelin"
+    },
+    {
+      "name": "total",
+      "value": 477.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 477.00"
+    },
+    {
+      "name": "invoice_number",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    },
+    {
+      "name": "invoice_date",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Replace the kitchen mixer tap",
+      "quantity": 1,
+      "unit_price": 284.0,
+      "amount": 284.0
+    },
+    {
+      "description": "Descale the boiler, per hour",
+      "quantity": 2,
+      "unit_price": 96.5,
+      "amount": 193.0
+    }
+  ]
+}

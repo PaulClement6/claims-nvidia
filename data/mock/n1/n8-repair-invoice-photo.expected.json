@@ -1,0 +1,53 @@
+{
+  "document_type": "repair_invoice",
+  "fields": [
+    {
+      "name": "invoice_date",
+      "value": "2026-10-14",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-10-14"
+    },
+    {
+      "name": "repair_company",
+      "value": "Kuster Elektro AG",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Kuster Elektro AG"
+    },
+    {
+      "name": "total",
+      "value": 724.0,
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "CHF 724.00"
+    },
+    {
+      "name": "invoice_number",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    },
+    {
+      "name": "customer_name",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Replace the fuse box",
+      "quantity": 1,
+      "unit_price": 412.0,
+      "amount": 412.0
+    },
+    {
+      "description": "Electrician, per hour",
+      "quantity": 3,
+      "unit_price": 104.0,
+      "amount": 312.0
+    }
+  ],
+  "variant": "photo"
+}

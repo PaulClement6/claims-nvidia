@@ -1,0 +1,32 @@
+{
+  "document_type": "booking_confirmation",
+  "fields": [
+    {
+      "name": "traveller_name",
+      "value": "Fabienne Rohner",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Fabienne Rohner"
+    },
+    {
+      "name": "departure_date",
+      "value": "2027-02-06",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2027-02-06"
+    },
+    {
+      "name": "booking_reference",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    },
+    {
+      "name": "trip_price",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    }
+  ],
+  "line_items": []
+}

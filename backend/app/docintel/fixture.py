@@ -47,6 +47,7 @@ class FixtureReader:
                 },
             }
             for f in found["fields"]
+            if f["value"] is not None  # absent: a perfect reader stores nothing
         ]
         return Extraction.model_validate(
             {

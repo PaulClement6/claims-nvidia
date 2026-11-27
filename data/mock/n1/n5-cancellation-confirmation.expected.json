@@ -1,0 +1,35 @@
+{
+  "document_type": "cancellation_confirmation",
+  "fields": [
+    {
+      "name": "booking_reference",
+      "value": "SWT-60382",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "SWT-60382"
+    },
+    {
+      "name": "cancellation_date",
+      "value": "2026-09-30",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "2026-09-30"
+    },
+    {
+      "name": "refund_received",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Price of the trip",
+      "amount": 2145.0
+    },
+    {
+      "description": "Cancellation charge",
+      "amount": -320.0
+    }
+  ]
+}

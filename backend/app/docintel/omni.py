@@ -25,6 +25,7 @@ from PIL import Image
 from pydantic import BaseModel, ValidationError
 from pypdf import PdfReader
 
+from app.docintel import labels
 from app.docintel.schemas import SCHEMAS
 from app.models import Document, DocumentType, ExtractedField, Extraction, Source
 from app.workflows import WORKFLOWS
@@ -481,12 +482,15 @@ def _field(
     name: str,
     value: Any,
     snippets: dict[str, Any],
+    kind: str = "",
 ) -> ExtractedField | None:
     """The field with its source, or None when its source cannot be given.
 
     With a text layer, the snippet must be on the page and hold the value: it is
-    stored as checked evidence. With no text layer (a scan, a photo), nothing can
-    check the snippet: the source is the whole page (a box) and a person checks it.
+    stored as checked evidence. The words in front of the value must also fit the
+    field (#125): if not, value and source stay and a person checks it. With no text
+    layer (a scan, a photo), nothing can check the snippet: the source is the whole
+    page (a box) and a person checks it. `kind` is the type of the document.
     """
     snippet = snippets.get(name)
     if not isinstance(snippet, str) or not 0 < len(snippet.strip()) <= MAX_SNIPPET:
@@ -497,7 +501,8 @@ def _field(
         if not _shown(snippet, page.text):  # an invented source
             return None
         source = Source(document_id=document_id, page=number, snippet=snippet.strip())
-        confidence = VERIFIED
+        fits = labels.verified(kind, name, value, snippet, page.text)
+        confidence = VERIFIED if fits else UNVERIFIED
     else:
         width, height = page.size
         box = (0.0, 0.0, float(width), float(height))
@@ -630,14 +635,22 @@ class OmniReader:
             values, snippets, lines_refused = answer
             for name in schema.model_fields:
                 value = getattr(values, name)
-                if name == "line_items" or value is None:
+                # A placeholder ("Not answerable") is no value: skipped like null,
+                # so it never makes a conflict with the real value of another page.
+                if (
+                    name == "line_items"
+                    or value is None
+                    or labels.is_placeholder(value)
+                ):
                     continue
                 same = _norm(value) if isinstance(value, str) else value
                 if first_seen.setdefault(name, same) != same:
                     disagree.add(name)
                 if name in fields:
                     continue
-                field = _field(document.id, number, page, name, value, snippets)
+                field = _field(
+                    document.id, number, page, name, value, snippets, kind.value
+                )
                 if field is not None:
                     fields[name] = field
             if has_lines:

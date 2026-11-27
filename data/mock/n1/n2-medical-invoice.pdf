@@ -1,0 +1,160 @@
+%PDF-1.4
+%“Œ‹ž ReportLab Generated PDF document (opensource)
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/Contents 8 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 7 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+5 0 obj
+<<
+/PageMode /UseNone /Pages 7 0 R /Type /Catalog
+>>
+endobj
+6 0 obj
+<<
+/Author () /CreationDate (D:20000101000000+00'00') /Creator (anonymous) /Keywords () /ModDate (D:20000101000000+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (unspecified) /Title (Statement of medical services) /Trapped /False
+>>
+endobj
+7 0 obj
+<<
+/Count 1 /Kids [ 4 0 R ] /Type /Pages
+>>
+endobj
+8 0 obj
+<<
+/Length 3071
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+.05 .45 .45 rg
+n 0 823.8898 595.2756 18 re f*
+0 0 0 rg
+BT /F2 18 Tf 21.6 TL ET
+BT 1 0 0 1 56 785.8898 Tm (Hausarztzentrum Seewinkel AG) Tj T* ET
+BT /F1 8.5 Tf 10.2 TL ET
+BT 1 0 0 1 56 769.8898 Tm (Seewinkelstrasse 14, 6403 Kuessnacht) Tj T* ET
+BT /F1 8.5 Tf 10.2 TL ET
+BT 1 0 0 1 56 758.8898 Tm (Tel. +41 41 555 63 08  |  billing@seewinkel.example) Tj T* ET
+BT /F1 8.5 Tf 10.2 TL ET
+BT 1 0 0 1 56 747.8898 Tm (UID CHE-418.903.276  |  IBAN CH62 0838 7000 4417 2950 3) Tj T* ET
+.05 .45 .45 RG
+n 56 729.8898 m 539.2756 729.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 691.8898 Tm (Ramon Gasser) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 678.8898 Tm (Bachtelweg 5) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 665.8898 Tm (6340 Baar) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 652.8898 Tm (Switzerland) Tj T* ET
+BT /F2 9 Tf 10.8 TL ET
+BT 1 0 0 1 330 691.8898 Tm (Date:) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 420 691.8898 Tm (2026-08-21) Tj T* ET
+BT /F2 9 Tf 10.8 TL ET
+BT 1 0 0 1 330 678.8898 Tm (Patient no.:) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 420 678.8898 Tm (P-60417) Tj T* ET
+BT /F2 9 Tf 10.8 TL ET
+BT 1 0 0 1 330 665.8898 Tm (Insured no.:) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 420 665.8898 Tm (756.4821.9937.05) Tj T* ET
+BT /F2 9 Tf 10.8 TL ET
+BT 1 0 0 1 330 652.8898 Tm (Billing:) Tj T* ET
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 420 652.8898 Tm (Patient pays) Tj T* ET
+BT /F2 16 Tf 19.2 TL ET
+BT 1 0 0 1 56 601.8898 Tm (Statement of medical services) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 56 579.8898 Tm (Patient:) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 170 579.8898 Tm (Ramon Gasser) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 56 563.8898 Tm (Doctor:) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 170 563.8898 Tm (Dr. med. Livio Andermatt) Tj T* ET
+.933333 .933333 .933333 rg
+n 52 520.8898 491.2756 17 re f*
+0 0 0 rg
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 56 525.8898 Tm (Service) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 350 525.8898 Tm (Qty) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 410 525.8898 Tm (Unit \(CHF\)) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 471.5156 525.8898 Tm (Amount \(CHF\)) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 519.8898 m 543.2756 519.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 507.8898 Tm (General check-up, 20 min) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 507.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 507.8898 Tm (74.30) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 514.2556 507.8898 Tm (74.30) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 501.8898 m 543.2756 501.8898 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 56 489.8898 Tm (Blood test, basic panel) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 350 489.8898 Tm (1) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 410 489.8898 Tm (58.90) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 514.2556 489.8898 Tm (58.90) Tj T* ET
+.827451 .827451 .827451 RG
+n 52 483.8898 m 543.2756 483.8898 l S
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 330 465.8898 Tm (Total) Tj T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 485.3656 465.8898 Tm (CHF 133.20) Tj T* ET
+ 
+endstream
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000061 00000 n 
+0000000102 00000 n 
+0000000209 00000 n 
+0000000321 00000 n 
+0000000524 00000 n 
+0000000592 00000 n 
+0000000865 00000 n 
+0000000924 00000 n 
+trailer
+<<
+/ID 
+[<008ff098b2b452363e11ff68e6f7802b><008ff098b2b452363e11ff68e6f7802b>]
+% ReportLab generated PDF document -- digest (opensource)
+
+/Info 6 0 R
+/Root 5 0 R
+/Size 9
+>>
+startxref
+4046
+%%EOF

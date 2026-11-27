@@ -1,0 +1,32 @@
+{
+  "document_type": "medical_report",
+  "fields": [
+    {
+      "name": "patient_name",
+      "value": "Nadine Caflisch",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Nadine Caflisch"
+    },
+    {
+      "name": "diagnosis",
+      "value": "acute bronchitis",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "acute bronchitis"
+    },
+    {
+      "name": "provider",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    },
+    {
+      "name": "treatment_date",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    }
+  ],
+  "line_items": []
+}

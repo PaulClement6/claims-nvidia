@@ -1,0 +1,89 @@
+{
+  "set": "n1",
+  "version": 1,
+  "issue": 125,
+  "purpose": "Safety set of issue #125: documents in which some fields are absent. A reader must give no value for an absent field (value null in the answer key).",
+  "documents": [
+    {
+      "file": "n1-repair-invoice.pdf",
+      "document_type": "repair_invoice",
+      "kind": "text",
+      "absent": {
+        "invoice_number": "plain",
+        "invoice_date": "plain"
+      }
+    },
+    {
+      "file": "n2-medical-invoice.pdf",
+      "document_type": "medical_invoice",
+      "kind": "text",
+      "absent": {
+        "invoice_number": "lure"
+      }
+    },
+    {
+      "file": "n3-repair-quote.pdf",
+      "document_type": "repair_quote",
+      "kind": "text",
+      "absent": {
+        "total": "plain",
+        "quote_date": "lure"
+      }
+    },
+    {
+      "file": "n4-booking-confirmation.pdf",
+      "document_type": "booking_confirmation",
+      "kind": "text",
+      "absent": {
+        "booking_reference": "lure",
+        "trip_price": "plain"
+      }
+    },
+    {
+      "file": "n5-cancellation-confirmation.pdf",
+      "document_type": "cancellation_confirmation",
+      "kind": "text",
+      "absent": {
+        "refund_received": "lure"
+      }
+    },
+    {
+      "file": "n6-medical-report.pdf",
+      "document_type": "medical_report",
+      "kind": "text",
+      "absent": {
+        "provider": "lure",
+        "treatment_date": "plain"
+      }
+    },
+    {
+      "file": "n7-booking-confirmation-scan.pdf",
+      "document_type": "booking_confirmation",
+      "kind": "scan",
+      "absent": {
+        "booking_reference": "plain",
+        "trip_price": "plain",
+        "departure_date": "plain"
+      }
+    },
+    {
+      "file": "n8-repair-invoice-photo.jpg",
+      "document_type": "repair_invoice",
+      "kind": "photo",
+      "absent": {
+        "invoice_number": "lure",
+        "customer_name": "plain"
+      }
+    },
+    {
+      "file": "n9-receipt-scan.pdf",
+      "document_type": "receipt",
+      "kind": "scan",
+      "absent": {
+        "amount_paid": "plain"
+      }
+    }
+  ],
+  "absent_fields": 16,
+  "present_fields": 23
+}

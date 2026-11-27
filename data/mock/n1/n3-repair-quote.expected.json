@@ -1,0 +1,58 @@
+{
+  "document_type": "repair_quote",
+  "fields": [
+    {
+      "name": "quote_number",
+      "value": "RB-Q-2731",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "RB-Q-2731"
+    },
+    {
+      "name": "repair_company",
+      "value": "Rietmann Bedachungen GmbH",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Rietmann Bedachungen GmbH"
+    },
+    {
+      "name": "customer_name",
+      "value": "Corinne Baumli",
+      "confidence": 1.0,
+      "page": 1,
+      "snippet": "Corinne Baumli"
+    },
+    {
+      "name": "total",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    },
+    {
+      "name": "quote_date",
+      "value": null,
+      "confidence": 1.0,
+      "page": 1
+    }
+  ],
+  "line_items": [
+    {
+      "description": "Replace roof tiles",
+      "quantity": 12,
+      "unit_price": 18.4,
+      "amount": 220.8
+    },
+    {
+      "description": "Scaffold, one day",
+      "quantity": 1,
+      "unit_price": 345.0,
+      "amount": 345.0
+    },
+    {
+      "description": "Repair the gutter, per metre",
+      "quantity": 3,
+      "unit_price": 41.7,
+      "amount": 125.1
+    }
+  ]
+}
